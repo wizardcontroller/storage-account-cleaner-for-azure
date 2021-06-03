@@ -1,0 +1,29 @@
+﻿@model com.ataxlab.azure.table.retention.models.TableStorageEntityRetentionPolicy
+@if (@Model == null)
+{
+    <span>no data available.</span>
+}
+else
+{
+    <div>
+        <h4>Table Storage Entity Retention Policy</h4>
+        <hr />
+
+        <dl class="container">
+            <dt class="col-sm-2">
+                <span>policy enforcement mode</span>
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.PolicyEnforcementMode)
+            </dd>
+
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.NumberOfDays)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.NumberOfDays)
+            </dd>
+        </dl>
+    </div>
+
+}

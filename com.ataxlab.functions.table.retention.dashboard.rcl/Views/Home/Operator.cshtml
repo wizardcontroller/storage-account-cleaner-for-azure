@@ -1,0 +1,16 @@
+﻿@using com.ataxlab.azure.table.retention.models.models.pagemodel
+@model OperatorPageModel
+
+@{
+    ViewData["Title"] = "Operator";
+}
+
+@{
+    if (this.Context.User.Identity.IsAuthenticated)
+
+    {
+        @await Html.PartialAsync("_OperatorPartial", Model)
+
+    }
+}
+

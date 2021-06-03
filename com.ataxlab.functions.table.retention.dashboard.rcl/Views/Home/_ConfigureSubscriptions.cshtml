@@ -1,0 +1,67 @@
+﻿@model IEnumerable<com.ataxlab.azure.table.retention.models.models.azuremanagement.SubscriptionDTO>
+@using com.ataxlab.functions.table.retention.dashboard.Controllers;
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="container">
+        <div>
+            <span>CHOOSE CONFIGURATION</span>
+        </div>
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>
+                        <span>is selected</span>
+                    </th>
+                    <th>
+                        details
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.displayName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.state)
+                    </th>
+                    <th>menu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IsSelected)
+                            <hr />
+                        </td>
+                        <td>
+                            <div>
+                                <div><span>Subscription ID</span></div>
+                                <span>@Html.DisplayFor(modelItem => item.subscriptionId)</span>
+                                <hr />
+                                <div><span>Tenant ID</span></div>
+                                <span>@Html.DisplayFor(modelItem => item.tenantId)</span>
+                            </div>
+                        </td>
+
+                        <td valign="top" style=" width: 10em; overflow-x: auto; white-space: nowrap;">
+                            <span>@Html.DisplayFor(modelItem => item.displayName)</span>
+                            <hr />
+                        </td>
+                        <td valign="top">
+                            @Html.DisplayFor(modelItem => item.state)
+                            <hr />
+                        </td>
+                        <td class="ui-state-hover" valign="bottom">
+
+                            <a asp-controller="home"
+                               asp-action="selectsubscription"
+                               asp-route-oid="@item.RequestingAzureAdUserOid"
+                               asp-route-subscriptionid="@item.subscriptionId">Select</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

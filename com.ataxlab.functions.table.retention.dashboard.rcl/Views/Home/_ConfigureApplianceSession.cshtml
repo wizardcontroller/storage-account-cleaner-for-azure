@@ -1,0 +1,86 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.auth.ApplianceSessionContext
+@using  com.ataxlab.functions.table.retention.dashboard.Controllers;
+@using com.ataxlab.azure.table.retention.models.models.azuremanagement;
+<!-- beginning of configure appliance session-->
+
+<style type="text/css">
+    body {
+        font-family: Arial;
+        font-size: 10pt;
+    }
+
+    .error {
+        color: red;
+        display: none;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnSubmit").click(function () {
+            console.log("validating storage account checkboxes");
+            var checked_checkboxes = $("#storageAccountChooserTbl input[type=checkbox]:checked");
+            if (checked_checkboxes.length == 0) {
+                console.log("storage account selecton failed validation")
+                $(".error").show();
+                return false;
+            }
+            console.log("storage account selecton passed validation")
+
+            return true;
+        });
+    });
+</script>
+@{
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h4>Configure Appliance Context</h4>
+        <hr />
+
+        <div class="container">
+            <div class="container">
+                @if (Model.AvailableSubscriptions == null || Model.AvailableSubscriptions.Count() == 0 && Model.SelectedSubscription == null )
+                {
+                    <span>no subscriptions available</span>
+                }
+                else
+                {
+                    <div id="AvailableSubscriptionsContainer">
+                        @await Html.PartialAsync("_ConfigureSubscriptions", Model.AvailableSubscriptions)
+                    </div>
+                }
+                <hr />
+                @* // show the storage accounts only when a subscription is selected*@
+                @if (!String.IsNullOrEmpty(Model.SelectedSubscriptionId))
+                {
+                    <form asp-controller="home" asp-action="configureappliance" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <span class="error">please select at least 1 storage account</span>
+
+                        @Html.AntiForgeryToken()
+                        <div class="row" id="ApplianceSessionContextContainer">
+                            <!-- begin wrapper for ApplianceSessionContext editor-->
+                            @Html.EditorForModel()
+                            <!-- end wrapper for ApplianceSessionContext editor-->
+                        </div>
+
+
+                        @if (Model.AvailableStorageAccounts?.Count > 0)
+                        {
+                            <div class="form-group">
+                                <input id="btnSubmit" type="submit" value="Save" class="btn btn-primary" />
+                            </div>
+                        }
+                    </form>
+                }
+
+            </div>
+        </div>
+
+        @section Scripts {
+            @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        }
+    }
+
+}
+
+<!-- end of configure appliance session-->

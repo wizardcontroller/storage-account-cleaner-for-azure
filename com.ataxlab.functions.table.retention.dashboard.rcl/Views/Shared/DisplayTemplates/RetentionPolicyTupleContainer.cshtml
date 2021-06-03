@@ -1,0 +1,30 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.auth.RetentionPolicyTupleContainer
+
+
+
+<div class="container" style="overflow:auto">
+    <h4>Policy </h4>
+    <hr />
+
+    <div>
+        <dl class="row">
+
+            <div style="overflow:auto">
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.StorageAccount)
+                </dd>
+            </div>
+        </dl>
+    </div>
+
+    <div>
+        <dl class="container">
+
+            <div style="overflow:auto">
+                <dd class="container">
+                    @Html.DisplayFor(model => model.TableStorageRetentionPolicy)
+                </dd>
+            </div>
+        </dl>
+    </div>
+</div>

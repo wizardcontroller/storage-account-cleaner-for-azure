@@ -1,0 +1,94 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.auth.ApplianceJobOutput
+@using com.ataxlab.azure.table.retention.models;
+@using com.ataxlab.azure.table.retention.models.models;
+@if (Model == null)
+{
+    <span>no job output available</span>
+
+}
+else
+{
+
+
+
+    foreach (var job in Model.RetentionPolicyJobs)
+    {
+
+        <script>
+                    // begin retention policy job specific script
+                    var viewportWidth = window.innerWidth - 20;
+                    var viewportHeight = window.innerHeight - 20;
+                    if (viewportWidth > 1000) viewportWidth = 1000;
+                    if (viewportHeight > 500) viewportHeight = 500;
+
+                    $(document).ready(function () {
+                        var dialogElement = "#RetentionSurfaceDialog@{@job.Id}";
+                        var dialogButtonElement = "#RetentionSurfaceDialogButton@{@job.Id}";
+                        // initialize retention policy editor dialogs
+                        $(dialogElement).dialog({
+                                        height: viewportHeight,
+                            width: viewportWidth,
+                            autoOpen: false,
+                            modal: true,
+                            title: "Retention Surface Viewer",
+                            position: {
+
+                                            my: "center",
+                                at: "center",
+                                of: window,
+                                collision: "none",
+                                create: function (event, ui) {
+                                    $(event.target).parent().css('position', 'fixed');
+                                }
+                            }
+
+                        });
+
+                        // set up the dialog editor button
+                        $(dialogButtonElement).click(function () {
+                            $(dialogElement).dialog("open");
+                            });
+                    });
+                    // end retention policy job specific script
+
+        </script>
+        <div class="custom-control border-info" style="border: groove; background-color:green">
+            <h4>Job Output For Storage Account: @job.StorageAccount.Name</h4>
+            <hr />
+
+            <div class="container">
+
+                <input class="ui-button" id="RetentionSurfaceDialogButton@{@job.Id}" value="DISPLAY" />
+                <br/>
+                <div>@job.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.Count policy managed metrics items</div>
+                <div>@job.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.Where(w => w.ItemExists == true).ToList().Count() metrics items exist</div>
+
+                <div>@job.TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Count policy managed diagnostics items</div>
+                <div>@job.TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.ItemExists == true).ToList().Count() diagnostics items exist</div>
+                <div id="RetentionSurfaceDialog@{@job.Id}" class="alert-dismissible">
+                    <span>Diagnostics Retention Surface</span>
+                    <div class="custom-control border-info" style="border: groove; background-color: burlywood; overflow-y: scroll; height:300px">
+                        @Html.DisplayFor(m => job.TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities)
+                    </div>
+                    <span>Metrics Retention Surface</span>
+                    <div class="custom-control border-info" style="border: groove; background-color: burlywood; overflow-y: scroll; height: 300px">
+                        @{
+                            var trimmedSet = job.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.Take(20);
+                        }
+                        @Html.DisplayFor(m => trimmedSet)
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                @Html.DisplayFor(m => job.TableStoragePolicyEnforcementResult)
+            </div>
+
+
+            <div>
+                @Html.DisplayFor(m => job.TableStorageEntityPolicyEnforcementResult)
+            </div>
+
+        </div>
+    }
+}

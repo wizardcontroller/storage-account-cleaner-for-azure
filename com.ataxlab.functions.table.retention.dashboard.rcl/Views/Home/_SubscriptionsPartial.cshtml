@@ -1,0 +1,69 @@
+﻿@model IEnumerable<com.ataxlab.azure.table.retention.models.models.azuremanagement.SubscriptionDTO>
+@using com.ataxlab.azure.table.retention.models.control;
+
+@{ if (Model?.Count() > 0)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.displayName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.authorizationSource)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.subscriptionId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.tenantId)
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => model.state)
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="ConfigureAppliance" asp-controller="Home">Change Subscription</a>
+                           
+                        </td>
+                        <td>
+                            <label for="subscriptionradio@{@item.subscriptionId}"> @Html.DisplayFor(modelItem => item.displayName)</label>
+                            @*<input class="subscriptionradio" type="radio" click="SetSubscriptionHeader('#SubscriptionTitle',@item.subscriptionId)" name="subscriptionradio@{@item.subscriptionId}" id="subscriptionradio@{@item.subscriptionId}" value="@item.subscriptionId" />*@
+                            <input class="subscriptionradio" checked type="radio" name="subscriptionradio@{@item.subscriptionId}" id="subscriptionradio@{@item.subscriptionId}" value="@item.subscriptionId" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.authorizationSource)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.subscriptionId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.tenantId)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.state)
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div>
+            <div>Subscriptions Are Unavailable. Check Your Permissions And Signin Again</div>
+
+        </div>
+    }
+}
+

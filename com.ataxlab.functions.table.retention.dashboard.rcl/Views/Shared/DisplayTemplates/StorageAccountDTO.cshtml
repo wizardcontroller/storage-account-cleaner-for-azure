@@ -1,0 +1,47 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.azuremanagement.StorageAccountDTO
+
+<div class="container" style="font-size: 12px" >
+    <h4>Storage Account : @Html.DisplayFor(model => model.Name)</h4>
+    <hr />
+    <div class="container">
+        <dl class="container">
+
+            <dt >
+                <span>Storage Account Kind: </span><span>@Html.DisplayFor(model => model.StorageAccountKind)</span>
+
+            </dt>
+
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Location)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Location)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.StorageAccountType)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.StorageAccountType)
+            </dd>
+            <dt class="col-sm-2">
+                <span>SKU Name</span>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.SkuName)
+            </dd>
+            <dt class="col-sm-2">
+                <span>Tenant ID</span>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TenantId)
+            </dd>
+        </dl>
+    </div>
+</div>
+

@@ -1,0 +1,235 @@
+﻿@using com.ataxlab.azure.table.retention.models.models.pagemodel
+@using  com.ataxlab.azure.table.retention.models.control
+@model OperatorPageModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@if (User.Identity.IsAuthenticated && Model != null && Model.Subscriptions != null && Model.Subscriptions.Count > 0)
+{
+    @if (this.Context.User.Identity.IsAuthenticated)
+    {
+        <script>
+ $(document).ready(function () {
+     UpdateWorkflowTimestamp("#AccordionTimestamp");
+
+    $("#ResetState").click(function () {
+        DeleteEntityState();
+        $('#Timestamp').html('');
+        $('#Timestamp').append('updating...');
+        location.reload();
+
+        //setTimeout(UpdateWorkflowTimestamp, 60000);
+        // UpdateWorkflowTimestamp();
+    });
+
+     $("#accordion").accordion({
+         heightStyle: "content"
+     });
+});
+
+
+    $(function () {
+        $("#accordion").accordion();
+    });
+
+
+ $(document).ready(function () {
+    UpdateWorkflowTimestamp("#Timestamp");
+
+    $("#ResetState").click(function () {
+        DeleteEntityState();
+        $('#Timestamp').html('');
+        $('#Timestamp').append('updating...');
+        location.reload();
+        //setTimeout(UpdateWorkflowTimestamp, 60000);
+        // UpdateWorkflowTimestamp();
+    });
+});
+
+
+            function UpdateWorkflowTimestamp(targetElement) {
+
+                //$('#Timestamp').html('');
+                //$('#Timestamp').append('updating...');
+
+                var element = targetElement;
+            $(element).html('');
+                $(element).append('updating...');
+
+
+        $.ajax({
+            type: "GET",
+            url: "@Model.ApplianceUrl.FirstOrDefault()@Model.QueryWorkflowCheckpointStatusEndpoint",
+            data: JSON.stringify(""),
+            headers: {
+                "X-ZUMO-AUTH": "@Model.EasyAuthAccessToken",
+                "credentials": "include",
+                "mode": "cors"
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                //alert(JSON.stringify(data));
+                //$("#DIV").html('');
+
+                $(element).html('');
+                $(element).append(data.TimeStamp);
+
+                console.log(JSON.stringify(data));
+            }, //End of AJAX Success function
+
+            failure: function (data) {
+                // alert(data.responseText);
+            }, //End of AJAX failure function
+            error: function (data) {
+                console.error("failed to call endpoint");
+                //alert(data.responseText);
+            } //End of AJAX error function
+
+        });
+}
+
+    function DeleteEntityState() {
+        console.log("deleting entity state");
+    $.ajax({
+        type: "delete",
+        @*url: "@Model.ApplianceUrl.FirstOrDefault()@ControlChannelConstants.DeleteWorkflowCheckpointEditModeEndPoint",*@
+        url: "@Model.ApplianceUrl.FirstOrDefault()@Model.ResetDeviceUrl",
+        headers: {
+            "X-ZUMO-AUTH": "@Model.EasyAuthAccessToken",
+            "credentials": "include",
+            "mode": "cors"
+        },
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data) {
+            //alert(JSON.stringify(data));
+            console.log("reset entity state");
+            console.log(JSON.stringify(data));
+        }, //End of AJAX Success function
+
+        failure: function (data) {
+            // alert(data.responseText);
+            console.log("failed to reset entity state");
+        }, //End of AJAX failure function
+        error: function (data) {
+            console.warn("failed to call the endpoint")
+            //alert(data.responseText);
+        } //End of AJAX error fuModelction
+
+    });
+
+}
+
+        </script>
+    }
+    <div id="accordion">
+        <h3 id="SubscriptionTitle">Subscriptions</h3>
+        <div>
+
+            @await Html.PartialAsync("_SubscriptionsPartial", Model.Subscriptions)
+        </div>
+        <h3>Appliance @Model.ApplianceUrl.FirstOrDefault()</h3>
+        <div>
+            <div>
+                <span onclick="UpdateWorkflowTimestamp('#AccordionTimestamp');">Checkpoint Timestamp</span><span>&nbsp;</span><span id="AccordionTimestamp"> </span>
+                <input type="button" id="ResetState" title="Reset State" value="Reset State" />
+            </div>
+
+        </div>
+        @if (Model.AvailableCommands == null)
+        {
+            <h3>Available Commands</h3>
+            <div>
+
+                <span>no data available</span>
+            </div>
+        }
+        else
+        {
+            <h3>Available Commands</h3>
+            <div>
+
+                @await Html.PartialAsync("_AvailableCommands", Model?.AvailableCommands)
+            </div>
+        }
+        <h3>Appliance Context</h3>
+        <div style="background-color: whitesmoke">
+            <div>
+
+                <script>
+
+                    var viewportWidth = window.innerWidth - 20;
+                    var viewportHeight = window.innerHeight - 20;
+                    if (viewportWidth > 1000) viewportWidth = 1000;
+                    if (viewportHeight > 500) viewportHeight = 500;
+
+                    $(document).ready(function () {
+                        var dialogElement = "#RetentionPolicyEditorDialog";
+                        var dialogButtonElement = "#RetentionPolicyEditorButton";
+                        // initialize retention policy editor dialogs
+                        $(dialogElement).dialog({
+                            height: viewportHeight,
+                            width: viewportWidth,
+                            autoOpen: false,
+                            modal: true,
+                            title : "Retention Policy Editor",
+                            position: {
+
+                                my: "center",
+                                at: "center",
+                                of: window,
+                                collision: "none",
+                                create: function (event, ui) {
+                                    $(event.target).parent().css('position', 'fixed');
+                                }
+                            }
+
+                        });
+
+                        // set up the dialog editor button
+                        $(dialogButtonElement).click(function () {
+                            $(dialogElement).dialog("open");
+                        });
+                    });
+
+                </script>
+
+                @if (Model.ApplianceSessionContext != null &&
+                  Model.ApplianceSessionContext.CurrentJobOutput != null &&
+                    Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs != null &&
+                  Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs.Count() > 0)
+                {
+                    <div>
+                        <hr />
+                        <a href="#" id="RetentionPolicyEditorButton">SHOW RETENTION POLICY EDITORS</a>
+                        <hr />
+                    </div>
+
+                    <div class="container border-warning" id="RetentionPolicyDialogContainer">
+
+                        <div id="RetentionPolicyEditorDialog" style="height:350px; overflow: scroll">
+                            @Html.EditorFor(m => Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs)
+                        </div>
+
+
+                    </div>
+                }
+
+                <div class="border-dark">
+                    @await Html.PartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext)
+                </div>
+
+            </div>
+        </div>
+
+        <h3>Orchestration Status</h3>
+        <div>
+            @await Html.PartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations)
+        </div>
+    </div>
+}
+else
+{
+    <span>no data is available. check your permissions and sign in again.</span>
+}

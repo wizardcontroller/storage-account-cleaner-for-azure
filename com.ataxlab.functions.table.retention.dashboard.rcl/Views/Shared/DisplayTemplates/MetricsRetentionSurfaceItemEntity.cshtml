@@ -1,0 +1,65 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.MetricsRetentionSurfaceItemEntity
+
+<div>
+    <span>table name: @Html.DisplayFor(m => m.TableName)</span>
+    <hr />
+    <div style="font-size:12px;">
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.PolicyAgeTriggerInMonths)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.PolicyAgeTriggerInMonths)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ItemType)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ItemType)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ItemDescription)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ItemDescription)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ItemExists)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ItemExists)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ItemWillBeDeleted)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ItemWillBeDeleted)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.StorageAccountId)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.StorageAccountId)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.SuscriptionId)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.SuscriptionId)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.TableName)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TableName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DocumentationLink)
+            </dt>
+            <dd class="col-sm-10">
+                <a href="@Html.DisplayFor(model => model.DocumentationLink)" target="_blank">Azure Documentation</a>
+            </dd>
+        </dl>
+    </div>
+</div>
+

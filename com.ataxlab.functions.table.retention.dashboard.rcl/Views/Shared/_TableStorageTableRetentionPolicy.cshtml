@@ -1,0 +1,29 @@
+﻿@model com.ataxlab.azure.table.retention.models.TableStorageTableRetentionPolicy
+
+@if (Model == null)
+{
+    <span>no data available.</span>
+}
+else
+{
+    <div>
+        <h4>Table Storage Table Retention Policy</h4>
+        <hr />
+        <dl class="container">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.PolicyEnforcementMode)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.PolicyEnforcementMode)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DeleteOlderTablesThanCurrentMonthMinusThis)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.DeleteOlderTablesThanCurrentMonthMinusThis)
+            </dd>
+        </dl>
+    </div>
+    <hr />
+
+}

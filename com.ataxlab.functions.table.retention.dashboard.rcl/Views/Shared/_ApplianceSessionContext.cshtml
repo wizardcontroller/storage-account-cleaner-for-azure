@@ -1,0 +1,20 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.auth.ApplianceSessionContext
+@using  com.ataxlab.azure.table.retention.models;
+
+@if (Model == null)
+{
+    <span>no data available.</span>
+}
+else
+{
+<div class="container">
+    <h4>Appliance Context</h4>
+    <hr />
+
+    <hr />
+    @Html.DisplayForModel()
+
+
+</div>
+
+}

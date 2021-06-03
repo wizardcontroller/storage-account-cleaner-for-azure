@@ -1,0 +1,32 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.auth.ApplianceSessionContext
+
+<div>
+    <div>Storage Accounts</div>
+
+    <ul>
+        @foreach (var item in Model.SelectedStorageAccounts)
+        {
+            <li><span>@item.Name</span></li>
+        }
+    </ul>
+    <dl class="row" style="font-size: 10px">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TenantId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TenantId)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserOid)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserOid)
+        </dd>
+    </dl>
+</div>
+<div>
+    @*@await Html.PartialAsync("_ApplianceJobOutput", Model.CurrentJobOutput)*@
+    @Html.DisplayFor(m => Model.CurrentJobOutput)
+</div>
+

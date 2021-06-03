@@ -1,0 +1,48 @@
+﻿@model IEnumerable<com.ataxlab.azure.table.retention.models.control.AvailableCommand>
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div>
+        <hr />
+        <p>
+            <span class="small">available operations - reported by the appliance</span>
+        </p>
+
+    </div>
+    <table class="table small">
+        <thead>
+            <tr>
+                <th>
+                    <span>Workflow Operation</span>
+                </th>
+                <th>
+                    <span>Display Message</span>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorkflowOperation)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorklowOperationDisplayMessage)
+                    </td>
+                    <td>
+                        <a 
+                           asp-controller="home"
+                           asp-action="selectcommand"
+                           asp-route-oid="@item.UserOid"
+                           asp-route-subscriptionId="@item.SubscriptionId"
+                           asp-route-tenantid="@item.TenantId" 
+                           asp-route-workflowoperation="@item.WorkflowOperation"
+                           asp-route-commandId="@item.AvailableCommandId">@item.MenuLabel.ToString()</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

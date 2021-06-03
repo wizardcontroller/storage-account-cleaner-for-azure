@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "com.ataxlab.functions.table.retention.appliance": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 31889,
+      "useSSL": false
+    }
+  }
+}

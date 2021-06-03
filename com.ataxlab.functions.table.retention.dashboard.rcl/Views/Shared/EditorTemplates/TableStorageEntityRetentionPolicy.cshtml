@@ -1,0 +1,25 @@
+﻿@model com.ataxlab.azure.table.retention.models.TableStorageEntityRetentionPolicy
+@using com.ataxlab.azure.table.retention.models;
+@using com.ataxlab.azure.table.retention.models.models.auth;
+@using com.ataxlab.azure.table.retention.models.models.pagemodel;
+
+<div>
+    <h4>Table Storage Entity Retention Policy Editor </h4>
+    <span>Id: @Model.Id</span>
+    <hr />
+    <div>
+        <div class="form-group">
+            <span>@Html.DisplayNameFor(model => model.PolicyEnforcementMode)</span>
+            @Html.EditorFor(model => model.PolicyEnforcementMode)
+
+
+            <span asp-validation-for="PolicyEnforcementMode" class="text-danger"></span>
+        </div>
+        <div>
+            <span>@Html.DisplayNameFor(model => model.NumberOfDays)</span>
+            @Html.EditorFor(model => model.NumberOfDays)
+        </div>
+    </div>
+
+</div>
+

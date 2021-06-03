@@ -1,0 +1,49 @@
+﻿@model com.ataxlab.azure.table.retention.models.TableStorageRetentionPolicy
+@using com.ataxlab.azure.table.retention.models;
+@using com.ataxlab.azure.table.retention.models.models.auth;
+@using com.ataxlab.azure.table.retention.models.models.pagemodel;
+
+@if (Model == null)
+{
+    <span>no data available</span>
+}
+else
+{
+
+    var retentionPolicyTupleContainer = ViewData["RetentionPolicyTupleContainer"] as RetentionPolicyTupleContainer;
+    var operatorPageModel = ViewData["OperatorPageModel"] as OperatorPageModel;
+
+    <div class="container border-danger">
+
+        <span>Id: @Model.Id</span>
+        <form asp-action="TableStorageTableRetentionPolicy">
+            <div>
+
+                <hr />
+                <div class="border-danger" style="font-size: 10px">
+
+                    @Html.EditorFor(m => Model.TableStorageEntityRetentionPolicy)
+
+                </div>
+                <div style="font-size: 10px">
+
+                    @Html.EditorFor(m => Model.TableStorageTableRetentionPolicy)
+
+                </div>
+            </div>
+
+            <div>
+                @Html.HiddenFor(m => retentionPolicyTupleContainer.StorageAccount.TenantId)
+                @Html.HiddenFor(m => retentionPolicyTupleContainer.StorageAccount.Id)
+                @Html.HiddenFor(m => retentionPolicyTupleContainer.Id)
+                @Html.HiddenFor(m => operatorPageModel.ApplianceSessionContext.UserOid)
+                @Html.HiddenFor(m => operatorPageModel.ApplianceSessionContext.SelectedSubscriptionId)
+            </div>
+            <div class="form-group">
+
+                <input type="submit" value="Update @retentionPolicyTupleContainer.StorageAccount.Name  Policy " class="btn btn-primary" />
+
+            </div>
+        </form>
+    </div>
+}

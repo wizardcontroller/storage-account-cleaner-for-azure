@@ -1,0 +1,58 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.azuremanagement.StorageAccountDTO
+
+    <div class="form-row" style="max-width:100%">
+        <h4>@Model.Name</h4>
+        <hr />
+        <table id="storageAccountChooserTbl" class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <span>is selected</span>
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Location)
+                    </th>
+                    <th>
+                        details
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => model.SkuName)
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>
+                        @Html.EditorFor(modelItem => modelItem.IsSelected)
+
+                        <hr />
+                        @Html.HiddenFor(modelItem => modelItem.Id)
+                        @Html.HiddenFor(modelItem => modelItem.Location)
+                        @Html.HiddenFor(modelItem => modelItem.Name)
+                        @Html.HiddenFor(modelItem => modelItem.RequestingAzureAdUserOid)
+                        @Html.HiddenFor(modelItem => modelItem.SkuName)
+                        @Html.HiddenFor(modelItem => modelItem.StorageAccountKind)
+                        @Html.HiddenFor(modelItem => modelItem.StorageAccountType)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Location)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.Name)
+                        <hr />
+                        @Html.DisplayFor(modelItem => modelItem.Id)
+
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem.SkuName)
+                    </td>
+
+                </tr>
+
+            </tbody>
+        </table>
+    </div>

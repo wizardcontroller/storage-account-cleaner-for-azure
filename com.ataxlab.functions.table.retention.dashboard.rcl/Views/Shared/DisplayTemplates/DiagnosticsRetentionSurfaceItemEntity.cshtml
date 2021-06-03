@@ -1,0 +1,58 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.DiagnosticsRetentionSurfaceItemEntity
+
+<div class="ui-controlgroup" style="width:100%">
+    <hr/
+    <span>Table Name: @Html.DisplayFor(model => model.TableName)</span>
+    <hr />
+    <dl class="flex-xl-row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ItemDescriptor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ItemDescriptor)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ItemType)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ItemType)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ItemDescription)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ItemDescription)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ItemExists)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ItemExists)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ItemWillBeDeleted)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ItemWillBeDeleted)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StorageAccountId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StorageAccountId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SuscriptionId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SuscriptionId)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DocumentationLink)
+        </dt>
+        <dd class="col-sm-10">
+            <a target="_blank" href="@Html.DisplayFor(model => model.DocumentationLink)">Azure Documentation</a>
+        </dd>
+    </dl>
+</div>

@@ -1,0 +1,53 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.auth.ApplianceSessionContext
+@using com.ataxlab.azure.table.retention.models.models.azuremanagement
+
+@if (Model == null || Model.AvailableStorageAccounts == null || Model.AvailableStorageAccounts.Count() == 0)
+{ 
+    // broken state - show nothing
+}
+else
+{
+
+        <div class="container">
+            <!-- beginning of ApplianceSessionContext editor-->
+            <h4>Configure Appliance Storage Accounts</h4>
+            <hr />
+
+
+            <div class="container-fluid overflow-auto" style="max-height:350px; max-width:100%;" id="StorageAccountChooser">
+                <!-- beginning of AvailableStorageAccounts editor-->
+                <table id="AvailableStorageAccountsWrapperTable" class="table">
+                    <tr>
+                        <td>@Html.EditorFor(e => e.AvailableStorageAccounts)</td>
+                    </tr>
+                    <!-- end of AvailableStorageAccounts editor-->
+                    @*@Html.HiddenFor(e => e.SelectedStorageAccounts)*@
+
+                </table>
+                @Html.HiddenFor(e => e.AvailableSubscriptions)
+            </div>
+            <div style="display:none;" id="NonDisplay">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <label asp-for="SelectedSubscriptionId" class="control-label"></label>
+                    <input hidden asp-for="SelectedSubscriptionId" />
+                    <span asp-validation-for="SelectedSubscriptionId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SelectedStorageAccountId" class="control-label"></label>
+                    <input hidden asp-for="SelectedStorageAccountId" class="form-control" />
+                    <span asp-validation-for="SelectedStorageAccountId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="UserOid" class="control-label"></label>
+                    <input hidden asp-for="UserOid" class="form-control" />
+                    <span asp-validation-for="UserOid" class="text-danger"></span>
+                </div>
+
+
+            </div>
+
+        </div>
+    }
+
+    <!-- end of ApplianceSessionContext editor-->

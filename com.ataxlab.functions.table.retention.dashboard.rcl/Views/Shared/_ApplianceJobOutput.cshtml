@@ -1,0 +1,17 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.auth.ApplianceJobOutput
+
+@if (Model == null)
+{
+    <span>no data available.</span>
+}
+else
+{
+    <div>
+        <h4>Appliance Job Output</h4>
+        <hr />
+        <dl class="container">
+            @Html.DisplayForModel()
+        </dl>
+    </div>
+
+}

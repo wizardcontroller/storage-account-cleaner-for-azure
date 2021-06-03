@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="com.ataxlab.azure.table.retention.state.entities.ApplianceSessionContextEntity">
+    <Position X="0.5" Y="1.75" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAIkAQJAAAAAAAAKYAAAFAACAEAAIBAAIgBAo=</HashCode>
+      <FileName>entities\ApplianceSessionContextEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="com.ataxlab.azure.table.retention.state.entities.ApplianceContextPersistResult" Collapsed="true">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>entities\ApplianceSessionContextEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.azure.table.retention.state.entities.ApplianceSessionContextEntityBase" Collapsed="true">
+    <Position X="1.25" Y="0.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAACAACAAAAYAAAAAAAAAAQAAAAAAAEAAAAgAAAAAAA=</HashCode>
+      <FileName>entities\ApplianceSessionContextEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.azure.table.retention.state.entities.StorageAccountEntity" Collapsed="true">
+    <Position X="7" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAgAAAEAQAAAIAAgQAAAAABAAAACAgAAABAAA=</HashCode>
+      <FileName>entities\StorageAccountEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.azure.table.retention.state.entities.WorkflowCheckpoint" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAogICAEAAAAAIAAAAAAIKAAAUAAAgAAAAQIAAEAAo=</HashCode>
+      <FileName>entities\WorkflowCheckpoint.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="com.ataxlab.azure.table.retention.state.entities.WorkflowCheckpointEditMode" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAogICAEAAAAAIAAAAAAIKAAAUAAAgAAAAQIAAEAAo=</HashCode>
+      <FileName>entities\WorkflowCheckpoint.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="com.ataxlab.azure.table.retention.state.entities.WorkflowCheckpointStatus" Collapsed="true">
+    <Position X="8.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>entities\WorkflowCheckpoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.AzureTableRetentionAppliance" Collapsed="true">
+    <Position X="7" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAEAiAACAQAAAICAAAAiBgABAAAAACAgQCAAAAAAAA=</HashCode>
+      <FileName>azure-table-retention-appliance.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.Startup" Collapsed="true">
+    <Position X="14" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAQAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Startup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.TableEntityRetentionClient" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAoBAggAOEAAAIACAADgwIIAAAwAEAABMAgAAAAAAAQ=</HashCode>
+      <FileName>TableEntityRetentionClient.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.c2.ControlChannelFunctions" Collapsed="true">
+    <Position X="8.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABBAABAAAAAQAAAAAAAACAAAAgAACAAAARAAAoBAAAA=</HashCode>
+      <FileName>c2\ControlChannelFunctions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.ApplianceJobOutputEntity" Collapsed="true">
+    <Position X="10.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>entities\ApplianceJobOutputEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.AvailableCommandEntity" Collapsed="true">
+    <Position X="14" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAEAAIAAAAAAACQAAAAAAAAgAAAAAgABAAAAA=</HashCode>
+      <FileName>entities\AvailableCommandEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.WorkflowOperationCommandEntity" Collapsed="true">
+    <Position X="10.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAEAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>entities\AvailableCommandEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.RetentionPolicyTupleContainerEntity" Collapsed="true">
+    <Position X="12.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAAQAAAAAECAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>entities\RetentionPolicyTupleContainerEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.TableStorageEntityRetentionPolicyEnforcementResultEntity" Collapsed="true">
+    <Position X="14" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAgAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>entities\TableStorageRetentionPolicyEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.TableStorageTableRetentionPolicyEnforcementResultEntity" Collapsed="true">
+    <Position X="10.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAgAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>entities\TableStorageRetentionPolicyEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.TableStorageTableRetentionPolicyEntity" Collapsed="true">
+    <Position X="12.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAiAAAAAAAAAAACAAAAAAACCAQAAAAAAABAAAAEAAA=</HashCode>
+      <FileName>entities\TableStorageRetentionPolicyEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.TableStorageEntityRetentionPolicyEntity" Collapsed="true">
+    <Position X="7" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAiAAAAAAAAAAAAAAAAAAAAAAQACACAAAAAAAAAAAI=</HashCode>
+      <FileName>entities\TableStorageRetentionPolicyEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.entities.TableStorageRetentionPolicyEntity" Collapsed="true">
+    <Position X="8.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACBAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>entities\TableStorageRetentionPolicyEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.parameters.ApplyWADDDefaultPolicyParameter" Collapsed="true">
+    <Position X="12.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAgAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>parameters\ApplyWADDDefaultPolicyParameter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.services.ActivityConfig" Collapsed="true">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>services\ActivityConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.services.TableRetentionApplianceActivities" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AggBAAgAMEAAAJAAAAAATAAAAiQIAKARAAgAAAAQAAQ=</HashCode>
+      <FileName>services\TableRetentionApplianceActivities.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.services.TableRetentionApplianceEngine" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IgVFBIAEAgEQQEAAIAEFigCAACAACAQRAAAAAiABIBA=</HashCode>
+      <FileName>services\TableRetentionApplianceEngine.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="com.ataxlab.functions.table.retention.utility.CrucialExtensions" Collapsed="true">
+    <Position X="10.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAABAAAAA=</HashCode>
+      <FileName>utility\CrucialExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="com.ataxlab.azure.table.retention.state.entities.IApplianceSessionContextEntity" Collapsed="true">
+    <Position X="7" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAIkAQJAAAAAAAAKYAAAFAACAEAAIBAAIgBAg=</HashCode>
+      <FileName>entities\ApplianceSessionContextEntity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="com.ataxlab.azure.table.retention.state.entities.IWorkflowCheckpointProperties" Collapsed="true">
+    <Position X="7" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAACAEAAAAAIAAAAAAAAAAAEAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>entities\WorkflowCheckpoint.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="com.ataxlab.azure.table.retention.state.entities.IWorkflowCheckpoint" Collapsed="true">
+    <Position X="14" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAIAIAAAAAAAAAAAAAAAIKAAAUAAAgAAAAQAAAEAAg=</HashCode>
+      <FileName>entities\WorkflowCheckpoint.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="com.ataxlab.functions.table.retention.ITableEntityRetentionClient" Collapsed="true">
+    <Position X="8.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAoBAAgAOEAAAIACAAAAwIAAAAgAEAABMAgAAAAAAAQ=</HashCode>
+      <FileName>TableEntityRetentionClient.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="com.ataxlab.functions.table.retention.services.ITableRetentionApplianceActivities" Collapsed="true">
+    <Position X="10.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AggBAAAAIEAAAJAAAAAARAAAACAIAIABAAgAAAAQAAA=</HashCode>
+      <FileName>services\TableRetentionApplianceActivities.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="com.ataxlab.functions.table.retention.services.ITableRetentionApplianceEngine" Collapsed="true">
+    <Position X="12.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IgVFBIAEAgAQAEAAIAAFAgCAACAACAQRAAAAAiABIAA=</HashCode>
+      <FileName>services\TableRetentionApplianceEngine.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="com.ataxlab.azure.table.retention.state.entities.AppliancePersistResultType" Collapsed="true">
+    <Position X="7" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAQAAA=</HashCode>
+      <FileName>entities\ApplianceSessionContextEntity.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="com.ataxlab.functions.table.retention.entities.WorkflowOperation" Collapsed="true">
+    <Position X="10.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAABAgAAAAAQAAEAAgAAAAAAAAAAAAAAQgA=</HashCode>
+      <FileName>entities\AvailableCommandEntity.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="com.ataxlab.functions.table.retention.entities.PolicyEnforcementMode" Collapsed="true">
+    <Position X="8.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>entities\TableStorageRetentionPolicyEntity.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

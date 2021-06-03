@@ -1,0 +1,34 @@
+﻿@using com.ataxlab.azure.table.retention.models;
+@using com.ataxlab.azure.table.retention.models.models.auth;
+@using com.ataxlab.azure.table.retention.models.models.pagemodel;
+
+@model com.ataxlab.azure.table.retention.models.TableStorageTableRetentionPolicy
+@{
+
+    var operatorPageModel = ViewData["OperatorPageModel"] as OperatorPageModel;
+
+}
+
+<h4>Table Storage Table Retention Policy Editor</h4>
+<span>Id: @Model.Id</span>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <span>@Html.DisplayNameFor(model => model.PolicyEnforcementMode)</span>
+            @Html.EditorFor(model => model.PolicyEnforcementMode)
+
+
+            <span asp-validation-for="PolicyEnforcementMode" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.DisplayNameFor(model => model.DeleteOlderTablesThanCurrentMonthMinusThis)
+            @Html.EditorFor(model => model.DeleteOlderTablesThanCurrentMonthMinusThis)
+
+        </div>
+
+
+    </div>
+</div>

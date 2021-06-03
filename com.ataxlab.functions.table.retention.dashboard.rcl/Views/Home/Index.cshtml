@@ -1,0 +1,133 @@
+﻿@using com.ataxlab.azure.table.retention.models.models.pagemodel
+@using  com.ataxlab.azure.table.retention.models.control
+@model OperatorPageModel
+
+@if (this.Context.User.Identity.IsAuthenticated){
+<script>
+    $(document).ready(function () {
+        $("#StatusAccordion").accordion({
+            heightStyle: "content"
+        });
+
+        $(function () {
+            $("#StatusAccordion").accordion();
+        }); // end of .accordion()
+
+        $("#StatusAccordionTimestamp").click(function () {
+            UpdateWorkflowTimestamp("#StatusAccordionTimestamp");
+            location.reload();
+        }); // end of click
+
+        UpdateWorkflowTimestamp("#StatusAccordionTimestamp");
+    }); // end of document.ready
+
+
+    function UpdateWorkflowTimestamp(targetElement) {
+
+                //$('#Timestamp').html('');
+                //$('#Timestamp').append('updating...');
+
+                var element = targetElement;
+            $(element).html('');
+        $(element).append('updating...');
+
+        var currentSubscription = "@Model.ApplianceSessionContext.SelectedSubscriptionId";
+        console.log("getting current workflow checkpoint status for subscription=".concat(currentSubscription))
+        $.ajax({
+            type: "GET",
+            @*url: "@Model.ApplianceUrl.FirstOrDefault()QueryWorkflowCheckpointStatus",*@
+            url: "@Model.ApplianceUrl.FirstOrDefault()@Model.QueryWorkflowCheckpointStatusEndpoint",
+            data: JSON.stringify(""),
+            headers: {
+                "X-ZUMO-AUTH": "@Model.EasyAuthAccessToken",
+                "credentials": "include",
+                "@ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION": currentSubscription,
+                "mode": "cors"
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                //alert(JSON.stringify(data));
+                //$("#DIV").html('');
+
+                $(element).html('');
+                $(element).append(data.TimeStamp);
+
+                console.log(JSON.stringify(data));
+            }, //End of AJAX Success function
+
+            failure: function (data) {
+                // alert(data.responseText);
+                console.log("problem getting workflow checkpoint");
+            }, //End of AJAX failure function
+            error: function (data) {
+                 console.warn("failed to call the endpoint")
+                //alert(data.responseText);
+            } //End of AJAX error function
+
+        });
+    } // end of UpdateWorkflowTimestamp
+
+</script>
+}
+@{
+
+    if (this.Context.User.Identity.IsAuthenticated &&
+        (Model.ApplianceSessionContext == null || Model.IsMustRenderApplianceConfig))
+    {
+        @* // here because the user has not setup an appliance context *@
+        <div id="SessionSetupContainer"  >
+            @{await Html.RenderPartialAsync("_ConfigureApplianceSession", Model.ApplianceSessionContext);}
+        </div>
+                }
+                else
+                {
+                    if (this.Context.User.Identity.IsAuthenticated)
+                    {
+
+
+
+            <div class="panel panel-primary">
+                <div id="StatusAccordion">
+                    <h3 id="SubscriptionTitle">Selected Subscription</h3>
+                    <div>
+                        @{await Html.RenderPartialAsync("_SubscriptionsPartial", Model.Subscriptions);}
+                    </div>
+                    <h3>Appliance</h3>
+                    <div>
+                        <div>
+                            <div>
+                                <span>Appliance Url </span>
+                                <span>@Model.ApplianceUrl.FirstOrDefault();</span>
+                            </div>
+                            <span>Checkpoint Timestamp</span><span>&nbsp;</span><span id="StatusAccordionTimestamp"> </span>
+
+                        </div>
+
+                    </div>
+                    <h3>Appliance Status</h3>
+                    <div style="overflow:auto; " >
+
+                        @{await Html.RenderPartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext);}
+                    </div>
+                    <h3>Orchestration Status</h3>
+                    <div>
+                        @{await Html.RenderPartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations);}
+                    </div>
+                </div>   <!--en dof panel-heading -->
+
+
+            </div> <!--end of Panel -->
+
+            //
+        }
+        else
+        {
+            <div >
+                <h1>welcome. please login to administer your device</h1>
+            </div>
+        }
+    }
+}
+
+

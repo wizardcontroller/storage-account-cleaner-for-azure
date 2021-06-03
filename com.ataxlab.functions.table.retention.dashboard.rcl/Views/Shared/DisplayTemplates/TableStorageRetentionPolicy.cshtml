@@ -1,0 +1,26 @@
+﻿@model com.ataxlab.azure.table.retention.models.TableStorageRetentionPolicy
+
+@if (Model == null)
+{
+    <span>no data available</span>
+}
+else
+{
+
+
+    <div>
+        @*<h4>Table Storage Retention Policy</h4>*@
+        <hr />
+        <div style="font-size: 10px">
+
+            @Html.DisplayFor(m => Model.TableStorageEntityRetentionPolicy)
+
+        </div>
+        <div style="font-size: 10px">
+
+            @Html.DisplayFor(m => Model.TableStorageTableRetentionPolicy)
+
+        </div>
+    </div>
+
+}

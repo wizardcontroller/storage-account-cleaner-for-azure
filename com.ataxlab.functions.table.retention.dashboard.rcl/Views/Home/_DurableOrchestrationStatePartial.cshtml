@@ -1,0 +1,72 @@
+﻿@model IEnumerable<com.ataxlab.azure.table.retention.models.models.DurableOrchestrationStateDTO>
+    <div>
+        <hr />
+        <p>
+            <span class="small">running operations - reported by the azure functions runtime</span>
+        </p>
+
+    </div>
+    <table class="table small">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.createdTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.lastUpdatedTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.input)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.output)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.runtimeStatus)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.customStatus)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.history)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.createdTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.lastUpdatedTime)
+                    </td>
+                    <td>
+                        @* @Html.DisplayFor(modelItem => item.input) *@
+                        @await Html.PartialAsync("_ApplianceSessionContext", item.InputApplianceContext)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.output)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.runtimeStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.customStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.history)
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>

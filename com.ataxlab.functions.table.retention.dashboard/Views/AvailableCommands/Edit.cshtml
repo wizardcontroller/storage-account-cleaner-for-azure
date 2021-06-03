@@ -1,0 +1,44 @@
+﻿@model com.ataxlab.azure.table.retention.models.control.AvailableCommand
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>AvailableCommand</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="AvailableCommandId" />
+            <div class="form-group">
+                <label asp-for="WorkflowOperation" class="control-label"></label>
+                <select asp-for="WorkflowOperation" class="form-control"></select>
+                <span asp-validation-for="WorkflowOperation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WorklowOperationDisplayMessage" class="control-label"></label>
+                <input asp-for="WorklowOperationDisplayMessage" class="form-control" />
+                <span asp-validation-for="WorklowOperationDisplayMessage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MenuLabel" class="control-label"></label>
+                <input asp-for="MenuLabel" class="form-control" />
+                <span asp-validation-for="MenuLabel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

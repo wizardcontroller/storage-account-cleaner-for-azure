@@ -1,0 +1,17 @@
+﻿@model com.ataxlab.azure.table.retention.models.models.auth.RetentionPolicyTupleContainer
+
+@if (Model == null)
+{
+    <span>no data available</span>
+}
+else
+{
+    <div >
+        <h4>Retention Policy</h4>
+        <hr />
+        <div class="container">
+            @Html.DisplayForModel()
+        </div>
+    </div>
+
+}
