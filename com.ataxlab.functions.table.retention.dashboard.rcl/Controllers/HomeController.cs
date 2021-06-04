@@ -30,11 +30,7 @@ using System.Threading.Tasks;
 
 namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 {
-    //[Route("Dashboard")]
-
-
-    // [AuthorizeForScopes(Scopes = new[] {  ControlChannelConstants.STORAGEIMPERSONATION, ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION })]
-    [AuthorizeForScopes(Scopes = new[] { "/.default" })] // , ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION })]
+    [AuthorizeForScopes(Scopes = new[] { "/.default" })]
     [Route("[controller]/[action]/{oid?}/{subscriptionId?}/{tenantid?}/{workflowoperation?}/{commandId?}")]
     [EnableCors("CorsPolicy")]
     [Authorize]
@@ -45,7 +41,6 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         private const string VIEWBAGKEY_ORCHESTRATION_STATUS = "OrchestrationStatus";
         private readonly ILogger<HomeController> log;
 
-        // public IAzureManagementAPIClient AzureManagementAPIClient { get; }
         public TableRetentionApplianceScopes TableRetentionApplianceScopes { get; private set; }
 
         public ITableRetentionDashboardAPI ApplianceClient { get; set; }
