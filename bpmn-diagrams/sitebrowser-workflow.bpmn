@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0hsqnrp" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="8.6.0">
+  <bpmn:collaboration id="Collaboration_0yrx4gc">
+    <bpmn:participant id="Participant_1yx6w7r" name="what problem does this tool solve" processRef="Process_190da2f" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_190da2f" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_0k8t48p" name="azure vm deployed">
+      <bpmn:outgoing>Flow_0seq4t5</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Activity_1qi8m3w" name="enable diagnostics logging to storage account">
+      <bpmn:incoming>Flow_0seq4t5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1285wsq</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_02zfof1" name="storage account leaks.0$$ from WADMetrics*">
+      <bpmn:incoming>Flow_1285wsq</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vpfpwq</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_1oriwa5" name="find out how this can manage retention">
+      <bpmn:incoming>Flow_0vpfpwq</bpmn:incoming>
+      <bpmn:outgoing>Flow_04flslc</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0870m3k</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Activity_0xxcoyf" name="login and use the demo appliance">
+      <bpmn:incoming>Flow_04flslc</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:task id="Activity_13bjfok" name="click on the appropriate deploy to azure button at the github repo">
+      <bpmn:incoming>Flow_0870m3k</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_0seq4t5" sourceRef="StartEvent_0k8t48p" targetRef="Activity_1qi8m3w" />
+    <bpmn:sequenceFlow id="Flow_1285wsq" sourceRef="Activity_1qi8m3w" targetRef="Activity_02zfof1" />
+    <bpmn:sequenceFlow id="Flow_0vpfpwq" sourceRef="Activity_02zfof1" targetRef="Gateway_1oriwa5" />
+    <bpmn:sequenceFlow id="Flow_04flslc" name="test-drive with demo appliance" sourceRef="Gateway_1oriwa5" targetRef="Activity_0xxcoyf" />
+    <bpmn:sequenceFlow id="Flow_0870m3k" name="deploy my own appliance" sourceRef="Gateway_1oriwa5" targetRef="Activity_13bjfok" />
+    <bpmn:textAnnotation id="TextAnnotation_0ddrxwc">
+      <bpmn:text>you must grant oAuth User.Read consent to your Azure AD tenant</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_1mcj2po">
+      <bpmn:text>you need  deploy to Azure App Service RBAC permissions</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_1fv83lq">
+      <bpmn:text>at minimum you must have Azure Storage Account Reader RBAC Role</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_11osuzx" sourceRef="Activity_0xxcoyf" targetRef="TextAnnotation_0ddrxwc" />
+    <bpmn:association id="Association_1azzjd4" sourceRef="Activity_13bjfok" targetRef="TextAnnotation_1mcj2po" />
+    <bpmn:association id="Association_0he34iw" sourceRef="Gateway_1oriwa5" targetRef="TextAnnotation_1fv83lq" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0yrx4gc">
+      <bpmndi:BPMNShape id="Participant_1yx6w7r_di" bpmnElement="Participant_1yx6w7r" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="920" height="390" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0ddrxwc_di" bpmnElement="TextAnnotation_0ddrxwc">
+        <dc:Bounds x="950" y="130" width="99.99656781987919" height="97.74848984074684" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1mcj2po_di" bpmnElement="TextAnnotation_1mcj2po">
+        <dc:Bounds x="950" y="300" width="99.99656781987919" height="83.47062053816585" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1fv83lq_di" bpmnElement="TextAnnotation_1fv83lq">
+        <dc:Bounds x="740" y="110" width="99.99656781987919" height="83.47062053816585" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0seq4t5_di" bpmnElement="Flow_0seq4t5">
+        <di:waypoint x="262" y="260" />
+        <di:waypoint x="314" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1285wsq_di" bpmnElement="Flow_1285wsq">
+        <di:waypoint x="414" y="260" />
+        <di:waypoint x="474" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vpfpwq_di" bpmnElement="Flow_0vpfpwq">
+        <di:waypoint x="574" y="260" />
+        <di:waypoint x="639" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04flslc_di" bpmnElement="Flow_04flslc">
+        <di:waypoint x="689" y="260" />
+        <di:waypoint x="820" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="716" y="246" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0870m3k_di" bpmnElement="Flow_0870m3k">
+        <di:waypoint x="664" y="285" />
+        <di:waypoint x="664" y="390" />
+        <di:waypoint x="820" y="390" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="703" y="376" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_0k8t48p">
+        <dc:Bounds x="226" y="242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="221" y="285" width="46" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1qi8m3w_di" bpmnElement="Activity_1qi8m3w">
+        <dc:Bounds x="314" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_02zfof1_di" bpmnElement="Activity_02zfof1">
+        <dc:Bounds x="474" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1oriwa5_di" bpmnElement="Gateway_1oriwa5" isMarkerVisible="true">
+        <dc:Bounds x="639" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="625" y="190" width="79" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0xxcoyf_di" bpmnElement="Activity_0xxcoyf">
+        <dc:Bounds x="820" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13bjfok_di" bpmnElement="Activity_13bjfok">
+        <dc:Bounds x="820" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_11osuzx_di" bpmnElement="Association_11osuzx">
+        <di:waypoint x="914" y="221" />
+        <di:waypoint x="950" y="189" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1azzjd4_di" bpmnElement="Association_1azzjd4">
+        <di:waypoint x="920" y="361" />
+        <di:waypoint x="950" y="344" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0he34iw_di" bpmnElement="Association_0he34iw">
+        <di:waypoint x="676" y="247" />
+        <di:waypoint x="740" y="179" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

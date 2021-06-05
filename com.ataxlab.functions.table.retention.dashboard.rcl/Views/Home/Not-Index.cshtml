@@ -2,7 +2,8 @@
 @using  com.ataxlab.azure.table.retention.models.control
 @model OperatorPageModel
 
-@if (this.Context.User.Identity.IsAuthenticated){
+@if (this.Context.User.Identity.IsAuthenticated)
+{
 <script>
     $(document).ready(function () {
         $("#StatusAccordion").accordion({
@@ -68,66 +69,57 @@
         });
     } // end of UpdateWorkflowTimestamp
 
-</script>
-}
-@{
-
-    if (this.Context.User.Identity.IsAuthenticated &&
-        (Model.ApplianceSessionContext == null || Model.IsMustRenderApplianceConfig))
-    {
-        @* // here because the user has not setup an appliance context *@
-        <div id="SessionSetupContainer"  >
-            @{await Html.RenderPartialAsync("_ConfigureApplianceSession", Model.ApplianceSessionContext);}
-        </div>
-                }
-                else
-                {
-                    if (this.Context.User.Identity.IsAuthenticated)
-                    {
+</script>}
+@{ if (this.Context.User.Identity.IsAuthenticated &&
+                    (Model.ApplianceSessionContext == null || Model.IsMustRenderApplianceConfig))
+                { @* // here because the user has not setup an appliance context *@
+                                <div id="SessionSetupContainer">
+                                    @{await Html.RenderPartialAsync("_ConfigureApplianceSession", Model.ApplianceSessionContext);}
+                                </div> }
+                                            else
+                                            {
+                                                if (this.Context.User.Identity.IsAuthenticated)
+                                                {
 
 
 
-            <div class="panel panel-primary">
-                <div id="StatusAccordion">
-                    <h3 id="SubscriptionTitle">Selected Subscription</h3>
-                    <div>
-                        @{await Html.RenderPartialAsync("_SubscriptionsPartial", Model.Subscriptions);}
-                    </div>
-                    <h3>Appliance</h3>
-                    <div>
-                        <div>
-                            <div>
-                                <span>Appliance Url </span>
-                                <span>@Model.ApplianceUrl.FirstOrDefault();</span>
-                            </div>
-                            <span>Checkpoint Timestamp</span><span>&nbsp;</span><span id="StatusAccordionTimestamp"> </span>
+                                <div class="panel panel-primary">
+                                    <div id="StatusAccordion">
+                                        <h3 id="SubscriptionTitle">Selected Subscription</h3>
+                                        <div>
+                                            @{await Html.RenderPartialAsync("_SubscriptionsPartial", Model.Subscriptions);}
+                                        </div>
+                                        <h3>Appliance</h3>
+                                        <div>
+                                            <div>
+                                                <div>
+                                                    <span>Appliance Url </span>
+                                                    <span>@Model.ApplianceUrl.FirstOrDefault();</span>
+                                                </div>
+                                                <span>Checkpoint Timestamp</span><span>&nbsp;</span><span id="StatusAccordionTimestamp"> </span>
 
-                        </div>
+                                            </div>
 
-                    </div>
-                    <h3>Appliance Status</h3>
-                    <div style="overflow:auto; " >
+                                        </div>
+                                        <h3>Appliance Status</h3>
+                                        <div style="overflow:auto; ">
 
-                        @{await Html.RenderPartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext);}
-                    </div>
-                    <h3>Orchestration Status</h3>
-                    <div>
-                        @{await Html.RenderPartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations);}
-                    </div>
-                </div>   <!--en dof panel-heading -->
+                                            @{await Html.RenderPartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext);}
+                                        </div>
+                                        <h3>Orchestration Status</h3>
+                                        <div>
+                                            @{await Html.RenderPartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations);}
+                                        </div>
+                                    </div>   <!--en dof panel-heading -->
 
 
-            </div> <!--end of Panel -->
-
-            //
-        }
-        else
-        {
-            <div >
-                <h1>welcome. please login to administer your device</h1>
-            </div>
-        }
-    }
-}
+                                </div> <!--end of Panel --> //
+                                                }
+                                                else
+                                                {
+                                <div>
+                                    <h3>welcome. please review the workflow to get started</h3>
+                                </div> }
+                                            } }
 
 
