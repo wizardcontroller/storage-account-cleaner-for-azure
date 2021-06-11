@@ -17,8 +17,8 @@
     <!-- Material Design for Bootstrap fonts and icons -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
-    
-    
+
+
     <style type="text/css">
 
 
@@ -33,18 +33,18 @@
         .center {
             margin: auto;
             width: 90%;
+            height: 90%;
         }
     </style>
 
 </head>
- 
 
-<body >
+
+<body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" 
-             style="position:fixed; top: 0; left:0; z-index:100; width:100%;"
-             >
-            <div class="container" >
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
+             style="position:fixed; top: 0; left:0; z-index:100; width:100%; margin-bottom:10px;">
+            <div class="container">
                 @if (this.Context.User.Identity.IsAuthenticated)
                 {
                     <a class="navbar-brand small" asp-area="" asp-controller="Home" asp-action="Operator">dashboard</a>
@@ -67,11 +67,10 @@
             </div>
         </nav>
     </header>
-    <div id="WorkflowDiagramContainer" class="vertical-center center" style="max-height: 600px; overflow:  auto; z-index:50; height: 70%; margin-bottom:10px; padding-bottom:10px;">
+    <div id="WorkflowUIContainer" class="center" style="width: 100%; z-index:50;  margin-bottom:10px; padding-bottom:10px;">
         <div class="container">
             <partial name="_CookieConsentPartial" />
             <main role="main" class="pb-3">
-
                 @RenderBody()
             </main>
         </div>

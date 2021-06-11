@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.Azure.Management.Network.Fluent.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,7 @@ using Polly;
 using Polly.Extensions.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -232,11 +234,14 @@ namespace com.ataxlab.functions.table.retention.dashboard
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
-            }).AddMicrosoftIdentityUI();
+
+            }).AddRazorRuntimeCompilation()
+                .AddMicrosoftIdentityUI();
             // as per https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/tree/master/3-WebApp-multi-APIs
 
 
             services.AddRazorPages()
+                .AddRazorRuntimeCompilation()
                  .AddMicrosoftIdentityUI();
 
             services.AddDbContext<ScaffoldingContext>(options =>

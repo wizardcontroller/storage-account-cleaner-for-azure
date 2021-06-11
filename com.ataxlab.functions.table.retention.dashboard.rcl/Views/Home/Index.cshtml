@@ -4,15 +4,15 @@
 
 @{ if (this.Context.User.Identity.IsAuthenticated)
     {
-<style type="text/css">
+        <style type="text/css">
 
-    body {
-        background: url('/img/overview-workflow-diagram.svg') no-repeat left;
-        background-size: contain;
-        background-attachment: fixed;
-    }
-</style>
-                <script>
+            body {
+                background: url('/img/overview-workflow-diagram.svg') no-repeat left;
+                background-size: contain;
+                background-attachment: fixed;
+            }
+        </style>
+        <script>
     $(document).ready(function () {
         $("#StatusAccordion").accordion({
             heightStyle: "content"
@@ -77,193 +77,203 @@
         });
     } // end of UpdateWorkflowTimestamp
 
-                </script>
- }
-            else
-            {
+        </script>
+    }
+    else
+    {
+        //ui  to show users
+        <style type="text/css">
 
-<script>
-
-
-    var dialogElement = "#StorageAccountDiagnosticsInfoDialog";
-    window.onload = function () {
-        var elements = findSVGElements();
-        initSvgEvents();
-    };
-
-    // begin retention policy job specific script
-    var viewportWidth = window.innerWidth - 20;
-    var viewportHeight = window.innerHeight - 20;
-    if (viewportWidth > 1000) viewportWidth = 1000;
-    if (viewportHeight > 500) viewportHeight = 500;
+            #WorkflowUIContainer {
+                background: url('/_content/com.ataxlab.functions.table.retention.dashboard.rcl/img/architecture/high-level-arch.svg') no-repeat left content-box;
+                background-size: contain;
+                background-attachment: scroll;
+                width: 100%;
+            }
+        </style>
+        <script>
 
 
-    $(document).ready(function () {
+            var dialogElement = "#StorageAccountDiagnosticsInfoDialog";
+            window.onload = function () {
+                var elements = findSVGElements();
+                initSvgEvents();
+            };
+
+            // begin retention policy job specific script
+            var viewportWidth = window.innerWidth - 20;
+            var viewportHeight = window.innerHeight - 20;
+            if (viewportWidth > 1000) viewportWidth = 1000;
+            if (viewportHeight > 500) viewportHeight = 500;
+
+
+            $(document).ready(function () {
 
 
 
 
-        var dialogTitle = "Retention Surface Viewer";
+                var dialogTitle = "Retention Surface Viewer";
 
-        // initialize retention policy editor dialogs
-        $(dialogElement).dialog({
-            height: viewportHeight,
-            width: viewportWidth,
-            autoOpen: false,
-            modal: true,
-            title: dialogTitle,
-            position: {
+                // initialize retention policy editor dialogs
+                $(dialogElement).dialog({
+                    height: viewportHeight,
+                    width: viewportWidth,
+                    autoOpen: false,
+                    modal: true,
+                    title: dialogTitle,
+                    position: {
 
-                my: "center",
-                at: "center",
-                of: window,
-                collision: "none",
-                create: function (event, ui) {
-                    $(event.target).parent().css('position', 'fixed');
+                        my: "center",
+                        at: "center",
+                        of: window,
+                        collision: "none",
+                        create: function (event, ui) {
+                            $(event.target).parent().css('position', 'fixed');
+                        }
+                    }
+
+                });
+
+
+            });
+
+            // http://xn--dahlstrm-t4a.net/svg/html/get-embedded-svg-document-script.html
+            function findSVGElements() {
+                /*        var elms = document.querySelectorAll("svg [name*='data-element-id']");*/
+
+                var a = document.getElementById("sitebrowserworkflowsvg");
+                var svgDoc = a.contentDocument; //get the inner DOM of alpha.svg
+                var svgElement = $("[data-element-id]"); //.val("Activity_1qi8m3w");
+                console.log(JSON.stringify(svgElement.length))
+
+                console.log('seting up even listener for svg');
+
+
+                var elms = svgDoc.querySelectorAll(".djs-group");
+                console.log('found ' + svgElement.length + ' svg elements');
+                for (var i = 0; i < svgElement.length; i++) {
+                    console.log(JSON.stringify(svgElement[i]))
+                    //var subdoc = getSubDocument(elms[i])
+                    //if (subdoc)
+                    //    console.log(JSON.stringify(subdoc));
                 }
             }
 
-        });
+            // as per http://xn--dahlstrm-t4a.net/svg/html/get-embedded-svg-document-script.html
+            // fetches the document for the given embedding_element
+            function getSubDocument(embedding_element) {
+                if (embedding_element.contentDocument) {
+                    return embedding_element.contentDocument;
+                }
+                else {
+                    var subdoc = null;
+                    try {
+                        subdoc = embedding_element.getSVGDocument();
+                    } catch (e) { }
+                    return subdoc;
+                }
+            }
+
+            // as per http://xn--dahlstrm-t4a.net/svg/html/get-embedded-svg-document-script.html
+            function initSvgEvents() {
+                console.log('getting document elen by i');
+
+                var a = document.getElementById("sitebrowserworkflowsvg");
+                console.log('got document elen by i');
+
+                console.log('seting up even listener for svg');
+                var svgDoc = a.contentDocument; //get the inner DOM of alpha.svg
+
+                //now we can query stuff with jquery like this
+                //note that we pass in the svgRoot as the context node!
+
+                // var svgElement = $("[data-element-id]", svgDoc).click(function () {
+                var svgElement = $("text", svgDoc).click(function (evt) {
+                    console.log("svg element clicked");
+                    console.log(JSON.stringify(evt.target.textContent));
 
 
-    });
+                    $(dialogElement).dialog('open');
+                });
+                //;
+                //$(svgElement, svgRoot).click(function () {
+                //    console.log("svg element clicked");
+                //    $(dialogElement).dialog('open');
+                //});
+                //it's important to add an load event listener to the object, as it will load the svg doc asynchronously
+                a.addEventListener("load", function () {
 
-    // http://xn--dahlstrm-t4a.net/svg/html/get-embedded-svg-document-script.html
-    function findSVGElements() {
-    /*        var elms = document.querySelectorAll("svg [name*='data-element-id']");*/
+                }, false);
 
-        var a = document.getElementById("sitebrowserworkflowsvg");
-        var svgDoc = a.contentDocument; //get the inner DOM of alpha.svg
-        var svgElement = $("[data-element-id]"); //.val("Activity_1qi8m3w");
-        console.log(JSON.stringify(svgElement.length))
+                console.log('added event listener');
 
-        console.log('seting up even listener for svg');
+            }
 
+                                                                                                                                            // end retention policy job specific script
 
-        var elms = svgDoc.querySelectorAll(".djs-group");
-        console.log('found ' + svgElement.length + ' svg elements');
-        for (var i = 0; i < svgElement.length; i++) {
-            console.log(JSON.stringify(svgElement[i]))
-            //var subdoc = getSubDocument(elms[i])
-            //if (subdoc)
-            //    console.log(JSON.stringify(subdoc));
-        }
-    }
+        </script>
 
-    // as per http://xn--dahlstrm-t4a.net/svg/html/get-embedded-svg-document-script.html
-    // fetches the document for the given embedding_element
-    function getSubDocument(embedding_element) {
-        if (embedding_element.contentDocument) {
-            return embedding_element.contentDocument;
-        }
-        else {
-            var subdoc = null;
-            try {
-                subdoc = embedding_element.getSVGDocument();
-            } catch (e) { }
-            return subdoc;
-        }
-    }
+        <div id="xx">
+            @*<object class="center vertical-center" data="/img/sitebrowser-workflow.svg" type="image/svg+xml" id="sitebrowserworkflowsvg"></object>*@
 
-    // as per http://xn--dahlstrm-t4a.net/svg/html/get-embedded-svg-document-script.html
-    function initSvgEvents() {
-        console.log('getting document elen by i');
-
-        var a = document.getElementById("sitebrowserworkflowsvg");
-        console.log('got document elen by i');
-
-        console.log('seting up even listener for svg');
-        var svgDoc = a.contentDocument; //get the inner DOM of alpha.svg
-  
-        //now we can query stuff with jquery like this
-        //note that we pass in the svgRoot as the context node!
-
-        // var svgElement = $("[data-element-id]", svgDoc).click(function () {
-        var svgElement = $("text", svgDoc).click(function (evt) {
-            console.log("svg element clicked");
-            console.log(JSON.stringify(evt.target.textContent));
-
-
-            $(dialogElement).dialog('open');
-        });
-        //;
-        //$(svgElement, svgRoot).click(function () {
-        //    console.log("svg element clicked");
-        //    $(dialogElement).dialog('open');
-        //});
-        //it's important to add an load event listener to the object, as it will load the svg doc asynchronously
-        a.addEventListener("load", function () {
-
-        }, false);
-
-        console.log('added event listener');
-
-    }
-
-                                                                                                                            // end retention policy job specific script
-
-</script>
-                <div id="xx">
-                    <object data="/img/sitebrowser-workflow.svg" type="image/svg+xml" id="sitebrowserworkflowsvg"></object>
-
-                </div>
-                                <div id="StorageAccountDiagnosticsInfoDialog">
-                                    <div style="background-color: black;">
-                                        <h3>this dialog</h3>
-                                    </div>
-                                </div> } }
+        </div>
+        <div id="StorageAccountDiagnosticsInfoDialog">
+            <div style="background-color: black;">
+                <h3>this dialog</h3>
+            </div>
+        </div> } }
 
 
 @{ if (this.Context.User.Identity.IsAuthenticated &&
-                               (Model.ApplianceSessionContext == null || Model.IsMustRenderApplianceConfig))
+                                 (Model.ApplianceSessionContext == null || Model.IsMustRenderApplianceConfig))
     { @* // here because the user has not setup an appliance context *@
-                    <div id="SessionSetupContainer">
-                        @{await Html.RenderPartialAsync("_ConfigureApplianceSession", Model.ApplianceSessionContext);}
-                    </div> }
-                else
-                {
-                    if (this.Context.User.Identity.IsAuthenticated)
-                    {
-
-
-
-    <div class="panel panel-primary">
-        <div id="StatusAccordion">
-            <h3 id="SubscriptionTitle">Selected Subscription</h3>
-            <div>
-                @{await Html.RenderPartialAsync("_SubscriptionsPartial", Model.Subscriptions);}
-            </div>
-            <h3>Appliance</h3>
-            <div>
-                <div>
-                    <div>
-                        <span>Appliance Url </span>
-                        <span>@Model.ApplianceUrl.FirstOrDefault();</span>
-                    </div>
-                    <span>Checkpoint Timestamp</span><span>&nbsp;</span><span id="StatusAccordionTimestamp"> </span>
-
-                </div>
-
-            </div>
-            <h3>Appliance Status</h3>
-            <div style="overflow:auto; ">
-
-                @{await Html.RenderPartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext);}
-            </div>
-            <h3>Orchestration Status</h3>
-            <div>
-                @{await Html.RenderPartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations);}
-            </div>
-        </div>   <!--en dof panel-heading -->
-
-
-    </div> <!--end of Panel --> //
-}
+    <div id="SessionSetupContainer">
+        @{await Html.RenderPartialAsync("_ConfigureApplianceSession", Model.ApplianceSessionContext);}
+    </div> }
 else
 {
-<div>
-    <h3>welcome. please review the workflow to get started</h3>
-</div> }
+    if (this.Context.User.Identity.IsAuthenticated)
+    {
+
+
+
+        <div class="panel panel-primary">
+            <div id="StatusAccordion">
+                <h3 id="SubscriptionTitle">Selected Subscription</h3>
+                <div>
+                    @{await Html.RenderPartialAsync("_SubscriptionsPartial", Model.Subscriptions);}
+                </div>
+                <h3>Appliance</h3>
+                <div>
+                    <div>
+                        <div>
+                            <span>Appliance Url </span>
+                            <span>@Model.ApplianceUrl.FirstOrDefault();</span>
+                        </div>
+                        <span>Checkpoint Timestamp</span><span>&nbsp;</span><span id="StatusAccordionTimestamp"> </span>
+
+                    </div>
+
+                </div>
+                <h3>Appliance Status</h3>
+                <div style="overflow:auto; ">
+
+                    @{await Html.RenderPartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext);}
+                </div>
+                <h3>Orchestration Status</h3>
+                <div>
+                    @{await Html.RenderPartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations);}
+                </div>
+            </div>   <!--en dof panel-heading -->
+
+
+        </div> <!--end of Panel --> //
+    }
+    else
+    {
+        <div>
+            <h3>welcome. please review the workflow to get started</h3>
+        </div> }
 } }
 
 
