@@ -41,9 +41,8 @@
 
 
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
-             style="position:fixed; top: 0; left:0; z-index:100; width:100%; margin-bottom:10px;">
+    <header style="position:fixed; top: 0; left:0; z-index:100; width:100%; margin-bottom:20px;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
                 @if (this.Context.User.Identity.IsAuthenticated)
                 {
@@ -67,7 +66,7 @@
             </div>
         </nav>
     </header>
-    <div id="WorkflowUIContainer" class="center" style="width: 100%; z-index:50;  margin-bottom:10px; padding-bottom:10px;">
+    <div id="WorkflowUIContainer" class="center" style="width: 100%; z-index:50;  margin-top:300px; margin-bottom:100px;" >
         <div class="container">
             <partial name="_CookieConsentPartial" />
             <main role="main" class="pb-3">
@@ -75,7 +74,7 @@
             </main>
         </div>
     </div>
-    <footer class="border-top footer text-muted" style="position:fixed; bottom: 0; left:0; z-index: 100; margin-top: 10px;">
+    <footer class="border-top footer text-muted" style="position:fixed; bottom: 0; left:0; z-index: 100; margin-top: 50px;">
         <div class="container">
             &copy; 2021 - dashboard - <img src="https://dev.azure.com/electricrucible/app.electricrucible.my/_apis/build/status/table-retention-appliance-dashboard?branchName=mrgncy" /> appliance - <img src="https://dev.azure.com/electricrucible/app.electricrucible.my/_apis/build/status/docker-azure-table-retention-appliance?branchName=mrgncy" /> <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>

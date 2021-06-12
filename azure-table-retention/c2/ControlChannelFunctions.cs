@@ -148,7 +148,7 @@ namespace com.ataxlab.functions.table.retention.c2
             log.LogInformation("ApplicationControlChannelEndpoint HttpRequest {0}", req.RequestUri.AbsoluteUri);
             var commandJson = await req.Content.ReadAsStringAsync();
 
-            bool isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req, claimsPrincipal);
+            bool isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             var impersonate = await this.TableRetentionApplianceEngine.GetImpersonationTokenFromHeaders(req.Headers);
             log.LogInformation("WorkflowOperator Operation Authorized? {0}", isAuthorized);
             var response = await this.TableRetentionApplianceEngine.GetResponseForWorkflowOperator(starter, durableClient, durableEntityClient, tenantId, oid, commandJson, impersonate);
@@ -167,7 +167,7 @@ namespace com.ataxlab.functions.table.retention.c2
 
             log.LogInformation("ResetWorkflowsEndpoint");
             bool isAuthorized = false;
-            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req, claimsPrincipal);
+            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             OrchestrationStatusQueryResult result = await DeleteRunningOrchestrationEntities(client);
 
             HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
@@ -197,23 +197,23 @@ namespace com.ataxlab.functions.table.retention.c2
             OrchestrationStatusQueryResult result = new OrchestrationStatusQueryResult();
             try
             {
-                result  = await TableRetentionApplianceEngine.QueryInstancesAsync(client, queryFilter);
+                result = await TableRetentionApplianceEngine.QueryInstancesAsync(client, queryFilter);
                 foreach (var instance in result.DurableOrchestrationState)
                 {
                     try
                     {
                         await client.TerminateAsync(instance.InstanceId, reason);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         log.LogError("problem deleting instances {0}", e.Message);
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 log.LogError("problem deleting instances {0}", e.Message);
-             }
+            }
 
             return result;
         }
@@ -232,7 +232,7 @@ namespace com.ataxlab.functions.table.retention.c2
         {
             log.LogInformation("QueryWorkflowsStatusEndpoint");
             bool isAuthorized = false;
-            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req, claimsPrincipal);
+            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             var noFilter = new OrchestrationStatusQueryCondition();
             //OrchestrationStatusQueryResult result = await client.ListInstancesAsync(
             //    noFilter,
@@ -267,13 +267,13 @@ namespace com.ataxlab.functions.table.retention.c2
                     {
                         log.LogInformation("getting orchestration state");
 
-                        foreach(var instance in state.DurableOrchestrationState)
+                        foreach (var instance in state.DurableOrchestrationState)
                         {
                             try
                             {
                                 result.Add(instance);
                             }
-                            catch(Exception e)
+                            catch (Exception e)
                             {
                                 log.LogError("issue getting orchestration state: {0}", e.Message);
                             }
@@ -327,7 +327,7 @@ namespace com.ataxlab.functions.table.retention.c2
                     });
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 log.LogError("issue getting status {0}", e.Message);
             }
@@ -351,7 +351,7 @@ namespace com.ataxlab.functions.table.retention.c2
                     }
                     );
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     log.LogError("issue getting orchestrations {0}", e.Message);
                 }
@@ -371,7 +371,7 @@ namespace com.ataxlab.functions.table.retention.c2
         {
             log.LogInformation("AbandonOrchestrationsEndpoint");
             bool isAuthorized = false;
-            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req, claimsPrincipal);
+            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
 
             // dequeue the command
             var commandset = await CrucialExtensions.DeserializeHttpMessageBody<OrchestrationStatusQueryResult>(req);
@@ -386,7 +386,7 @@ namespace com.ataxlab.functions.table.retention.c2
 
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     log.LogError("issue terminating {0}", e.Message);
                 }
@@ -429,7 +429,7 @@ namespace com.ataxlab.functions.table.retention.c2
         {
             log.LogInformation("DeleteWorkflowCheckpointEditModeEndPoint");
             bool isAuthorized = false;
-            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req, claimsPrincipal);
+            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
 
             log.LogInformation("Delete Operation Authorized? {0}", isAuthorized);
             //provisionally ignore the entity key
@@ -449,7 +449,7 @@ namespace com.ataxlab.functions.table.retention.c2
             await client.SignalEntityAsync(editModeEntityId, "Delete");
             await client.SignalEntityAsync(contextKey, "Delete");
 
-   
+
             log.LogInformation("signalled entities");
             OrchestrationStatusQueryResult deleteResult = new OrchestrationStatusQueryResult();
             try
@@ -458,34 +458,40 @@ namespace com.ataxlab.functions.table.retention.c2
                 deleteResult = await DeleteRunningOrchestrationEntities(orchestrationClient);
                 log.LogInformation("current orchestration status {0}", await deleteResult.DurableOrchestrationState.ToJSONStringAsync());
             }
-            catch(Exception  e)
+            catch (Exception e)
             {
                 log.LogError("issue deleting running orchestrations {0}", e.Message);
             }
             // init the associated entities
-            await client.SignalEntityAsync<IWorkflowCheckpoint>(workflowCheckpointEntityId, proxy => {
+            await client.SignalEntityAsync<IWorkflowCheckpoint>(workflowCheckpointEntityId, proxy =>
+            {
                 proxy.SetTimeStamp(DateTime.UtcNow);
             });
 
-            await client.SignalEntityAsync<IWorkflowCheckpoint>(workflowCheckpointEntityId, proxy => {
+            await client.SignalEntityAsync<IWorkflowCheckpoint>(workflowCheckpointEntityId, proxy =>
+            {
                 proxy.SetCurrentCheckpoint(WorkflowCheckpointIdentifier.UnProvisioned);
             });
 
-            await client.SignalEntityAsync<IWorkflowCheckpoint>(workflowCheckpointEntityId, proxy => {
+            await client.SignalEntityAsync<IWorkflowCheckpoint>(workflowCheckpointEntityId, proxy =>
+            {
                 proxy.SetMessage("device is in factory reset condition");
             });
 
 
             // init the associated entities
-            await client.SignalEntityAsync<IWorkflowCheckpoint>(editModeEntityId, proxy => {
+            await client.SignalEntityAsync<IWorkflowCheckpoint>(editModeEntityId, proxy =>
+            {
                 proxy.SetTimeStamp(DateTime.UtcNow);
             });
 
-            await client.SignalEntityAsync<IWorkflowCheckpoint>(editModeEntityId, proxy => {
+            await client.SignalEntityAsync<IWorkflowCheckpoint>(editModeEntityId, proxy =>
+            {
                 proxy.SetCurrentCheckpoint(WorkflowCheckpointIdentifier.UnProvisioned);
             });
 
-            await client.SignalEntityAsync<IWorkflowCheckpoint>(editModeEntityId, proxy => {
+            await client.SignalEntityAsync<IWorkflowCheckpoint>(editModeEntityId, proxy =>
+            {
                 proxy.SetMessage("device is in factory reset condition");
             });
 
@@ -520,7 +526,7 @@ namespace com.ataxlab.functions.table.retention.c2
         {
             log.LogInformation("QueryWorkflowEditModeCheckpointStatusEndpoint");
             bool isAuthorized = false;
-            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req, claimsPrincipal);
+            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             if (isAuthorized)
             {
                 var response = await this.TableRetentionApplianceEngine.GetWorkflowEditModeCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
@@ -561,7 +567,7 @@ namespace com.ataxlab.functions.table.retention.c2
         {
             log.LogInformation("QueryWorkflowCheckpointStatusEndpoint");
             bool isAuthorized = false;
-            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req, claimsPrincipal);
+            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
 
             //try
             //{
@@ -669,6 +675,56 @@ namespace com.ataxlab.functions.table.retention.c2
 
             }
 
+        }
+
+
+        [FunctionName(ControlChannelConstants.RetentionPolicyEndpoint)]
+        public async Task<HttpResponseMessage> RetentionPolicyEndpoint(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post" , Route = ControlChannelConstants.RetentionPolicyEndpoint
+                                                            + ControlChannelConstants.RetentionPolicyRouteTemplate)]
+        HttpRequestMessage req,
+        [DurableClient] IDurableClient durableClient,
+        [DurableClient] IDurableEntityClient durableEntityClient,
+        string tenantId,
+        string oid,
+        ClaimsPrincipal claimsPrincipal)
+        {
+            log.LogInformation("QueryWorkflowCheckpointStatusEndpoint");
+            bool isAuthorized = false;
+            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
+
+            if (isAuthorized)
+            {
+                log.LogInformation("authorized request");
+                try
+                {
+                    log.LogInformation("getting workflow checkpoint response for user");
+                    var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                    log.LogInformation("got workflow checkpoint response for user");
+
+                    return response;
+                }
+                catch (Exception e)
+                {
+
+                    log.LogWarning("problem getting checkpoint for user. recovering state {0}", e.Message);
+
+                    log.LogError("problem getting checkpoint {0}", e.Message);
+                    HttpResponseMessage unauthorizedResp = new HttpResponseMessage();
+                    unauthorizedResp.StatusCode = HttpStatusCode.Accepted;
+                    return unauthorizedResp;
+                }
+            }
+            else
+            {
+
+                log.LogWarning("unauthorized request");
+                // fell through to here because of unauthorized request
+                HttpResponseMessage unauthorizedResp = new HttpResponseMessage();
+                unauthorizedResp.StatusCode = HttpStatusCode.Unauthorized;
+                return unauthorizedResp;
+
+            }
         }
     }
 }

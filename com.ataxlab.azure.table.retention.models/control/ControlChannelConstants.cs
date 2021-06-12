@@ -60,6 +60,11 @@ namespace com.ataxlab.azure.table.retention.models.control
         /// </summary>
         public const string GetCurrentApplianceContextActivityEndpoint = "GetCurrentApplianceContextActivityEndpoint";
 
+
+        public const string RetentionPolicyEndpoint = "RetentionPolicyEndpoint";
+        public const string RetentionPolicyRouteFormatTemplate = "/{0}/{1}/{2}/{3}";
+        public const string RetentionPolicyRouteTemplate = "/{tenantId}/{subscriptionId}/{storageAccountId}/{oid}";
+
         public const string ApplianceContextEndpoint = "ApplianceContextEndpoint";
         public const string ApplianceContextRouteFormatTemplate = "/{0}/{1}";
         public const string ApplianceContextRouteTemplate = "/{tenantId}/{oid}";

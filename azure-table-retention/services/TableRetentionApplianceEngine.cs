@@ -40,8 +40,8 @@ namespace com.ataxlab.functions.table.retention.services
                                                         string userOid, ApplianceSessionContextEntityBase ctx);
         public Task<HttpResponseMessage> GetResponseForBeginWorkflow(IDurableEntityClient entityClient, IDurableClient durableClient, IDurableOrchestrationClient starter, string tenantId, string oid);
 
-        public Task<bool> ApplyAuthorizationStrategy(HttpRequestMessage req, ClaimsPrincipal claimsPrincipal, SubscriptionDTO subscription = null);
-        public string GetAuthorizationHeader(HttpRequestMessage req);
+        public Task<bool> ApplyAuthorizationStrategy(HttpRequestHeaders req, ClaimsPrincipal claimsPrincipal, SubscriptionDTO subscription = null);
+        public string GetAuthorizationHeader(HttpRequestHeaders req);
         public Task<bool> ValidateClaimsPrincipalFromHeaders(HttpRequestMessage req, SubscriptionDTO subscription = null);
         public Task<Tuple<bool, ClaimsPrincipal>> IsAuthorized(string authorizationHeader, SubscriptionDTO subscription = null);
         // public Task<EntityStateResponse<WorkflowCheckpointEditMode>> GetCurrentEditModeWorkflowCheckpoint(IDurableEntityClient durableClient, SubscriptionDTO subscription = null);
@@ -60,6 +60,9 @@ namespace com.ataxlab.functions.table.retention.services
         Task<TableRetentionApplianceEngine.ApplianceInitializationResult> ValidateApplianceContextForUser(string tenantId, string oid, List<Claim> userClaims, string impersonationToken, ApplianceSessionContextEntityBase ctx);
         Task<string> GetImpersonationTokenFromHeaders(HttpRequestHeaders headers);
         Task<string> GetUserOidFromClaims(IEnumerable<Claim> claims);
+
+        Task<TableStorageRetentionPolicyEntity> GetRetentionPolicy(string tenantId, string subscriptionId, string storageAccountId, string oid, IDurableClient durableClient);
+        Task<TableStorageRetentionPolicyEntity> SetGetRetentionPolicy(string tenantId, string subscriptionId, string storageAccountId, string oid, TableStorageRetentionPolicyEntity policy, IDurableClient durableClient);
 
         #region durable entity operations
 
@@ -1012,7 +1015,47 @@ namespace com.ataxlab.functions.table.retention.services
 
         }
 
-        public string GetAuthorizationHeader(HttpRequestMessage req)
+        public string GetAuthorizationHeader(HttpRequestHeaders req)
+        {
+            log.LogInformation("GetAuthorizationHeader starting");
+            string ret = string.Empty;
+            try
+            {
+                var scratchHeader = string.Empty;
+                var t = new List<Tuple<string, string>>();
+
+                foreach (var header in req)
+                {
+                    // log.LogInformation("provided header {0}", header.Key);
+                    foreach (var v in header.Value)
+                    {
+                        scratchHeader += v;
+                    }
+
+                    t.Add(new Tuple<string, string>(header.Key, scratchHeader));
+                    // log.LogDebug("header key" + header.Key + " value = " + header.Value);
+                    scratchHeader = string.Empty;
+                }
+                var headerResult = t.Where(w => w.Item1.ToLower().Equals(ControlChannelConstants.HEADER_AUTHORIZATION)).FirstOrDefault();
+                log.LogDebug("auth header present? {0}", t.Where(w => w.Item1.ToLower().Equals(ControlChannelConstants.HEADER_AUTHORIZATION)));
+
+                ret = headerResult?.Item2;
+                if (headerResult == null || String.IsNullOrEmpty(headerResult.Item2))
+                {
+                    headerResult = t.Where(w => w.Item1.ToLower().Equals(ControlChannelConstants.HEADER_X_ZUMO_AUTH)).FirstOrDefault();
+                    ret = headerResult?.Item2;
+                }
+            }
+            catch (Exception e)
+            {
+                log.LogError("problem getting authorization header {0}", e.Message);
+            }
+
+            return ret;
+        }
+
+        [Obsolete]
+        public string GetAuthorizationHeaderDeprecated(HttpRequestMessage req)
         {
             log.LogInformation("GetAuthorizationHeader starting");
             string ret = string.Empty;
@@ -1062,7 +1105,7 @@ namespace com.ataxlab.functions.table.retention.services
         /// <param name="req"></param>
         /// <param name="claimsPrincipal"></param>
         /// <returns></returns>
-        public async Task<bool> ApplyAuthorizationStrategy(HttpRequestMessage req, ClaimsPrincipal claimsPrincipal, SubscriptionDTO subscription = null)
+        public async Task<bool> ApplyAuthorizationStrategy(HttpRequestHeaders req, ClaimsPrincipal claimsPrincipal, SubscriptionDTO subscription = null)
         {
             bool isAuthorized = false;
             try
@@ -1884,43 +1927,15 @@ namespace com.ataxlab.functions.table.retention.services
             return ret;
         }
 
-        //[Obsolete]
-        //public async Task<EntityStateResponse<WorkflowCheckpointEditMode>> GetCurrentEditModeWorkflowCheckpoint(IDurableEntityClient durableClient, SubscriptionDTO subscription = null)
-        //{
-        //    var entityId = new EntityId(nameof(WorkflowCheckpointEditMode),
-        //                                ControlChannelConstants.DefaultWorkflowCheckpointEntityKey);
-        //    var currentstate = await durableClient.ReadEntityStateAsync<WorkflowCheckpointEditMode>(entityId);
-        //    var defaultCommandSet = await this.GetAvailableCommandsForTransition(WorkflowOperation.ProvisionAppliance);
-        //    if (!currentstate.EntityExists)
-        //    {
+        public Task<TableStorageRetentionPolicyEntity> GetRetentionPolicy(string tenantId, string subscriptionId, string storageAccountId, string oid, IDurableClient durableClient)
+        {
+            throw new NotImplementedException();
+        }
 
-        //        // we have no state -  enable the device to move to provisioning
+        public Task<TableStorageRetentionPolicyEntity> SetGetRetentionPolicy(string tenantId, string subscriptionId, string storageAccountId, string oid, TableStorageRetentionPolicyEntity policy, IDurableClient durableClient)
+        {
+            throw new NotImplementedException();
+        }
 
-        //        await durableClient.SignalEntityAsync<IWorkflowCheckpoint>(entityId, proxy =>
-        //                    proxy.SetAvailableCommands(defaultCommandSet));
-
-        //        await durableClient.SignalEntityAsync<IWorkflowCheckpoint>(entityId, proxy =>
-        //                        proxy.SetCurrentCheckpoint(WorkflowCheckpointIdentifier.UnProvisioned));
-
-        //        await durableClient.SignalEntityAsync<IWorkflowCheckpoint>(entityId, proxy =>
-        //                        proxy.SetMessage("provision your device"));
-
-        //        await durableClient.SignalEntityAsync<IWorkflowCheckpoint>(entityId, proxy =>
-        //                        proxy.SetTimeStamp(DateTime.UtcNow));
-        //    }
-        //    else if ((await currentstate.EntityState.GetAvailableCommands()) == null || (await currentstate.EntityState.GetAvailableCommands()).Count == 0)
-        //    {
-        //        log.LogWarning("unprovisioned state - populating missing property available commands");
-        //        // defend against unpopulated properties
-        //        await durableClient.SignalEntityAsync<IWorkflowCheckpoint>(entityId, proxy =>
-        //                    proxy.SetAvailableCommands(defaultCommandSet));
-
-        //    }
-
-
-        //    //var teststate = await durableClient.ReadEntityStateAsync<IWorkflowCheckpoint>(entityId);
-        //    var state = await durableClient.ReadEntityStateAsync<WorkflowCheckpointEditMode>(entityId);
-        //    return state;
-        //}
     }
 }
