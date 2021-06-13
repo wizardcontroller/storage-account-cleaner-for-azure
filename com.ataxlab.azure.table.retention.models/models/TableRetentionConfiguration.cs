@@ -44,10 +44,10 @@ namespace com.ataxlab.azure.table.retention.models
     /// </summary>
     public class DefaultTableRetentionConfiguration : TableRetentionConfiguration
     {
-        public static String WADMetrics = "WADMetrics";
-        public static String WADDiagnosticInfrastructureLogsTable = "WADDiagnosticInfrastructureLogsTable";
-        public static String WADWindowsEventLogsTable = "WADWindowsEventLogsTable";
-        public static String WADPerformanceCountersTable = "WADPerformanceCountersTable";
+        public String WADMetrics = "WADMetrics";
+        public String WADDiagnosticInfrastructureLogsTable = "WADDiagnosticInfrastructureLogsTable";
+        public String WADWindowsEventLogsTable = "WADWindowsEventLogsTable";
+        public String WADPerformanceCountersTable = "WADPerformanceCountersTable";
         public List<String> WADMetricsTableNameMatchPatterns { get; set; }
         private List<String> defaultDiagnosticsList;
         private List<String> defaultMetricsist;

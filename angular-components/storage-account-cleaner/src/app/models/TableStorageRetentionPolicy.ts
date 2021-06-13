@@ -5,7 +5,7 @@ import { TableStorageEntityRetentionPolicy } from "./TableStorageEntityRetention
 @Injectable()
 
 
-export class TableStorageRetentionPolicyEntity {
+export class TableStorageRetentionPolicy {
   constructor() {}
   public id : String = new String();
 

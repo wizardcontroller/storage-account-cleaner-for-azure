@@ -115,6 +115,10 @@ namespace com.ataxlab.functions.table.retention.entities
         [JsonProperty("DeleteOlderTablesThanCurrentMonthMinusThis")]
         public int DeleteOlderTablesThanCurrentMonthMinusThis { get; set; }
 
+
+        public DateTime OldestRetainedTable {get; set;}
+
+        public DateTime MostRecentRetainedTable {get; set;}
         /// <summary>
         /// you'd be better off supplying these
         /// </summary>
@@ -202,6 +206,13 @@ namespace com.ataxlab.functions.table.retention.entities
         /// </summary>
         [JsonProperty("NumberOfDays")]
         public int NumberOfDays { get; set; }
+
+        
+        public DateTime OldestRetainedEntity {get; set;}
+
+        public DateTime MostRecentRetainedEntity {get; set;}
+
+
         public DiagnosticsRetentionSurfaceEntity DiagnosticsRetentionSurface { get; set; }
 
         public String GetTicks(Func<String> tickProvider = null)

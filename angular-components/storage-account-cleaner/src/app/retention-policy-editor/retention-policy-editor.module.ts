@@ -4,8 +4,9 @@ import { RetentionPolicyEditorComponent } from './retention-policy-editor.compon
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
   ],
+  exports: [RetentionPolicyEditorComponent],
   declarations: [RetentionPolicyEditorComponent]
 })
 export class RetentionPolicyEditorModule { }
