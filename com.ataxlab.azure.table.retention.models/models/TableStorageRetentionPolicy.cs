@@ -9,6 +9,7 @@ using System.Text;
 
 namespace com.ataxlab.azure.table.retention.models
 {
+    ///todo enumerate these numerically wherever they appear
     public enum PolicyEnforcementMode { WhatIf, ApplyPolicy}
 
     public class TableStorageTableRetentionPolicy
@@ -36,6 +37,10 @@ namespace com.ataxlab.azure.table.retention.models
         /// defaults to 65536 just in case man
         /// </summary>
         public int DeleteOlderTablesThanCurrentMonthMinusThis { get; set; }
+
+        public DateTime OldestRetainedTable {get; set;}
+
+        public DateTime MostRecentRetainedTable {get; set;}
 
         /// <summary>
         /// you'd be better off supplying these
@@ -127,6 +132,10 @@ namespace com.ataxlab.azure.table.retention.models
         /// defaults to 65536 just in case woman
         /// </summary>
         public int NumberOfDays { get; set; }
+
+        public DateTime OldestRetainedEntity {get; set;}
+
+        public DateTime MostRecentRetainedEntity {get; set;}
 
         public String GetTicks(Func<String> tickProvider = null)
         {
