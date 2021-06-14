@@ -678,57 +678,5 @@ namespace com.ataxlab.functions.table.retention.c2
         }
 
 
-        [FunctionName(ControlChannelConstants.RetentionPolicyEndpoint)]
-        public async Task<ActionResult<TableStorageRetentionPolicy>> RetentionPolicyEndpoint(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post" , Route = ControlChannelConstants.RetentionPolicyEndpoint
-                                                            + ControlChannelConstants.RetentionPolicyRouteTemplate)]
-        HttpRequestMessage req,
-        [DurableClient] IDurableClient durableClient,
-        [DurableClient] IDurableEntityClient durableEntityClient,
-        string tenantId,
-        string oid,
-        string subscriptionId,
-        string storageAccountId,
-        ClaimsPrincipal claimsPrincipal)
-        {
-            log.LogInformation("RetentionPolicyEndpoint");
-            var ret = new ActionResult<TableStorageRetentionPolicy>(new TableStorageRetentionPolicy());
-
-            bool isAuthorized = false;
-            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
-
-            if (isAuthorized)
-            {
-                log.LogInformation("authorized request");
-                try
-                {
-                    log.LogInformation("getting workflow checkpoint response for user");
-                    var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
-                    log.LogInformation("got workflow checkpoint response for user");
-
-                    return await Task.FromResult(ret);
-                }
-                catch (Exception e)
-                {
-
-                    log.LogWarning("problem getting checkpoint for user. recovering state {0}", e.Message);
-
-                    log.LogError("problem getting checkpoint {0}", e.Message);
-                    HttpResponseMessage unauthorizedResp = new HttpResponseMessage();
-                    unauthorizedResp.StatusCode = HttpStatusCode.Accepted;
-                    return ret;
-                }
-            }
-            else
-            {
-
-                log.LogWarning("unauthorized request");
-                // fell through to here because of unauthorized request
-                HttpResponseMessage unauthorizedResp = new HttpResponseMessage();
-                unauthorizedResp.StatusCode = HttpStatusCode.Unauthorized;
-                return await Task.FromResult(ret);
-
-            }
-        }
     }
 }
