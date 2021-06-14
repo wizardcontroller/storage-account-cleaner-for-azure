@@ -679,7 +679,7 @@ namespace com.ataxlab.functions.table.retention.c2
 
 
         [FunctionName(ControlChannelConstants.RetentionPolicyEndpoint)]
-        public async Task<HttpResponseMessage> RetentionPolicyEndpoint(
+        public async Task<ActionResult<TableStorageRetentionPolicy>> RetentionPolicyEndpoint(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post" , Route = ControlChannelConstants.RetentionPolicyEndpoint
                                                             + ControlChannelConstants.RetentionPolicyRouteTemplate)]
         HttpRequestMessage req,
@@ -687,9 +687,13 @@ namespace com.ataxlab.functions.table.retention.c2
         [DurableClient] IDurableEntityClient durableEntityClient,
         string tenantId,
         string oid,
+        string subscriptionId,
+        string storageAccountId,
         ClaimsPrincipal claimsPrincipal)
         {
-            log.LogInformation("QueryWorkflowCheckpointStatusEndpoint");
+            log.LogInformation("RetentionPolicyEndpoint");
+            var ret = new ActionResult<TableStorageRetentionPolicy>(new TableStorageRetentionPolicy());
+
             bool isAuthorized = false;
             isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
 
@@ -702,7 +706,7 @@ namespace com.ataxlab.functions.table.retention.c2
                     var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
                     log.LogInformation("got workflow checkpoint response for user");
 
-                    return response;
+                    return await Task.FromResult(ret);
                 }
                 catch (Exception e)
                 {
@@ -712,7 +716,7 @@ namespace com.ataxlab.functions.table.retention.c2
                     log.LogError("problem getting checkpoint {0}", e.Message);
                     HttpResponseMessage unauthorizedResp = new HttpResponseMessage();
                     unauthorizedResp.StatusCode = HttpStatusCode.Accepted;
-                    return unauthorizedResp;
+                    return ret;
                 }
             }
             else
@@ -722,7 +726,7 @@ namespace com.ataxlab.functions.table.retention.c2
                 // fell through to here because of unauthorized request
                 HttpResponseMessage unauthorizedResp = new HttpResponseMessage();
                 unauthorizedResp.StatusCode = HttpStatusCode.Unauthorized;
-                return unauthorizedResp;
+                return await Task.FromResult(ret);
 
             }
         }

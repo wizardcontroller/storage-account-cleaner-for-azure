@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "..\\com.ataxlab.functions.table.retention.dashboard.rcl\\Views"
+		},
+		{
+			"path": "..\\..\\..\\danwahlin-angular-architecture\\angular-architecture"
 		}
 	]
 }
