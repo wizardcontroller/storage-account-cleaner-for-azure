@@ -2,6 +2,16 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "appliance-apiclient": [
+        "dist/appliance-apiclient/appliance-apiclient",
+        "dist/appliance-apiclient"
+      ],
+      "appliance-client": [
+        "dist/appliance-client/appliance-client",
+        "dist/appliance-client"
+      ]
+    },
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,

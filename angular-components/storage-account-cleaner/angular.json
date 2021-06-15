@@ -100,6 +100,68 @@
           }
         }
       }
+    },
+    "appliance-client": {
+      "projectType": "library",
+      "root": "projects/appliance-client",
+      "sourceRoot": "projects/appliance-client/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/appliance-client/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/appliance-client/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/appliance-client/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/appliance-client/src/test.ts",
+            "tsConfig": "projects/appliance-client/tsconfig.spec.json",
+            "karmaConfig": "projects/appliance-client/karma.conf.js"
+          }
+        }
+      }
+    },
+    "appliance-apiclient": {
+      "projectType": "library",
+      "root": "projects/appliance-apiclient",
+      "sourceRoot": "projects/appliance-apiclient/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/appliance-apiclient/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/appliance-apiclient/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/appliance-apiclient/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/appliance-apiclient/src/test.ts",
+            "tsConfig": "projects/appliance-apiclient/tsconfig.spec.json",
+            "karmaConfig": "projects/appliance-apiclient/karma.conf.js"
+          }
+        }
+      }
     }
   },
   "defaultProject": "storage-account-cleaner"
