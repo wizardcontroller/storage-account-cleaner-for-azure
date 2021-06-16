@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 
 namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 {
+
     [AuthorizeForScopes(Scopes = new[] { "/.default" })]
     [Route("[controller]/[action]/{oid?}/{subscriptionId?}/{tenantid?}/{workflowoperation?}/{commandId?}")]
     [EnableCors("CorsPolicy")]
@@ -192,6 +193,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return isValid;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("/ConfigureAppliance")]
         public async Task<IActionResult> GetCofigureAppliance()
@@ -261,6 +263,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Route("/configureappliance")]
         //[Route("{controller}/{oid}/{action}")]
         // [Route("ConfigureAppliance/{Id}")]

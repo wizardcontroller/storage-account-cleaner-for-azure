@@ -48,7 +48,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="extensions\" />
     <Folder Include="Models\" />
     <Folder Include="options\" />

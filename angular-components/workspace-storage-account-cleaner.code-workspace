@@ -4,16 +4,17 @@
 			"path": "."
 		},
 		{
-			"path": "..\\com.ataxlab.azure.table.retention.models"
-		},
-		{
-			"path": "..\\azure-table-retention"
-		},
-		{
 			"path": "..\\com.ataxlab.functions.table.retention.dashboard.rcl\\Views"
 		},
 		{
 			"path": "..\\..\\..\\danwahlin-angular-architecture\\angular-architecture"
+		},
+		{
+			"path": "..\\..\\..\\saas-storage-account-cleaner-for-azure\\angular-prototypes\\swagger"
 		}
-	]
+	],
+	"settings": {
+		"angular.enable-strict-mode-prompt": false,
+		"git.ignoreLimitWarning": true
+	}
 }

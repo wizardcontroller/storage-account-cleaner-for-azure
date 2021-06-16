@@ -121,6 +121,7 @@ namespace com.ataxlab.azure.table.retention.models.control
         //public const string COOKIE_CURRENTSUBSCRIPTION = "SelectedSubscription";
 
         public const string HEADER_CURRENTSUBSCRIPTION = "x-table-retention-current-subscription";
+        public const string HEADER_CURRENT_STORAGE_ACCOUNT = "x-table-retention-current-storage-account";
         public const string HEADER_IMPERSONATION_TOKEN = "x-table-retention-mgmt-impersonation";
         public const string HEADER_AUTHORIZATION = "authorization";
         public const string HEADER_X_ZUMO_AUTH = "X-ZUMO-AUTH";
