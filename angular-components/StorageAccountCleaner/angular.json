@@ -17,6 +17,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "stylePreprocessorOptions": {
+              "includePaths": ["../../com.ataxlab.functions.table.retention.dashboard/wwwroot/css"]
+            },
             "outputPath": "dist/StorageAccountCleaner",
             "index": "src/index.html",
             "main": "src/main.ts",

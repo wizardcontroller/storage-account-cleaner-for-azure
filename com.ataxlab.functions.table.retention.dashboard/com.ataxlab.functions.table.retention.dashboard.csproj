@@ -57,6 +57,7 @@
     <Folder Include="Views\Home\" />
     <Folder Include="Views\Shared\DisplayTemplates\" />
     <Folder Include="Views\Shared\EditorTemplates\" />
+    <Folder Include="wwwroot\angular\" />
   </ItemGroup>
 
 </Project>

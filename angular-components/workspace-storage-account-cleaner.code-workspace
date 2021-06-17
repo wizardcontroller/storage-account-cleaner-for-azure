@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "..\\com.ataxlab.functions.table.retention.dashboard.rcl\\Views"
+		},
+		{
+			"path": "..\\com.ataxlab.functions.table.retention.dashboard\\wwwroot"
 		}
 	],
 	"settings": {
