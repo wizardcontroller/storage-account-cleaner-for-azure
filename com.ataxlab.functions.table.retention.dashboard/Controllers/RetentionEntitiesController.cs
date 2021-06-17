@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 {
     [Route("api/[controller]/[Action]/{tenantId}/{oid}")]
+    [Produces("application/json")]
     [ApiController]
     public class RetentionEntitiesController : ControllerBase
     {

@@ -195,6 +195,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
         [HttpGet]
         [Route("/OperatorPageModel")]
+        [Produces("application/json")]
         public async Task<OperatorPageModel> GetOperatorPageModel()
         {
             var model = await InitializeOperatorPageModel();
