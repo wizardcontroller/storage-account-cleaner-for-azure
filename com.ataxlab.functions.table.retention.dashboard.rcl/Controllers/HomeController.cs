@@ -193,6 +193,14 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return isValid;
         }
 
+        [HttpGet]
+        [Route("/OperatorPageModel")]
+        public async Task<OperatorPageModel> GetOperatorPageModel()
+        {
+            var model = await InitializeOperatorPageModel();
+            return model;
+        }
+
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("/ConfigureAppliance")]
@@ -519,7 +527,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         }
 
         [HttpGet]
-        [Route("/Privacy")]
+        [Route("Privacy")]
         public IActionResult Privacy()
         {
             return View();
