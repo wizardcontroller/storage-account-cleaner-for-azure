@@ -74,12 +74,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
 
-        [HttpGet(Name="GetOperatorPageModel")]
-        public async Task<OperatorPageModel> GetOperatorPageModel([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-        [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
-        {
-            return await Task.FromResult(new OperatorPageModel());
-        }
+        //[HttpGet(Name="GetOperatorPageModel")]
+        //public async Task<OperatorPageModel> GetOperatorPageModel([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
+        //[FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
+        //{
+        //    return await Task.FromResult(new OperatorPageModel());
+        //}
 
         [HttpPost(Name="SetOperatorPageModel")]
         public async Task<OperatorPageModel> SetOperatorPageModel([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,

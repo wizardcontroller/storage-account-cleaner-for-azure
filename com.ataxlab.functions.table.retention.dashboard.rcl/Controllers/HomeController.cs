@@ -421,7 +421,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet(Name = "BeginWorkflow")]
+        [HttpGet(Name = "ProvisionAppliance")]
         [Route("/Dashboard/ProvisionAppliance/{commandId}")]
 
         public async Task<ActionResult> ProvisionAppliance(string commandId)
