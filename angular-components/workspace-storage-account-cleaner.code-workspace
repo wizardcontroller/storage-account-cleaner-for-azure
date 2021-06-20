@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "..\\com.ataxlab.functions.table.retention.dashboard\\wwwroot"
+		},
+		{
+			"path": "..\\..\\..\\saas-storage-account-cleaner-for-azure\\angular-prototypes\\swagger\\storage-account-cleaner-appliance"
 		}
 	],
 	"settings": {

@@ -57,7 +57,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             TableRetentionApplianceScopes = requiredScopes;
         }
 
-        [HttpGet]
+        [HttpGet(Name="Index")]
         [Route("/")]
         // [Route("/[controller]")]
         [AllowAnonymous]
@@ -115,7 +115,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return OperatorPageModel;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "BeginEnvironmentDiscovery")]
         [Route("/Dashboard/BeginEnvironmentDiscovery/{commandId}")]
 
         public async Task<ActionResult> BeginEnvironmentDiscovery(string id)
@@ -193,7 +193,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return isValid;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetOperatorPageModel")]
         [Route("/OperatorPageModel")]
         [Produces("application/json")]
         public async Task<OperatorPageModel> GetOperatorPageModel()
@@ -203,7 +203,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet]
+        [HttpGet(Name = "GetCofigureAppliance")]
         [Route("/ConfigureAppliance")]
         public async Task<IActionResult> GetCofigureAppliance()
         {
@@ -270,7 +270,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         /// </summary>
         /// <param name="applianceSessionContext"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost(Name = "ConfigureAppliance")]
         [ValidateAntiForgeryToken]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Route("/configureappliance")]
@@ -368,7 +368,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return RedirectToAction(nameof(HomeController.Operator), OperatorPageModel);
         }
 
-        [HttpGet]
+        [HttpGet(Name = "SelectSubscription")]
         [Route("/dashboard/{oid}/selectsubscription/{subscriptionId}")]
         public async Task<ActionResult> SelectSubscription(string oid, string subscriptionId)
         {
@@ -421,7 +421,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet(Name = "BeginWorkflow")]
         [Route("/Dashboard/ProvisionAppliance/{commandId}")]
 
         public async Task<ActionResult> ProvisionAppliance(string commandId)
@@ -452,7 +452,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return RedirectToAction(nameof(Operator));
         }
 
-        [HttpGet]
+        [HttpGet(Name = "BeginWorkflow")]
         //[Route("BeginWorkflow/{commandId}")]
         [Route("/Dashboard/BeginWorkflow/{commandId}")]
         public async Task<IActionResult> BeginWorkflow(string commandId)
@@ -481,7 +481,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return RedirectToAction(nameof(Operator));
         }
 
-        [HttpGet]
+        [HttpGet(Name = "SelectCommand")]
 
 
         //[Route("/dashboard/dispatch/{tenantid}/{workflowoperation}/{commandid}")]
@@ -516,7 +516,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return RedirectToAction(nameof(Operator));
         }
 
-        [HttpGet]
+        [HttpGet(Name = "Operator")]
         [Route("/Operator")]
         public async Task<IActionResult> Operator()
         {
@@ -527,14 +527,14 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
         }
 
-        [HttpGet]
+        [HttpGet(Name = "Privacy")]
         [Route("Privacy")]
         public IActionResult Privacy()
         {
             return View();
         }
 
-        [HttpGet]
+        [HttpGet(Name = "Error")]
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
