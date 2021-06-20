@@ -39,7 +39,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             TableRetentionApplianceScopes = requiredScopes;
         }
 
-        [HttpGet]
+        [HttpGet(Name="GetApplianceStatuss")]
         [AuthorizeForScopes(Scopes = new[] { "User.Read" })]
         [EnableCors("CorsPolicy")]
         [Authorize]
