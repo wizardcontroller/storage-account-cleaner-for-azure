@@ -29,8 +29,10 @@ using Microsoft.Graph;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Polly;
 using Polly.Extensions.Http;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,6 +44,29 @@ using static System.Net.WebRequestMethods;
 
 namespace com.ataxlab.functions.table.retention.dashboard
 {
+    /// <summary>
+    /// as per https://stackoverflow.com/questions/29701573/how-to-omit-methods-from-swagger-documentation-on-webapi-using-swashbuckle
+    /// </summary>
+    class RemoveVerbsFilter : IDocumentFilter
+    {
+   
+        /// <summary>
+        /// filter openaapi spec
+        /// </summary>
+        /// <param name="swaggerDoc"></param>
+        /// <param name="context"></param>
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
+        {
+            var pathsToRemove = swaggerDoc.Paths
+                            .Where(pathItem => pathItem.Key.Contains("/MicrosoftIdentity"))
+                            .ToList();
+
+            foreach (var item in pathsToRemove)
+            {
+                swaggerDoc.Paths.Remove(item.Key);
+            }
+        }
+    }
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -77,7 +102,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
 
                 EnsureServicesConfiguration(services);
 
- 
+
                 // holy crap trailing slashes matter 
                 var applianceBaseUrl = Configuration.GetValue<String>("ApplianceBaseUrl");
                 applianceBaseUrl = applianceBaseUrl == null ? String.Empty :
@@ -141,7 +166,8 @@ namespace com.ataxlab.functions.table.retention.dashboard
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Storage Account Cleaner For Azure", Version = "v1" });
-
+                // as per https://stackoverflow.com/questions/29701573/how-to-omit-methods-from-swagger-documentation-on-webapi-using-swashbuckle
+                c.DocumentFilter<RemoveVerbsFilter>();
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
 
