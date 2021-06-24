@@ -1,2 +1,2 @@
 
-export * from '@wizardcontroller/storage-account-cleaner-lib/src/appliance-webapi/index'
+export * from '@wizardcontroller/sac-appliance-lib'

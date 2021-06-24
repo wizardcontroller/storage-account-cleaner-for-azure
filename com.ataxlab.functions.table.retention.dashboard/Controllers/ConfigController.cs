@@ -11,9 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace com.ataxlab.functions.table.retention.dashboard.rcl.Controllers
 {
+    [AllowAnonymous]
     [Route("[controller]/[action]")]
     public class ConfigController : Controller
     {

@@ -116,7 +116,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
                                       builder =>
                                       {
                                           builder.WithOrigins("https://localhost:44349", "https://localhost", "http://localhost",
-                                                              "https://logon.microsoft.com",
+                                                              "https://logon.microsoft.com", "http://192.168.10.138:4200",
                                                               applianceBaseUrl)
                                           .AllowAnyHeader()
                                           .AllowAnyMethod()
