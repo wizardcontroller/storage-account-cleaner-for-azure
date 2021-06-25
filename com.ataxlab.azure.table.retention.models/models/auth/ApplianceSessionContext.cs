@@ -51,7 +51,7 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
         public List<SubscriptionDTO> AvailableSubscriptions { get; set; }
         public List<StorageAccountDTO> AvailableStorageAccounts { get; set; }
 
-        public List<ApplianceJobOutput> JobOutput { get; set; } 
+        public List<ApplianceJobOutput> JobOutput { get; set; }
 
         [JsonProperty("CurrentJobOutput")]
         public ApplianceJobOutput CurrentJobOutput { get; set; }
@@ -70,12 +70,12 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
         /// <summary>
         /// useful for rendering asp.net core display templates from a collection
         /// </summary>
-        internal List<Tuple<TableStorageTableRetentionPolicy, RetentionPolicyTupleContainer>> TableRetentionPolicies 
+        internal List<Tuple<TableStorageTableRetentionPolicy, RetentionPolicyTupleContainer>> TableRetentionPolicies
         {
             get
             {
                 var ret = new List<Tuple<TableStorageTableRetentionPolicy, RetentionPolicyTupleContainer>>();
-                foreach(var job in RetentionPolicyJobs)
+                foreach (var job in RetentionPolicyJobs)
                 {
                     ret.Add(new Tuple<TableStorageTableRetentionPolicy, RetentionPolicyTupleContainer>
                                 (job.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy, job));
@@ -85,7 +85,7 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
             }
         }
 
-#region obsolete 
+        #region obsolete 
         [Obsolete]
         public TableStorageTableRetentionPolicyEnforcementResult TableRetentionResult { get; set; }
 
@@ -108,25 +108,27 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
         [JsonIgnore]
         [JsonProperty("NotTheWireRetentionPolicyTuples")]
         public List<RetentionPolicyTupleContainer> RetentionPolicyTuples
-        { 
+        {
             get
             {
                 var ret = new List<RetentionPolicyTupleContainer>();
-                foreach (var tuple in PolicyTuples)
+                if (PolicyTuples != null)
                 {
-                    ret.Add(new RetentionPolicyTupleContainer()
+                    foreach (var tuple in PolicyTuples)
                     {
-                        SourceTuple = tuple,
-                        TableStorageRetentionPolicy = tuple.Item1,
-                        StorageAccount = tuple.Item2
-                    });
+                        ret.Add(new RetentionPolicyTupleContainer()
+                        {
+                            SourceTuple = tuple,
+                            TableStorageRetentionPolicy = tuple.Item1,
+                            StorageAccount = tuple.Item2
+                        });
+                    }
                 }
-
                 return ret;
             }
         }
 
-#endregion obsolete 
+        #endregion obsolete 
         /// <summary>
         /// container for policies and enforcement results
         /// one per job
@@ -156,7 +158,7 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
         /// <summary>
         /// tuples interfere with asp.net core mvc view scaffolding
         /// </summary>
-        public async Task<Tuple<TableStorageRetentionPolicy, StorageAccountDTO>> GetSourceTuple() 
+        public async Task<Tuple<TableStorageRetentionPolicy, StorageAccountDTO>> GetSourceTuple()
         {
             return await Task.FromResult(SourceTuple);
         }
