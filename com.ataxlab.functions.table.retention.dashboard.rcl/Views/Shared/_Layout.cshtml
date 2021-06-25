@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html class="no-js" lang="en">
 <head>
+    <base href="/">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - dashboard</title>
@@ -91,9 +92,16 @@
     <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
     <script>$(document).ready(function () { $('body').bootstrapMaterialDesign(); });</script>
-    <script src="~/angular/runtime.4495585b41883d543463.js" defer></script>
-    <script src="~/angular/polyfills.795a675696049aa4f088.js" defer></script>
-    <script src="~/angular/main.9c317224dd01ca9763b1.js" defer></script>
+
+    
+    <script>
+        $(document).ready(function () {
+            $("#angular").load("angular-assets/app-root.html");
+            console.log("set up angular comopnents");
+});
+
+    </script>
+    <div id="angular"></div>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

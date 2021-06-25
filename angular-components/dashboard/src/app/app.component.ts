@@ -10,6 +10,7 @@ import { OperatorPageModel } from 'index';
 })
 export class AppComponent implements OnInit {
   operatorPageModel: OperatorPageModel | undefined;
+  baseUri: String | undefined;
   title = 'dashboard';
   constructor(private apiConfigSvc : ApiConfigService) {
 
@@ -17,6 +18,7 @@ export class AppComponent implements OnInit {
 
    ngOnInit(): void {
     this.operatorPageModel = this.apiConfigSvc.operatorPageModel;
+    this.baseUri = this.operatorPageModel?.applianceUrl?.toString();
   }
 
 }

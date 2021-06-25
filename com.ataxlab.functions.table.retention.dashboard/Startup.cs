@@ -23,6 +23,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
@@ -322,6 +323,32 @@ namespace com.ataxlab.functions.table.retention.dashboard
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            #region angular integration
+            // corresponds with /angular* paths
+            // expected by angular components
+            // that are otherwise self-contained
+            // and configured at runtime by calling
+            // configuration webapi
+            var cwd = Directory.GetParent(Directory.GetCurrentDirectory());
+            var angularPath = Path.Combine(cwd.FullName, "angular-components\\dashboard\\dist\\dashboard");
+            var angularAssetsPath = Path.Combine(cwd.FullName, "angular-components\\dashboard\\dist\\dashboard\\assets");
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+
+                FileProvider = new PhysicalFileProvider(angularPath),
+                RequestPath = new PathString("/angular")
+            });
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+
+                FileProvider = new PhysicalFileProvider(angularAssetsPath),
+                RequestPath = new PathString("/angular-assets")
+            });
+
+            #endregion angular integration
 
             // as per https://seankilleen.com/2020/06/solved-net-core-azure-ad-in-docker-container-incorrectly-uses-an-non-https-redirect-uri/
             // attempted fix for aad redict url issues to docker apps running on http: you cannot redirect to a routeable http from azuread
