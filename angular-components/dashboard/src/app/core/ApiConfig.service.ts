@@ -1,5 +1,6 @@
 
 import { Injectable, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ConfigService, OperatorPageModel } from 'index';
 @Injectable({
   providedIn: 'root'
@@ -7,8 +8,10 @@ import { ConfigService, OperatorPageModel } from 'index';
 export class ApiConfigService implements OnInit {
   operatorPageModel: OperatorPageModel | undefined;
 
-constructor(private configService : ConfigService) {
+constructor(private configService : ConfigService, private router: Router) {
   console.log("config service starting");
+
+  configService.configuration.basePath = window.location.origin;
   this.ngOnInit();
  }
 
@@ -21,8 +24,12 @@ constructor(private configService : ConfigService) {
     (
         (data: OperatorPageModel) => this.operatorPageModel = data,
         (err: any) => console.log(err),
-        () => console.log("done getting operator page model")
+        () => {
+          console.log("done getting operator page model: applianceUrl is " + this.operatorPageModel?.applianceUrl);
+        }
     );
+
+
   }
 
 }
