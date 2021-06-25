@@ -325,28 +325,28 @@ namespace com.ataxlab.functions.table.retention.dashboard
             app.UseStaticFiles();
 
             #region angular integration
-            // corresponds with /angular* paths
-            // expected by angular components
-            // that are otherwise self-contained
-            // and configured at runtime by calling
-            // configuration webapi
-            var cwd = Directory.GetParent(Directory.GetCurrentDirectory());
-            var angularPath = Path.Combine(cwd.FullName, "angular-components\\dashboard\\dist\\dashboard");
-            var angularAssetsPath = Path.Combine(cwd.FullName, "angular-components\\dashboard\\dist\\dashboard\\assets");
+            //// corresponds with /angular* paths
+            //// expected by angular components
+            //// that are otherwise self-contained
+            //// and configured at runtime by calling
+            //// configuration webapi
+            //var cwd = Directory.GetParent(Directory.GetCurrentDirectory());
+            //var angularPath = Path.Combine(cwd.FullName, "angular-components\\dashboard\\dist\\dashboard");
+            //var angularAssetsPath = Path.Combine(cwd.FullName, "angular-components\\dashboard\\dist\\dashboard\\assets");
 
-            app.UseStaticFiles(new StaticFileOptions()
-            {
+            //app.UseStaticFiles(new StaticFileOptions()
+            //{
 
-                FileProvider = new PhysicalFileProvider(angularPath),
-                RequestPath = new PathString("/angular")
-            });
+            //    FileProvider = new PhysicalFileProvider(angularPath),
+            //    RequestPath = new PathString("/angular")
+            //});
 
-            app.UseStaticFiles(new StaticFileOptions()
-            {
+            //app.UseStaticFiles(new StaticFileOptions()
+            //{
 
-                FileProvider = new PhysicalFileProvider(angularAssetsPath),
-                RequestPath = new PathString("/angular-assets")
-            });
+            //    FileProvider = new PhysicalFileProvider(angularAssetsPath),
+            //    RequestPath = new PathString("/angular-assets")
+            //});
 
             #endregion angular integration
 

@@ -2,11 +2,19 @@
 import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigService, OperatorPageModel } from 'index';
+import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
+import { BehaviorSubject, Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
+
+@AutoUnsubscribe()
 export class ApiConfigService implements OnInit {
   operatorPageModel: OperatorPageModel | undefined;
+    // operator page model change notification support
+    private currentPageModelSource =  new BehaviorSubject<OperatorPageModel | null>(null);
+    operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
+
 
 constructor(private configService : ConfigService, private router: Router) {
   console.log("config service starting");
@@ -19,17 +27,39 @@ constructor(private configService : ConfigService, private router: Router) {
     currently angular injectables do not participate in all lifecycle hooks
   */
   ngOnInit(): void {
-    console.log("calling config service");
-    this.configService.getOperatorPageModel().subscribe
-    (
-        (data: OperatorPageModel) => this.operatorPageModel = data,
-        (err: any) => console.log(err),
-        () => {
-          console.log("done getting operator page model: applianceUrl is " + this.operatorPageModel?.applianceUrl);
-        }
-    );
-
 
   }
+
+   /*
+                call the dashboard and get the operator page model
+                including base url for discovery appliance
+                and user appliances
+            */
+                getOperatorPageModel() {
+                  console.log("apiconfigsvc is getting operator page model");
+                  this.configService.configuration.basePath = window.location.origin;
+                  console.log('calling config service');
+                  this.configService.getOperatorPageModel().subscribe(
+                    (data: OperatorPageModel) => {
+                      return this.gotOperatorPageModel(data);
+                    },
+                    (err: any) => console.log(err),
+                    () => {
+                      console.log(
+                        'done getting operator page model: applianceUrl is ' +
+                          this.operatorPageModel?.applianceUrl
+                      );
+                    }
+                  );
+                }
+
+                /**
+                 * @description signal the new pagemodel subject listeners
+                 * @param data
+                 */
+                private gotOperatorPageModel(data: OperatorPageModel): void {
+                  this.operatorPageModel = data;
+                  this.currentPageModelSource.next(data);
+                }
 
 }

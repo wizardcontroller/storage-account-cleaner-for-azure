@@ -20,6 +20,7 @@
     "@angular/router": "~12.0.4",
     "@wizardcontroller/sac-appliance-lib": "^0.0.15",
     "@wizardcontroller/storage-account-cleaner-lib": "^0.0.16",
+    "ngx-auto-unsubscribe": "^3.0.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.1.0",
     "zone.js": "~0.11.4"

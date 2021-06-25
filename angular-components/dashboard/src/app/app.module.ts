@@ -1,3 +1,4 @@
+import { SharedModule } from './shared/shared.module';
 
 import { CoreModule } from './core/core.module';
 import { HttpClientModule } from '@angular/common/http';
@@ -20,6 +21,7 @@ import {ApiModule} from '@wizardcontroller/sac-appliance-lib'
   imports: [
     ApiModule,
     CoreModule,
+    SharedModule,
     BrowserModule,
     AppRoutingModule,
     HttpClientModule
