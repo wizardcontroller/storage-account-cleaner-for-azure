@@ -12,7 +12,6 @@ import { ApiConfigService } from 'src/app/core/ApiConfig.service';
   providedIn: 'root',
 })
 
-@AutoUnsubscribe()
 export class ApplianceApiService {
   operatorPageModel!: OperatorPageModel | null;
   baseUri: string | undefined;

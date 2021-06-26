@@ -10,10 +10,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BASE_PATH } from '@wizardcontroller/sac-appliance-lib';
 import { environment } from '../environments/environment';
-
-
+import {CardModule} from 'primeng/card';
+import {ButtonModule} from 'primeng/button';
 import {ApiModule} from '@wizardcontroller/sac-appliance-lib'
-
+import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index';
 @NgModule({
   declarations: [
     AppComponent
@@ -24,6 +24,8 @@ import {ApiModule} from '@wizardcontroller/sac-appliance-lib'
     SharedModule,
     BrowserModule,
     AppRoutingModule,
+    CardModule,
+    ButtonModule,
     HttpClientModule
   ],
   providers: [{ provide: BASE_PATH, useValue: environment.API_BASE_PATH }],

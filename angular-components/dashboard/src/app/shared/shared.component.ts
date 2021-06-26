@@ -7,7 +7,6 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
   styleUrls: ['./shared.component.css']
 })
 
-@AutoUnsubscribe()
 export class SharedComponent implements OnInit {
 
   constructor() { }

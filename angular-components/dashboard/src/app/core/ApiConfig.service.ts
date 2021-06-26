@@ -3,16 +3,15 @@ import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigService, OperatorPageModel } from 'index';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
 
-@AutoUnsubscribe()
 export class ApiConfigService implements OnInit {
-  operatorPageModel: OperatorPageModel | undefined;
+  operatorPageModel!: OperatorPageModel;
     // operator page model change notification support
-    private currentPageModelSource =  new BehaviorSubject<OperatorPageModel | null>(null);
+    private currentPageModelSource =  new ReplaySubject<OperatorPageModel>();
     operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
 
 

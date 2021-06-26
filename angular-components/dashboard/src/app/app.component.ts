@@ -1,11 +1,13 @@
 import { ApplianceApiService } from './shared/services/appliance-api.service';
 
 import { ApiConfigService } from './core/ApiConfig.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CoreComponent } from './core/core.component';
-import { OperatorPageModel } from 'index';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index';
+import { BehaviorSubject, Operator, ReplaySubject, Subject } from 'rxjs';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
+import { SubscriptionsViewComponent } from './shared/display-templates/SubscriptionsView/SubscriptionsView.component';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -13,12 +15,12 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 })
 
 @AutoUnsubscribe()
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
 
-  operatorPageModel!: OperatorPageModel | null;
+  operatorPageModel!: OperatorPageModel;
     // operator page model change notification support
-    private currentPageModelSource = new BehaviorSubject<OperatorPageModel | null>(null);
+    private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
     operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
 
   baseUri: String | undefined;
@@ -26,9 +28,12 @@ export class AppComponent implements OnInit {
   constructor(private apiConfigSvc : ApiConfigService, private applianceSvc : ApplianceApiService) {
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       console.log("app component has operator page model");
-      this.baseUri = data?.applianceUrl?.toString();
+      this.baseUri = data.applianceUrl?.toString();
       return this.operatorPageModel = data;
     });
+  }
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
   }
 
    ngOnInit(): void {

@@ -1,1 +1,14 @@
-<span>Welcome {{title}} - base url: {{baseUri}}<app-core></app-core></span>
+<p-card header="Appliance Context">
+  <fieldset title="Azure Active Directory">
+    <div class="row">
+      <div class="col-sm-3">Appliance URL</div>
+      <div class="col-sm-9">{{ operatorPageModel?.applianceUrl }}</div>
+    </div>
+    <hr/>
+    <app-SubscriptionsView></app-SubscriptionsView>
+    <hr/>
+  </fieldset>
+  <ng-template pTemplate="footer">
+    <p-button label="Storage Accounts"></p-button>
+  </ng-template>
+</p-card>
