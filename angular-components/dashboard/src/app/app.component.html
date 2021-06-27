@@ -1,4 +1,5 @@
 <p-card header="Appliance Context">
+  <button pButton type="button" icon="fa-pencil" class="ui-button-secondary" (click)="toggleExpand('azuread')"></button>
   <fieldset title="Azure Active Directory">
     <ng-container *ngif="operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
       <div class="row">

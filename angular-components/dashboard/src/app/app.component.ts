@@ -33,6 +33,11 @@ export class AppComponent implements OnInit, OnDestroy {
       return this.operatorPageModel = data;
     });
   }
+
+  toggleExpand(section : any){
+
+  }
+
   ngOnDestroy(): void {
     throw new Error('Method not implemented.');
   }

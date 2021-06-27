@@ -1,12 +1,18 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async, inject } from '@angular/core/testing';
+import { ConfigService, RetentionEntitiesService } from '@wizardcontroller/sac-appliance-lib';
 import { ApplianceApiService } from './appliance-api.service';
-
+import {OperatorPageModel} from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index'
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 describe('Service: ApplianceApi', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ApplianceApiService]
+      imports: [
+        HttpClientTestingModule, RouterTestingModule
+        ],
+      providers: [ ApplianceApiService ]
     });
   });
 

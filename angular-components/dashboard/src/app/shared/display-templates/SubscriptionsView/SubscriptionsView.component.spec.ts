@@ -4,6 +4,8 @@ import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { SubscriptionsViewComponent } from './SubscriptionsView.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('SubscriptionsViewComponent', () => {
   let component: SubscriptionsViewComponent;
@@ -11,6 +13,7 @@ describe('SubscriptionsViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, RouterTestingModule],
       declarations: [ SubscriptionsViewComponent ]
     })
     .compileComponents();
