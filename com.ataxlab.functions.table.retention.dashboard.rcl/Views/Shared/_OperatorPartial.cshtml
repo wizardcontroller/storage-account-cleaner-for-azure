@@ -125,9 +125,52 @@
 
 }
 
-</script>}
+</script>
+}
 
                 <div id="accordion">
+                    <h3>Workbench</h3>
+                    <div>
+                        <!--loaded by angular components -->
+
+                        <script>
+                            //$(document).ready(function () {
+                            //    $("#angular").load("angular/app-root.html");
+                            //    console.log("set up angular comopnents");
+
+                            //});
+
+                            $(document).ready(async function  () {
+
+
+
+                                await $.ajax({
+                                    async: true,
+                                    url: '/angular/app-root.html?format=html',
+                                    data: {
+                                        format: 'html'
+                                    },
+                                    error: function () {
+                                        /// $('#info').html('<p>An error has occurred</p>');
+                                    },
+                                    dataType: 'html',
+                                    success: function (data) {
+                                        console.log("deploying angular components");
+                                        $("#angular").append(data);
+                                        //var loader = $("#angularLoader").html();
+                                        //$("#angular").append(loader);
+                                        //var elem = document.querySelector('#angularLoader');
+                                        //elem.parentNode.removeChild(elem);
+                                    },
+                                    type: 'GET'
+                                });
+                            });
+                            
+                        </script>
+                        <div id="angular">
+
+                        </div>
+                    </div>
                     <h3 id="SubscriptionTitle">Subscriptions</h3>
                     <div>
 
@@ -148,13 +191,13 @@
 
                             <span>no data available</span>
                         </div> }
-                                        else
-                                        {
-                        <h3>Available Commands</h3>
-                                            <div>
+                    else
+                    {
+    <h3>Available Commands</h3>
+                        <div>
 
-                                                @await Html.PartialAsync("_AvailableCommands", Model?.AvailableCommands)
-                                            </div>}
+                            @await Html.PartialAsync("_AvailableCommands", Model?.AvailableCommands)
+                        </div>}
                     <h3>Appliance Context</h3>
                     <div style="background-color: whitesmoke">
                         <div>
@@ -198,9 +241,9 @@
                             </script>
 
                             @if (Model.ApplianceSessionContext != null &&
-                             Model.ApplianceSessionContext.CurrentJobOutput != null &&
-                               Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs != null &&
-                             Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs.Count() > 0)
+                          Model.ApplianceSessionContext.CurrentJobOutput != null &&
+                            Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs != null &&
+                          Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs.Count() > 0)
                             {
             <div>
                 <hr />
@@ -215,7 +258,7 @@
                                     </div>
 
 
-                                </div>                }
+                                </div>}
 
                             <div class="border-dark">
                                 @await Html.PartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext)
@@ -229,6 +272,6 @@
                         @await Html.PartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations)
                     </div>
                 </div> }
-                            else
-                            {
-                <span>no data is available. check your permissions and sign in again.</span>}
+            else
+            {
+<span>no data is available. check your permissions and sign in again.</span>}

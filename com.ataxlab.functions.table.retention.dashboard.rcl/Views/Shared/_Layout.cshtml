@@ -93,39 +93,18 @@
     <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
     <script>$(document).ready(function () { $('body').bootstrapMaterialDesign(); });</script>
 
-    
+
     <script>
-        $(document).ready(function () {
-            // $("#angular").load("angular/app-root.html");
-            // console.log("set up angular comopnents");
+            //$(document).ready(function () {
+            //    $("#angularLoader").load("angular/app-root.html");
+            //    console.log("set up angular comopnents");
 
-
-});
+            //});
 
     </script>
-    <script>
-        $(document).ready(function () {
-            console.log("loading angular components");
-            $.ajax({
-                async : true,
-                url: '/angular/app-root.html',
-                data: {
-                    format: 'html'
-                },
-                error: function () {
-                    /// $('#info').html('<p>An error has occurred</p>');
-                },
-                dataType: 'html',
-                success: function (data) {
-
-                    $('#angular')
-                        .append(data)
-                },
-                type: 'GET'
-            });
-        });
-    </script>
-    <div id="angular"></div>
+    <div id="loaderContainer">
+        <div id="angularLoader"></div>
+    </div>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

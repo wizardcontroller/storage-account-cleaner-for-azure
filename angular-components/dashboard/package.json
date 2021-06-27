@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
+    "start": "ng serve && npm run-script postBuild",
+    "build": "ng build && npm run-script postBuild",
+    "watch": "ng build --watch --configuration development && npm run-script postBuild",
+    "postBuild": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./postBuild.ps1",
     "test": "ng test"
   },
   "private": true,

@@ -16,7 +16,7 @@ export class ApiConfigService implements OnInit {
 
 
 constructor(private configService : ConfigService, private router: Router) {
-  console.log("config service starting");
+  console.log("ApiConfigService service starting");
 
   configService.configuration.basePath = window.location.origin;
   this.ngOnInit();

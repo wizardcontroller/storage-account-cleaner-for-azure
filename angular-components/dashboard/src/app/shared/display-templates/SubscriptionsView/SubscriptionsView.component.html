@@ -1,9 +1,16 @@
 <div class="row">
-  <p>
-    <p-table
+
+  <ng-container *ngif="operatorPageModelChanges$ | async as pageModel">
+    <span>Tenant: {{ pageModel.tenantId }}</span>
+
+  </ng-container>
+  <hr/>
+    <ng-container *ngIf="subscriptions$ | async as availableSubscriptions else noSubscriptions">
+
+      <p-table
       styleClass="p-datatable-gridlines p-datatable-striped"
       [columns]="cols"
-      [value]="subscriptions"
+      [value]="availableSubscriptions"
     >
       <ng-template pTemplate="caption"> Subscriptions </ng-template>
       <ng-template pTemplate="header" let-columns>
@@ -21,5 +28,9 @@
         </tr>
       </ng-template>
     </p-table>
-  </p>
+    </ng-container>
+    <ng-template  #noSubscriptions>
+      <span>no subscriptions</span>
+    </ng-template>
+
 </div>
