@@ -14,6 +14,7 @@ import {CardModule} from 'primeng/card';
 import {ButtonModule} from 'primeng/button';
 import {ApiModule} from '@wizardcontroller/sac-appliance-lib'
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index';
+import { TableModule } from 'primeng/table';
 @NgModule({
   declarations: [
     AppComponent
@@ -26,6 +27,7 @@ import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appli
     AppRoutingModule,
     CardModule,
     ButtonModule,
+    TableModule,
     HttpClientModule
   ],
   providers: [{ provide: BASE_PATH, useValue: environment.API_BASE_PATH }],

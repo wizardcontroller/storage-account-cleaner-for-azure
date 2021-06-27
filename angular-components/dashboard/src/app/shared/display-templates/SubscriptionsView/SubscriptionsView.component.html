@@ -1,12 +1,13 @@
 <div class="row">
 
-  <ng-container *ngif="operatorPageModelChanges$ | async as pageModel">
-    <span>Tenant: {{ pageModel.tenantId }}</span>
 
-  </ng-container>
-  <hr/>
+
     <ng-container *ngIf="subscriptions$ | async as availableSubscriptions else noSubscriptions">
-
+      <ng-container >
+        <span>Tenant: {{ operatorPageModel.applianceSessionContext?.tenantId }}</span>
+        <span>Operator OID: {{ operatorPageModel.applianceSessionContext?.userOid}}</span>
+        <hr/>
+      </ng-container>
       <p-table
       styleClass="p-datatable-gridlines p-datatable-striped"
       [columns]="cols"
@@ -30,7 +31,7 @@
     </p-table>
     </ng-container>
     <ng-template  #noSubscriptions>
-      <span>no subscriptions</span>
+      <span>no subscriptions available</span>
     </ng-template>
 
 </div>

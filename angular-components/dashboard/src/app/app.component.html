@@ -1,13 +1,22 @@
 <p-card header="Appliance Context">
   <fieldset title="Azure Active Directory">
-    <div class="row">
-      <div class="col-sm-3">Appliance URL</div>
-      <div class="col-sm-9">{{ operatorPageModel?.applianceUrl }}</div>
-    </div>
-    <hr/>
+    <ng-container *ngif="operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
+      <div class="row">
+        <div class="col-sm-3">Appliance URL</div>
+        <div class="col-sm-9">{{ operatorPageModel?.applianceUrl }}</div>
+        <div class="col-sm-3">Tenant Id</div>
+        <div class="col-sm-9">{{ operatorPageModel?.applianceSessionContext?.tenantId}}</div>
+      </div>
+      <hr/>
+
+    </ng-container>
+
     <app-SubscriptionsView></app-SubscriptionsView>
     <hr/>
   </fieldset>
+  <ng-template #noPageModel>
+    no operator data
+  </ng-template> 
   <ng-template pTemplate="footer">
     <p-button label="Storage Accounts"></p-button>
   </ng-template>

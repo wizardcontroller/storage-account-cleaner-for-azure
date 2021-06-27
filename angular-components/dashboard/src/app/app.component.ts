@@ -29,6 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       console.log("app component has operator page model");
       this.baseUri = data.applianceUrl?.toString();
+      this.currentPageModelSource.next(data);
       return this.operatorPageModel = data;
     });
   }

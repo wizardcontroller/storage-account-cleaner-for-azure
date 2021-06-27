@@ -26,10 +26,10 @@ export class ApplianceApiService {
       console.log('appliance api service has operator page model');
       try {
         this.baseUri = data?.applianceUrl?.toString();
-
-        console.log('appliance api service is configuring access token');
         this.entityService.configuration.accessToken = this.operatorPageModel
-          ?.easyAuthAccessToken as string;
+        ?.easyAuthAccessToken as string;
+        console.log('appliance api service is configuring access token' + this.entityService.configuration.accessToken);
+       
         this.entityService.configuration.basePath =
           this.operatorPageModel?.applianceUrl?.toString();
         console.log(
