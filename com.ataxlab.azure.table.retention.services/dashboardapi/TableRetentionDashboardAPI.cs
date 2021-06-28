@@ -141,7 +141,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
         public async Task<OperatorPageModel> GetOperatorPageModel()
         {
-            OperatorPageModel OperatorPageModel = await EnsureAuthScopesforOperatorPageModel();
+            OperatorPageModel operatorPageModel = await EnsureAuthScopesforOperatorPageModel();
             string oid = string.Empty;
             string tenantid = string.Empty;
 
@@ -150,6 +150,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             {
                 oid = GetUserOidFromUserClaims();
                 tenantid = GetTenantIdFromUserClaims();
+                operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+                operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
 
                 try
                 {
@@ -162,7 +164,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     var queryWorkflowStatusTemplateRoute = await this.GetTemplateUrlForRoute(routeParam, oid, tenantid);
 
                     log.LogTrace("populationg operator pagemodel with workflow checkpoint status");
-                    OperatorPageModel.QueryWorkflowCheckpointStatusEndpoint = queryWorkflowStatusTemplateRoute;
+                    operatorPageModel.QueryWorkflowCheckpointStatusEndpoint = queryWorkflowStatusTemplateRoute;
 
 
                     var resetStateParams = new ControlChannelRouteParameter()
@@ -172,7 +174,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     };
 
                     var resetRoute = await this.GetTemplateUrlForRoute(resetStateParams, oid, tenantid);
-                    OperatorPageModel.ResetDeviceUrl = resetRoute;
+                    operatorPageModel.ResetDeviceUrl = resetRoute;
                     //OperatorPageModel.QueryWorkflowCheckpointStatusEndpoint = await this.GetTemplateUrlForRoute(ControlChannelConstants.QueryWorkflowCheckpointStatusEndpoint);
                 }
                 catch (Exception e)
@@ -183,7 +185,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
             }
             /// this model is only useful if the user is authenticated
-            OperatorPageModel.ApplianceUrl.Add(this.HttpClient.BaseAddress.AbsoluteUri);
+            operatorPageModel.ApplianceUrl.Add(this.HttpClient.BaseAddress.AbsoluteUri);
 
             // detect unprovisioned device
             try
@@ -192,7 +194,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 {
                     log.LogTrace("getting subscriptions for logged in user");
                     var subscriptionsResult = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
-                    OperatorPageModel.Subscriptions = subscriptionsResult;
+                    operatorPageModel.Subscriptions = subscriptionsResult;
 
                     log.LogTrace("got subscriptions for logged in user");
                 }
@@ -207,30 +209,30 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 if (isValidCheckpoint == null)
                 {
                    
-                    OperatorPageModel.IsMustRenderApplianceConfig = true;
-                    OperatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
-                    OperatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
-                    OperatorPageModel.ApplianceSessionContext.AvailableSubscriptions = OperatorPageModel.Subscriptions;
+                    operatorPageModel.IsMustRenderApplianceConfig = true;
+                    operatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
+                    operatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
+                    operatorPageModel.ApplianceSessionContext.AvailableSubscriptions = operatorPageModel.Subscriptions;
 
                     log.LogWarning("null checkpoint. rendering config wizard");
-                    return OperatorPageModel;
+                    return operatorPageModel;
                 }
                 else if (isValidCheckpoint.CurrentCheckpoint == WorkflowCheckpointIdentifier.UnProvisioned)
                 {
                     log.LogWarning("unprovisioned device checkpoint. rendering config wizard");
-                    OperatorPageModel.IsMustRenderApplianceConfig = true;
-                    OperatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
-                    OperatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
-                    OperatorPageModel.ApplianceSessionContext.AvailableSubscriptions = OperatorPageModel.Subscriptions;
+                    operatorPageModel.IsMustRenderApplianceConfig = true;
+                    operatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
+                    operatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
+                    operatorPageModel.ApplianceSessionContext.AvailableSubscriptions = operatorPageModel.Subscriptions;
                     log.LogWarning("null checkpoint. rendering config wizard");
-                    return OperatorPageModel;
+                    return operatorPageModel;
 
                 }
 
             }
             catch (Exception e)
             {
-                OperatorPageModel.IsMustRenderApplianceConfig = true;
+                operatorPageModel.IsMustRenderApplianceConfig = true;
             }
 
             if (this.CurrentHttpContext.User.Identity.IsAuthenticated)
@@ -238,7 +240,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 var selectedSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
 
                 ApplianceSessionContext applianceContext = new ApplianceSessionContext();
-                OperatorPageModel.ApplianceSessionContext = applianceContext;
+                operatorPageModel.ApplianceSessionContext = applianceContext;
                 try
                 {
                     log.LogTrace("getting appliance context");
@@ -253,13 +255,13 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     }
                     else
                     {
-                        OperatorPageModel.IsMustRenderApplianceConfig = true;
-                        OperatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
-                        OperatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
-                        OperatorPageModel.ApplianceSessionContext.AvailableSubscriptions = OperatorPageModel.Subscriptions;
+                        operatorPageModel.IsMustRenderApplianceConfig = true;
+                        operatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
+                        operatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
+                        operatorPageModel.ApplianceSessionContext.AvailableSubscriptions = operatorPageModel.Subscriptions;
 
                         log.LogWarning("null checkpoint. rendering config wizard");
-                        return OperatorPageModel;
+                        return operatorPageModel;
                     }
                 }
                 catch (Exception e)
@@ -273,14 +275,14 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 {
                     // did not find a context on the appliance
                     // ViewData["AvailableSubscriptions"] = subscriptionsResult;
-                    OperatorPageModel.ApplianceSessionContext.UserOid = oid;
-                    OperatorPageModel.IsMustRenderApplianceConfig = true;
+                    operatorPageModel.ApplianceSessionContext.UserOid = oid;
+                    operatorPageModel.IsMustRenderApplianceConfig = true;
                 }
                 else
                 {
                     // found a context on the appliance
-                    OperatorPageModel.ApplianceSessionContext = applianceContext;
-                    selectedSubscription = OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
+                    operatorPageModel.ApplianceSessionContext = applianceContext;
+                    selectedSubscription = operatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
 
                     try
                     {
@@ -290,38 +292,38 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         {
                             this.CurrentHttpContext.Session.SetString(DashboardConstants.SESSIONKEY_AVAILABLECOMMANDS, JsonConvert.SerializeObject(result.AvailableCommands));
                             log.LogInformation("applying aailable commands to operator page model");
-                            OperatorPageModel.AvailableCommands = result.AvailableCommands;
+                            operatorPageModel.AvailableCommands = result.AvailableCommands;
                         }
                         else
                         {
                             log.LogWarning("no workflow checkpoint found");
-                            OperatorPageModel.IsMustRenderApplianceConfig = true;
-                            OperatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
-                            OperatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
-                            OperatorPageModel.ApplianceSessionContext.AvailableSubscriptions = OperatorPageModel.Subscriptions;
+                            operatorPageModel.IsMustRenderApplianceConfig = true;
+                            operatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
+                            operatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
+                            operatorPageModel.ApplianceSessionContext.AvailableSubscriptions = operatorPageModel.Subscriptions;
 
                             log.LogWarning("null checkpoint. rendering config wizard");
-                            return OperatorPageModel;
+                            return operatorPageModel;
                         }
                     }
                     catch (Exception e)
                     {
                         log.LogError("problem biulding available commands for page model {0}", e.Message);
-                        OperatorPageModel.IsMustRenderApplianceConfig = true;
+                        operatorPageModel.IsMustRenderApplianceConfig = true;
                     }
 
-                    OperatorPageModel.IsMustRenderApplianceConfig = false;
+                    operatorPageModel.IsMustRenderApplianceConfig = false;
                 }
 
                 var impersonationToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
                 if (!String.IsNullOrEmpty(selectedSubscription)
                     && !String.IsNullOrEmpty(impersonationToken)
-                    && !String.IsNullOrEmpty(OperatorPageModel.ApplianceSessionContext.UserOid))
+                    && !String.IsNullOrEmpty(operatorPageModel.ApplianceSessionContext.UserOid))
                 {
                     log.LogInformation("conditions exist to request storage accounts for the current user");
-                    OperatorPageModel.ApplianceSessionContext.AvailableStorageAccounts =
+                    operatorPageModel.ApplianceSessionContext.AvailableStorageAccounts =
                         await this.GetStorageAccounts(subscriptionid: selectedSubscription, impersonationToken: impersonationToken,
-                        requestingOid: OperatorPageModel.ApplianceSessionContext.UserOid);
+                        requestingOid: operatorPageModel.ApplianceSessionContext.UserOid);
                 }
 
             }
@@ -346,7 +348,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         await this.GetTemplateUrlForRoute(orchestrationRouteParams, oid, tenantid, fromDays));
 
                     // ViewData[VIEWBAGKEY_ORCHESTRATION_STATUS] = orchestrationStatus;
-                    OperatorPageModel.Orchestrations = orchestrationStatus;
+                    operatorPageModel.Orchestrations = orchestrationStatus;
                     log.LogTrace("done populating orchestrations");
 
                 }
@@ -356,7 +358,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 }
             }
 
-            return OperatorPageModel;
+            return operatorPageModel;
         }
 
         private async Task<OperatorPageModel> EnsureAuthScopesforOperatorPageModel()
@@ -378,7 +380,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken);
-                        OperatorPageModel.AccessToken = impersonationResult.AccessToken;
+                        OperatorPageModel.ImpersonationToken = impersonationResult.AccessToken;
 
                         eventualAccessToken = impersonationResult.AccessToken;
                          // aud	

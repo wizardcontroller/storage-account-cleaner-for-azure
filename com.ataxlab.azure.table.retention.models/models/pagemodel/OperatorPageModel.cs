@@ -45,8 +45,9 @@ namespace com.ataxlab.azure.table.retention.models.models.pagemodel
         public List<DurableOrchestrationStateDTO> Orchestrations { get; set; }
 
         public List<AvailableCommand> AvailableCommands { get; set; }
-        public string AccessToken { get; set; }
+        public string ImpersonationToken { get; set; }
 
+        public string SelectedSubscriptionId { get; set; }
         /// <summary>
         /// signals view logic to show user
         /// subscription and storage account selection

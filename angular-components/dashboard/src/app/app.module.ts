@@ -1,7 +1,7 @@
 import { SharedModule } from './shared/shared.module';
 
 import { CoreModule } from './core/core.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -15,6 +15,8 @@ import {ButtonModule} from 'primeng/button';
 import {ApiModule} from '@wizardcontroller/sac-appliance-lib'
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index';
 import { TableModule } from 'primeng/table';
+import { AuthHeaderInterceptorInterceptor as AuthHeaderInterceptor } from './interceptors/auth-header-interceptor.interceptor';
+import { ApiConfigService } from './core/ApiConfig.service';
 @NgModule({
   declarations: [
     AppComponent
@@ -30,7 +32,18 @@ import { TableModule } from 'primeng/table';
     TableModule,
     HttpClientModule
   ],
-  providers: [{ provide: BASE_PATH, useValue: environment.API_BASE_PATH }],
+  providers: [
+  {
+    provide: BASE_PATH,
+    useValue: environment.API_BASE_PATH
+  },
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthHeaderInterceptor,
+    multi: true,
+    deps: [ApiConfigService]
+  }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

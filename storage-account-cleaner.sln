@@ -28,6 +28,118 @@ Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "appliance-arm-deployment", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.ataxlab.functions.table.retention.dashboard.rcl", "com.ataxlab.functions.table.retention.dashboard.rcl\com.ataxlab.functions.table.retention.dashboard.rcl.csproj", "{F7E97B08-104E-425B-B9D3-76094FAAB26A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{CF8BB4E6-54FC-4D0B-98A9-37E7B8402947}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\app-routing.module.ts = angular-components\dashboard\src\app\app-routing.module.ts
+		angular-components\dashboard\src\app\app.component.css = angular-components\dashboard\src\app\app.component.css
+		angular-components\dashboard\src\app\app.component.html = angular-components\dashboard\src\app\app.component.html
+		angular-components\dashboard\src\app\app.component.spec.ts = angular-components\dashboard\src\app\app.component.spec.ts
+		angular-components\dashboard\src\app\app.component.ts = angular-components\dashboard\src\app\app.component.ts
+		angular-components\dashboard\src\app\app.module.ts = angular-components\dashboard\src\app\app.module.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{8B76043D-FBAB-4998-A951-A20FED94F7E4}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\core\ApiConfig.service.spec.ts = angular-components\dashboard\src\app\core\ApiConfig.service.spec.ts
+		angular-components\dashboard\src\app\core\ApiConfig.service.ts = angular-components\dashboard\src\app\core\ApiConfig.service.ts
+		angular-components\dashboard\src\app\core\core.component.css = angular-components\dashboard\src\app\core\core.component.css
+		angular-components\dashboard\src\app\core\core.component.html = angular-components\dashboard\src\app\core\core.component.html
+		angular-components\dashboard\src\app\core\core.component.ts = angular-components\dashboard\src\app\core\core.component.ts
+		angular-components\dashboard\src\app\core\core.module.ts = angular-components\dashboard\src\app\core\core.module.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "interceptors", "interceptors", "{50F8DB2D-7259-44E3-87D6-AE15047D0A8B}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\interceptors\auth-header-interceptor.interceptor.spec.ts = angular-components\dashboard\src\app\interceptors\auth-header-interceptor.interceptor.spec.ts
+		angular-components\dashboard\src\app\interceptors\auth-header-interceptor.interceptor.ts = angular-components\dashboard\src\app\interceptors\auth-header-interceptor.interceptor.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{C7CBB90B-D5F1-4595-BB2A-84A940413D8D}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\shared.component.css = angular-components\dashboard\src\app\shared\shared.component.css
+		angular-components\dashboard\src\app\shared\shared.component.html = angular-components\dashboard\src\app\shared\shared.component.html
+		angular-components\dashboard\src\app\shared\shared.component.ts = angular-components\dashboard\src\app\shared\shared.component.ts
+		angular-components\dashboard\src\app\shared\shared.module.ts = angular-components\dashboard\src\app\shared\shared.module.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "display-templates", "display-templates", "{7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApplianceContextView", "ApplianceContextView", "{B3B734C6-1993-4A5F-8A32-6067A3AA05DD}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\display-templates\ApplianceContextView\ApplianceContextView.component.css = angular-components\dashboard\src\app\shared\display-templates\ApplianceContextView\ApplianceContextView.component.css
+		angular-components\dashboard\src\app\shared\display-templates\ApplianceContextView\ApplianceContextView.component.html = angular-components\dashboard\src\app\shared\display-templates\ApplianceContextView\ApplianceContextView.component.html
+		angular-components\dashboard\src\app\shared\display-templates\ApplianceContextView\ApplianceContextView.component.spec.ts = angular-components\dashboard\src\app\shared\display-templates\ApplianceContextView\ApplianceContextView.component.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\ApplianceContextView\ApplianceContextView.component.ts = angular-components\dashboard\src\app\shared\display-templates\ApplianceContextView\ApplianceContextView.component.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DiagnosticsRetentionSurfaceView", "DiagnosticsRetentionSurfaceView", "{3ED6ED4D-696D-4D81-811C-56B168349543}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\display-templates\DiagnosticsRetentionSurfaceView\DiagnosticsRetentionSurfaceView.component.css = angular-components\dashboard\src\app\shared\display-templates\DiagnosticsRetentionSurfaceView\DiagnosticsRetentionSurfaceView.component.css
+		angular-components\dashboard\src\app\shared\display-templates\DiagnosticsRetentionSurfaceView\DiagnosticsRetentionSurfaceView.component.html = angular-components\dashboard\src\app\shared\display-templates\DiagnosticsRetentionSurfaceView\DiagnosticsRetentionSurfaceView.component.html
+		angular-components\dashboard\src\app\shared\display-templates\DiagnosticsRetentionSurfaceView\DiagnosticsRetentionSurfaceView.component.spec.ts = angular-components\dashboard\src\app\shared\display-templates\DiagnosticsRetentionSurfaceView\DiagnosticsRetentionSurfaceView.component.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\DiagnosticsRetentionSurfaceView\DiagnosticsRetentionSurfaceView.component.ts = angular-components\dashboard\src\app\shared\display-templates\DiagnosticsRetentionSurfaceView\DiagnosticsRetentionSurfaceView.component.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JobOutputView", "JobOutputView", "{630F5AD7-BF0E-4D44-85DA-BA25C493627D}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\display-templates\JobOutputView\JobOutputView.component.css = angular-components\dashboard\src\app\shared\display-templates\JobOutputView\JobOutputView.component.css
+		angular-components\dashboard\src\app\shared\display-templates\JobOutputView\JobOutputView.component.html = angular-components\dashboard\src\app\shared\display-templates\JobOutputView\JobOutputView.component.html
+		angular-components\dashboard\src\app\shared\display-templates\JobOutputView\JobOutputView.component.spec.ts = angular-components\dashboard\src\app\shared\display-templates\JobOutputView\JobOutputView.component.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\JobOutputView\JobOutputView.component.ts = angular-components\dashboard\src\app\shared\display-templates\JobOutputView\JobOutputView.component.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MetricRetentionSurfaceView", "MetricRetentionSurfaceView", "{884FDFFA-6B79-4DA1-AC0E-54B5C39E7CDE}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\display-templates\MetricRetentionSurfaceView\MetricRetentionSurfaceView.component.css = angular-components\dashboard\src\app\shared\display-templates\MetricRetentionSurfaceView\MetricRetentionSurfaceView.component.css
+		angular-components\dashboard\src\app\shared\display-templates\MetricRetentionSurfaceView\MetricRetentionSurfaceView.component.html = angular-components\dashboard\src\app\shared\display-templates\MetricRetentionSurfaceView\MetricRetentionSurfaceView.component.html
+		angular-components\dashboard\src\app\shared\display-templates\MetricRetentionSurfaceView\MetricRetentionSurfaceView.component.spec.ts = angular-components\dashboard\src\app\shared\display-templates\MetricRetentionSurfaceView\MetricRetentionSurfaceView.component.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\MetricRetentionSurfaceView\MetricRetentionSurfaceView.component.ts = angular-components\dashboard\src\app\shared\display-templates\MetricRetentionSurfaceView\MetricRetentionSurfaceView.component.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{B549EAD0-8BD6-4024-9056-E339AD5672CE}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\display-templates\services\ApplianceContext.service.spec.ts = angular-components\dashboard\src\app\shared\display-templates\services\ApplianceContext.service.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\services\ApplianceContext.service.ts = angular-components\dashboard\src\app\shared\display-templates\services\ApplianceContext.service.ts
+		angular-components\dashboard\src\app\shared\display-templates\services\ApplianceContextServiceBase.ts = angular-components\dashboard\src\app\shared\display-templates\services\ApplianceContextServiceBase.ts
+		angular-components\dashboard\src\app\shared\display-templates\services\HomeGrownLogging.service.spec.ts = angular-components\dashboard\src\app\shared\display-templates\services\HomeGrownLogging.service.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\services\HomeGrownLogging.service.ts = angular-components\dashboard\src\app\shared\display-templates\services\HomeGrownLogging.service.ts
+		angular-components\dashboard\src\app\shared\display-templates\services\ILogger.ts = angular-components\dashboard\src\app\shared\display-templates\services\ILogger.ts
+		angular-components\dashboard\src\app\shared\display-templates\services\LoggingConfiguration.service.spec.ts = angular-components\dashboard\src\app\shared\display-templates\services\LoggingConfiguration.service.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\services\LoggingConfiguration.service.ts = angular-components\dashboard\src\app\shared\display-templates\services\LoggingConfiguration.service.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StorageAccountView", "StorageAccountView", "{87B119F2-740E-41DE-8DCF-F7A1CF4F039F}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\display-templates\StorageAccountView\StorageAccountView.component.css = angular-components\dashboard\src\app\shared\display-templates\StorageAccountView\StorageAccountView.component.css
+		angular-components\dashboard\src\app\shared\display-templates\StorageAccountView\StorageAccountView.component.html = angular-components\dashboard\src\app\shared\display-templates\StorageAccountView\StorageAccountView.component.html
+		angular-components\dashboard\src\app\shared\display-templates\StorageAccountView\StorageAccountView.component.spec.ts = angular-components\dashboard\src\app\shared\display-templates\StorageAccountView\StorageAccountView.component.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\StorageAccountView\StorageAccountView.component.ts = angular-components\dashboard\src\app\shared\display-templates\StorageAccountView\StorageAccountView.component.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SubscriptionsView", "SubscriptionsView", "{BE15D5C7-025C-41A9-8989-9BF02641CF3E}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\display-templates\SubscriptionsView\SubscriptionsView.component.css = angular-components\dashboard\src\app\shared\display-templates\SubscriptionsView\SubscriptionsView.component.css
+		angular-components\dashboard\src\app\shared\display-templates\SubscriptionsView\SubscriptionsView.component.html = angular-components\dashboard\src\app\shared\display-templates\SubscriptionsView\SubscriptionsView.component.html
+		angular-components\dashboard\src\app\shared\display-templates\SubscriptionsView\SubscriptionsView.component.spec.ts = angular-components\dashboard\src\app\shared\display-templates\SubscriptionsView\SubscriptionsView.component.spec.ts
+		angular-components\dashboard\src\app\shared\display-templates\SubscriptionsView\SubscriptionsView.component.ts = angular-components\dashboard\src\app\shared\display-templates\SubscriptionsView\SubscriptionsView.component.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "forms", "forms", "{98967C56-89D4-4AEB-AA43-CAEEDED43D4F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RetentionPolicyEditor", "RetentionPolicyEditor", "{A51C90AE-782A-4377-A95C-12C6C8378FB4}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\forms\RetentionPolicyEditor\RetentionPolicyEditor.component.css = angular-components\dashboard\src\app\shared\forms\RetentionPolicyEditor\RetentionPolicyEditor.component.css
+		angular-components\dashboard\src\app\shared\forms\RetentionPolicyEditor\RetentionPolicyEditor.component.html = angular-components\dashboard\src\app\shared\forms\RetentionPolicyEditor\RetentionPolicyEditor.component.html
+		angular-components\dashboard\src\app\shared\forms\RetentionPolicyEditor\RetentionPolicyEditor.component.spec.ts = angular-components\dashboard\src\app\shared\forms\RetentionPolicyEditor\RetentionPolicyEditor.component.spec.ts
+		angular-components\dashboard\src\app\shared\forms\RetentionPolicyEditor\RetentionPolicyEditor.component.ts = angular-components\dashboard\src\app\shared\forms\RetentionPolicyEditor\RetentionPolicyEditor.component.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{CECEF061-78C8-456A-9BD9-7B3770B4C1E6}"
+	ProjectSection(SolutionItems) = preProject
+		angular-components\dashboard\src\app\shared\services\appliance-api.service.spec.ts = angular-components\dashboard\src\app\shared\services\appliance-api.service.spec.ts
+		angular-components\dashboard\src\app\shared\services\appliance-api.service.ts = angular-components\dashboard\src\app\shared\services\appliance-api.service.ts
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +185,22 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8B76043D-FBAB-4998-A951-A20FED94F7E4} = {CF8BB4E6-54FC-4D0B-98A9-37E7B8402947}
+		{50F8DB2D-7259-44E3-87D6-AE15047D0A8B} = {CF8BB4E6-54FC-4D0B-98A9-37E7B8402947}
+		{C7CBB90B-D5F1-4595-BB2A-84A940413D8D} = {CF8BB4E6-54FC-4D0B-98A9-37E7B8402947}
+		{7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2} = {C7CBB90B-D5F1-4595-BB2A-84A940413D8D}
+		{B3B734C6-1993-4A5F-8A32-6067A3AA05DD} = {7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2}
+		{3ED6ED4D-696D-4D81-811C-56B168349543} = {7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2}
+		{630F5AD7-BF0E-4D44-85DA-BA25C493627D} = {7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2}
+		{884FDFFA-6B79-4DA1-AC0E-54B5C39E7CDE} = {7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2}
+		{B549EAD0-8BD6-4024-9056-E339AD5672CE} = {7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2}
+		{87B119F2-740E-41DE-8DCF-F7A1CF4F039F} = {7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2}
+		{BE15D5C7-025C-41A9-8989-9BF02641CF3E} = {7CD4C0D2-2EC5-430F-B0C1-62CC1CAF73F2}
+		{98967C56-89D4-4AEB-AA43-CAEEDED43D4F} = {C7CBB90B-D5F1-4595-BB2A-84A940413D8D}
+		{A51C90AE-782A-4377-A95C-12C6C8378FB4} = {98967C56-89D4-4AEB-AA43-CAEEDED43D4F}
+		{CECEF061-78C8-456A-9BD9-7B3770B4C1E6} = {C7CBB90B-D5F1-4595-BB2A-84A940413D8D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {24A4C1E5-F730-45B1-9A7B-D1F6CA335B37}
