@@ -8,14 +8,14 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { BASE_PATH } from '@wizardcontroller/sac-appliance-lib';
+import { BASE_PATH } from '@wizardcontroller/sac-appliance-lib/';
 import { environment } from '../environments/environment';
 import {CardModule} from 'primeng/card';
-import {ButtonModule} from 'primeng/button';
-import {ApiModule} from '@wizardcontroller/sac-appliance-lib'
+import { ButtonModule } from 'primeng/button';
+import { ApiModule } from '@wizardcontroller/sac-appliance-lib/'
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index';
 import { TableModule } from 'primeng/table';
-import { AuthHeaderInterceptorInterceptor as AuthHeaderInterceptor } from './interceptors/auth-header-interceptor.interceptor';
+import { AuthHeaderInterceptor } from './interceptors/auth-header.interceptor';
 import { ApiConfigService } from './core/ApiConfig.service';
 @NgModule({
   declarations: [

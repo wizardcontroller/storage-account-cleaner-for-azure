@@ -3,7 +3,7 @@ import { ApplianceApiService } from './shared/services/appliance-api.service';
 import { ApiConfigService } from './core/ApiConfig.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CoreComponent } from './core/core.component';
-import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index';
+import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { BehaviorSubject, Operator, ReplaySubject, Subject } from 'rxjs';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { SubscriptionsViewComponent } from './shared/display-templates/SubscriptionsView/SubscriptionsView.component';

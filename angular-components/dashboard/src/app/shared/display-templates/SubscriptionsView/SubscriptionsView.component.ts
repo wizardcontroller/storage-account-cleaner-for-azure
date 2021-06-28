@@ -1,6 +1,6 @@
 import { ApplianceApiService } from './../../services/appliance-api.service';
 import { Component, OnInit } from '@angular/core';
-import { OperatorPageModel } from 'index';
+import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/';
 import { Observable, ReplaySubject } from 'rxjs';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { TableModule } from 'primeng/table';
@@ -8,13 +8,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import {
   SubscriptionDTO,
   SubscriptionPoliciesDTO
-} from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index';
+} from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
+import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 @Component({
   selector: 'app-SubscriptionsView',
   templateUrl: './SubscriptionsView.component.html',
   styleUrls: ['./SubscriptionsView.component.css'],
 })
-export class SubscriptionsViewComponent implements OnInit {
+export class SubscriptionsViewComponent implements OnInit, ICanBeHiddenFromDisplay {
   operatorPageModel! : OperatorPageModel;
   cols!: any[];
 
@@ -29,13 +30,17 @@ export class SubscriptionsViewComponent implements OnInit {
     private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService
   ) {
-
+    this.isShow = true;
 
 }
+  isShow: boolean;
+  toggleDisplay(): void {
+
+  }
 
 
 private configAuth() : void {
-  
+
 }
   ngOnDestroy(): void {}
 
@@ -43,7 +48,7 @@ private configAuth() : void {
 
         // this.operatorPageModel$ = this.apiConfigSvc.operatorPageModelChanges$;
     // push operator page model changes
-    // push current subscriptions 
+    // push current subscriptions
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       console.log("subscriptionviewcomponent has current subscriptions");
       var subscriptions = data.subscriptions as SubscriptionDTO[] | undefined;
