@@ -18,6 +18,7 @@ import { TableModule } from 'primeng/table';
 import { AuthHeaderInterceptor } from './interceptors/auth-header.interceptor';
 import { ApiConfigService } from './core/ApiConfig.service';
 import { MockOperatorPageModelInterceptor } from './interceptors/mock-operator-page-model.interceptor';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent
@@ -31,7 +32,8 @@ import { MockOperatorPageModelInterceptor } from './interceptors/mock-operator-p
     CardModule,
     ButtonModule,
     TableModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule
   ],
   providers: [
   {
