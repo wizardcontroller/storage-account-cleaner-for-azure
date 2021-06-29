@@ -1,19 +1,25 @@
-<p-card header="Appliance Context">
+<p-card header="Appliance Context" >
 
-  <fieldset title="Azure Active Directory">
-    <ng-container *ngIf="operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
-      <button pButton type="button" icon="fa-pencil" class="ui-button-secondary" (click)="toggleExpand('azuread')"></button>
-      <div class="row">
-        <div class="col-sm-3">Appliance URL</div>
-        <div class="col-sm-9">{{ operatorPageModel?.applianceUrl }}</div>
-        <div class="col-sm-3">Tenant Id</div>
-        <div class="col-sm-9">{{ operatorPageModel?.applianceSessionContext?.tenantId}}</div>
+  <p-card header="Appliance Summary" >
+  <fieldset style="float:initial" title="Appliance Summary">
+    <mat-button-toggle style="float: right; width: 30%;" (click)="toggleDisplay()">Toggle Appliance Summary Visibility</mat-button-toggle>
+    <ng-container class="a-ng-container"  *ngIf=" operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
+      <div class="container" *ngIf=isShow>
+        <span class="">Appliance URL</span>
+        <div class="">{{ operatorPageModel?.applianceUrl }}</div>
+        <span class="">Tenant Id</span>
+        <div class="">{{ operatorPageModel?.applianceSessionContext?.tenantId}}</div>
       </div>
       <hr/>
+    </ng-container>
+  </fieldset>
+</p-card>
+  <fieldset style="float:initial" title="Azure Active Directory">
 
+      <ng-container  class="a-ng-container" >
+           <app-SubscriptionsView></app-SubscriptionsView>
     </ng-container>
 
-    <app-SubscriptionsView></app-SubscriptionsView>
     <hr/>
   </fieldset>
   <ng-template #noPageModel>

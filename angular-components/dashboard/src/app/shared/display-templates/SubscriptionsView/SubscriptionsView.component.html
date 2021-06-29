@@ -1,9 +1,10 @@
-<div class="row">
+<p-card header="Subscriptions Summary" >
 
 
-
+  <mat-button-toggle style="float:right; width: 30%;" (click)="toggleDisplay()">Toggle Subscription Summary Visibility</mat-button-toggle>
+  <fieldset style="float:initial" *ngIf="isShow" title="Appliance Summary">
     <ng-container *ngIf="subscriptions$ | async as availableSubscriptions else noSubscriptions">
-      <ng-container >
+      <ng-container  >
         <span>Tenant: {{ operatorPageModel.applianceSessionContext?.tenantId }}</span>
         <span>Operator OID: {{ operatorPageModel.applianceSessionContext?.userOid}}</span>
         <hr/>
@@ -30,8 +31,9 @@
       </ng-template>
     </p-table>
     </ng-container>
+  </fieldset>
     <ng-template  #noSubscriptions>
       <span>no subscriptions available</span>
     </ng-template>
 
-</div>
+  </p-card>

@@ -14,9 +14,11 @@ import { HomeGrownLoggingService } from './display-templates/services/HomeGrownL
 import { LoggingConfigurationService } from './display-templates/services/LoggingConfiguration.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CardModule } from 'primeng/card';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 @NgModule({
   imports: [
-    CommonModule, TableModule, BrowserModule, CardModule, HttpClientModule
+    CommonModule, TableModule, BrowserModule, CardModule, HttpClientModule,
+    MatButtonToggleModule
   ],
   exports: [
     SharedComponent,

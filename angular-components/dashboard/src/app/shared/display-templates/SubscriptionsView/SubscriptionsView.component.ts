@@ -35,7 +35,7 @@ export class SubscriptionsViewComponent implements OnInit, ICanBeHiddenFromDispl
 }
   isShow: boolean;
   toggleDisplay(): void {
-
+    this.isShow = !this.isShow;
   }
 
 

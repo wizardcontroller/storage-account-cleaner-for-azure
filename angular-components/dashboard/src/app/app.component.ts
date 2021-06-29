@@ -7,7 +7,8 @@ import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { BehaviorSubject, Operator, ReplaySubject, Subject } from 'rxjs';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { SubscriptionsViewComponent } from './shared/display-templates/SubscriptionsView/SubscriptionsView.component';
-
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { ICanBeHiddenFromDisplay } from './shared/interfaces/ICanBeHiddenFromDisplay';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -15,7 +16,7 @@ import { SubscriptionsViewComponent } from './shared/display-templates/Subscript
 })
 
 @AutoUnsubscribe()
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
 
 
   operatorPageModel!: OperatorPageModel;
@@ -26,6 +27,8 @@ export class AppComponent implements OnInit, OnDestroy {
   baseUri: String | undefined;
   title = 'dashboard';
   constructor(private apiConfigSvc : ApiConfigService, private applianceSvc : ApplianceApiService) {
+
+    this.isShow = false;
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       console.log("app component has operator page model");
       this.baseUri = data.applianceUrl?.toString();
@@ -33,10 +36,13 @@ export class AppComponent implements OnInit, OnDestroy {
       return this.operatorPageModel = data;
     });
   }
-
-  toggleExpand(section : any){
-
+  isShow!: boolean;
+  toggleDisplay(): void {
+    console.log("toggling");
+    this.isShow = !this.isShow;
   }
+
+
 
   ngOnDestroy(): void {
 
