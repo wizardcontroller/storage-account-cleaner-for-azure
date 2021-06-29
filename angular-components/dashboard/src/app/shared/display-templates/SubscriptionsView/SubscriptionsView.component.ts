@@ -13,7 +13,7 @@ import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDispla
 @Component({
   selector: 'app-SubscriptionsView',
   templateUrl: './SubscriptionsView.component.html',
-  styleUrls: ['./SubscriptionsView.component.css'],
+  styleUrls: ['./SubscriptionsView.component.css']
 })
 export class SubscriptionsViewComponent implements OnInit, ICanBeHiddenFromDisplay {
   operatorPageModel! : OperatorPageModel;

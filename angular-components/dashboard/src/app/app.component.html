@@ -1,7 +1,8 @@
 <p-card header="Appliance Context">
-  <button pButton type="button" icon="fa-pencil" class="ui-button-secondary" (click)="toggleExpand('azuread')"></button>
+
   <fieldset title="Azure Active Directory">
-    <ng-container *ngif="operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
+    <ng-container *ngIf="operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
+      <button pButton type="button" icon="fa-pencil" class="ui-button-secondary" (click)="toggleExpand('azuread')"></button>
       <div class="row">
         <div class="col-sm-3">Appliance URL</div>
         <div class="col-sm-9">{{ operatorPageModel?.applianceUrl }}</div>
@@ -17,7 +18,7 @@
   </fieldset>
   <ng-template #noPageModel>
     no operator data
-  </ng-template> 
+  </ng-template>
   <ng-template pTemplate="footer">
     <p-button label="Storage Accounts"></p-button>
   </ng-template>

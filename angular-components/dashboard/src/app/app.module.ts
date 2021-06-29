@@ -17,6 +17,7 @@ import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appli
 import { TableModule } from 'primeng/table';
 import { AuthHeaderInterceptor } from './interceptors/auth-header.interceptor';
 import { ApiConfigService } from './core/ApiConfig.service';
+import { MockOperatorPageModelInterceptor } from './interceptors/mock-operator-page-model.interceptor';
 @NgModule({
   declarations: [
     AppComponent
@@ -42,6 +43,12 @@ import { ApiConfigService } from './core/ApiConfig.service';
     useClass: AuthHeaderInterceptor,
     multi: true,
     deps: [ApiConfigService]
+  },
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: MockOperatorPageModelInterceptor,
+    multi: true,
+    deps: []
   }
   ],
   bootstrap: [AppComponent]

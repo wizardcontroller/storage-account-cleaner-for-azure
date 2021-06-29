@@ -12,14 +12,14 @@ import { DiagnosticsRetentionSurfaceViewComponent } from './display-templates/Di
 import { ApplianceContextService } from './display-templates/services/ApplianceContext.service';
 import { HomeGrownLoggingService } from './display-templates/services/HomeGrownLogging.service';
 import { LoggingConfigurationService } from './display-templates/services/LoggingConfiguration.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { CardModule } from 'primeng/card';
 @NgModule({
   imports: [
-    CommonModule, TableModule, BrowserModule
+    CommonModule, TableModule, BrowserModule, CardModule, HttpClientModule
   ],
   exports: [
     SharedComponent,
-    HttpClientModule,
     SubscriptionsViewComponent,
     ApplianceContextViewComponent,
     StorageAccountViewComponent,

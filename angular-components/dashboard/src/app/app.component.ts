@@ -39,7 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
+
   }
 
    ngOnInit(): void {
