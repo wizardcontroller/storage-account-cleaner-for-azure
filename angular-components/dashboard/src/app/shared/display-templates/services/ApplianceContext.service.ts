@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import {
+  ApplianceSessionContext,
   ConfigService,
   OperatorPageModel,
   RetentionEntitiesService,
 } from '@wizardcontroller/sac-appliance-lib';
+import { ReplaySubject } from 'rxjs';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextServiceBase } from './ApplianceContextServiceBase';
 
@@ -23,6 +25,9 @@ constructor(
 
 }
 
+  private currentApplianceContextSource = new ReplaySubject<ApplianceSessionContext>();
+  currentApplianceContextChanges$ = this.currentApplianceContextSource.asObservable();
+  
   protected subscribeToOperatorPageModel() : void{
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       this.pageModel = data;

@@ -1,5 +1,6 @@
 ﻿using com.ataxlab.azure.table.retention.models;
 using com.ataxlab.azure.table.retention.models.control;
+using com.ataxlab.azure.table.retention.models.models;
 using com.ataxlab.azure.table.retention.models.models.auth;
 using com.ataxlab.azure.table.retention.models.models.pagemodel;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +17,13 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
     [ApiController]
     public class RetentionEntitiesController : ControllerBase
     {
+
+        [HttpGet(Name = "GetWorkflowCheckpoint")]
+        public async Task<WorkflowCheckpointDTO> GetWorkflowCheckpoint([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId)
+        {
+            return await Task.FromResult(new WorkflowCheckpointDTO());
+        }
+
         [HttpGet(Name="GetApplianceSessionContext")]
         public async Task<ApplianceSessionContext> GetApplianceSessionContext([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId)
         {
