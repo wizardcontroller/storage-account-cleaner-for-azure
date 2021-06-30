@@ -152,7 +152,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 tenantid = GetTenantIdFromUserClaims();
                 operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
                 operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
-
+                operatorPageModel.Oid = oid;
+                operatorPageModel.Tenantid = tenantid;
                 try
                 {
                     var routeParam = new ControlChannelRouteParameter()

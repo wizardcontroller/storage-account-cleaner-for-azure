@@ -23,6 +23,9 @@ namespace com.ataxlab.azure.table.retention.models.models.pagemodel
             IsMustRenderApplianceConfig = true;
         }
 
+        public string Tenantid { get; set; }
+        public string Oid { get; set; }
+        public string SubscriptionId { get; set; }
 
         /// <summary>
         /// in debug we need to be able to split brain the html client

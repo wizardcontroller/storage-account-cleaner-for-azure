@@ -14,6 +14,7 @@ import { ApplianceContextServiceBase } from './ApplianceContextServiceBase';
 })
 export class ApplianceContextService extends ApplianceContextServiceBase {
   pageModel!: OperatorPageModel;
+  applianceContext! : ApplianceSessionContext
 
 constructor(
   private apiConfigSvc : ApiConfigService,
@@ -28,10 +29,22 @@ constructor(
   private currentApplianceContextSource = new ReplaySubject<ApplianceSessionContext>();
   currentApplianceContextChanges$ = this.currentApplianceContextSource.asObservable();
   
+  protected subscribeToApplianceContext(tenantId : string, oid: string, subscriptionId: string) : void{
+    this.retentionSvc.getApplianceSessionContext(tenantId, oid, subscriptionId).subscribe(data => {
+      this.applianceContext = data;
+      this.configureApplianceAuth();
+    }, error => {
+      console.log("error getting appliance sesssion context " + JSON.stringify(error));
+    });
+  }
+
   protected subscribeToOperatorPageModel() : void{
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       this.pageModel = data;
       this.configureApplianceAuth();
+
+      // new page model - update dependencies
+      
     });
   }
 
