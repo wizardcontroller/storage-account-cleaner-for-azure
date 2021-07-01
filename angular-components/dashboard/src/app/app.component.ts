@@ -50,7 +50,7 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
 
    ngOnInit(): void {
      console.log("app component is initializing page model");
-     this.apiConfigSvc.getOperatorPageModel();
+     this.apiConfigSvc.initPageModelSubject();
 
     // this.operatorPageModel = this.apiConfigSvc.operatorPageModel;
     // this.baseUri = this.operatorPageModel?.applianceUrl?.toString();

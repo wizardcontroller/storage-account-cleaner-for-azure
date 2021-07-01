@@ -16,7 +16,10 @@ export class ApplianceContextServiceBase {
   protected subscribeToApplianceContext(tenantId : string, oid: string, subscriptionId: string) : void{
     this.retentionSvc.getApplianceSessionContext(tenantId, oid, subscriptionId).subscribe(data => {
       this.applianceContext = data;
-      this.configureApplianceAuth();
+
+      // signal listeners on the subject
+      this.currentApplianceContextSource.next(data);
+      this.configureRetentionEntitiesSvc();
     }, error => {
       console.log("error getting appliance sesssion context " + JSON.stringify(error));
     });
@@ -25,7 +28,8 @@ export class ApplianceContextServiceBase {
   protected subscribeToOperatorPageModel() : void{
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       this.pageModel = data;
-      this.configureApplianceAuth();
+
+      this.configureRetentionEntitiesSvc();
 
       // new page model - update dependencies
 
@@ -35,7 +39,7 @@ export class ApplianceContextServiceBase {
   /**
    * apply the requierd tokens to the appliance service
    */
-  protected configureApplianceAuth() : void{
+  protected configureRetentionEntitiesSvc() : void{
     this.retentionSvc.configuration.basePath =
       this.pageModel?.applianceUrl?.toString();
   }

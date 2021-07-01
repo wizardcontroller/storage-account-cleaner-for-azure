@@ -20,13 +20,17 @@ constructor(
   retentionSvc : RetentionEntitiesService
   ) {
   super(apiConfigSvc, retentionSvc);
-
+  
   this.subscribeToOperatorPageModel();
 
 
 }
 
-  getApplianceContext(){
+  initApplianceContextSubject(){
+
+  }
+
+  initWorkflowCheckpointSubject(){
 
   }
 }

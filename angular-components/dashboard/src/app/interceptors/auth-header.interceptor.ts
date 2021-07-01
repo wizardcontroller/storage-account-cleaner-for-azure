@@ -17,11 +17,13 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
   private HEADER_X_ZUMO_AUTH = "X-ZUMO-AUTH";
   private HEADER_CURRENTSUBSCRIPTION = "x-table-retention-current-subscription";
   private HEADER_CURRENT_STORAGE_ACCOUNT = "x-table-retention-current-storage-account";
+  private interceptorIsReady : boolean = false;
 
   constructor(private apiConfigSvc: ApiConfigService) {
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
       this.pageModel = data;
       this.applianceUrl = this.pageModel?.applianceUrl?.toString() as string;
+      this.interceptorIsReady = true;
     });
   }
 
@@ -30,6 +32,12 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     const requestClone = request.clone();
+
+    /**
+     * this interceptor depends on the current pagemodel context
+     */
+    if(this.interceptorIsReady)
+    {
 
     if (requestClone.url.includes(this.applianceUrl)) {
 
@@ -44,7 +52,7 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
         this.HEADER_IMPERSONATION_TOKEN,
         this.pageModel?.impersonationToken?.toString() as string
       );
-    }
+    }}
     return next.handle(requestClone);
   }
 }

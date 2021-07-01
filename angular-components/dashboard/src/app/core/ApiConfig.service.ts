@@ -34,13 +34,13 @@ constructor(private configService : ConfigService, private router: Router) {
                 including base url for discovery appliance
                 and user appliances
             */
-                getOperatorPageModel() {
+                initPageModelSubject() {
                   console.log("apiconfigsvc is getting operator page model");
                   this.configService.configuration.basePath = window.location.origin;
                   console.log('calling config service');
                   this.configService.getOperatorPageModel().subscribe(
                     (data: OperatorPageModel) => {
-                      return this.gotOperatorPageModel(data);
+                      return this.cacheOperatorPageModelSignalSubscribers(data);
                     },
                     (err: any) => console.log(err),
                     () => {
@@ -56,7 +56,7 @@ constructor(private configService : ConfigService, private router: Router) {
                  * @description signal the new pagemodel subject listeners
                  * @param data
                  */
-                private gotOperatorPageModel(data: OperatorPageModel): void {
+                private cacheOperatorPageModelSignalSubscribers(data: OperatorPageModel): void {
                   this.operatorPageModel = data;
                   this.currentPageModelSource.next(data);
                 }
