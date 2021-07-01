@@ -150,6 +150,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             {
                 oid = GetUserOidFromUserClaims();
                 tenantid = GetTenantIdFromUserClaims();
+
                 operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
                 operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
                 operatorPageModel.Oid = oid;
@@ -214,7 +215,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     operatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
                     operatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
                     operatorPageModel.ApplianceSessionContext.AvailableSubscriptions = operatorPageModel.Subscriptions;
-
+                    operatorPageModel.Tenantid = this.GetTenantIdFromUserClaims();
+                    operatorPageModel.Oid = this.GetUserOidFromUserClaims();
+                    
                     log.LogWarning("null checkpoint. rendering config wizard");
                     return operatorPageModel;
                 }
@@ -226,6 +229,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     operatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
                     operatorPageModel.ApplianceSessionContext.AvailableSubscriptions = operatorPageModel.Subscriptions;
                     log.LogWarning("null checkpoint. rendering config wizard");
+                    operatorPageModel.Tenantid = this.GetTenantIdFromUserClaims();
+                    operatorPageModel.Oid = this.GetUserOidFromUserClaims();
+
                     return operatorPageModel;
 
                 }
