@@ -6,7 +6,7 @@ import {
   RetentionEntitiesService,
   WorkflowCheckpointDTO,
 } from '@wizardcontroller/sac-appliance-lib';
-import { timeStamp } from 'console';
+
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { config, ReplaySubject, Subject } from 'rxjs';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
@@ -44,6 +44,8 @@ export class ApplianceApiService {
     this.entityService.getApplianceSessionContext(tenantId,oid,subscriptionId).subscribe(data =>{
       console.log("apliance session context updated");
       this.currentApplianceSessionContextSource.next(data);
+    }, error => {
+      console.log("error getting session context: " + (error as Error).message);
     });
   }
 
@@ -51,6 +53,8 @@ export class ApplianceApiService {
     this.entityService.getWorkflowCheckpoint(tenantId,oid).subscribe(data =>{
       console.log("workflow context updated");
       this.currentWorkflowCheckpointSource.next(data);
+    }, error =>{
+      console.log("error getting workflow context: " + (error as Error).message);
     });
   }
 
@@ -62,16 +66,25 @@ export class ApplianceApiService {
     this.apiConfigService.operatorPageModelChanges$.subscribe((data) => {
       console.log('appliance api service has operator page model');
       try {
+        this.operatorPageModel = data
         this.ensureServiceUrls(data);
         var tenantid = data.tenantid as string;
-        var subscriptionId = data.subscriptionId as string;
-        var oid = data.oid as string;
+        console.log("ensurePageModelSubject(): tenantId: " + tenantid);
 
+        var subscriptionId = data.subscriptionId as string;
+        console.log("ensurePageModelSubject(): subscriptionId: " + subscriptionId);
+
+        var oid = data.oid as string;
+        console.log("ensurePageModelSubject(): oid: " + oid);
+
+        console.log("getting workflow checkpoint");
         this.ensureWorkflowSessionContextSubject(tenantid,subscriptionId,oid);
 
+        console.log("getting appliance context");
         this.ensureApplianceSessionContextSubject(tenantid,subscriptionId,oid);
-      } catch (err) {
-        console.log('error starting ApplianceApiSvc');
+      } catch (ex) {
+        console.log('error starting ApplianceApiSvc ' + (ex as Error).message);
+
       }
 
       return (this.operatorPageModel = data);
@@ -79,14 +92,15 @@ export class ApplianceApiService {
   }
 
   private ensureServiceUrls(data: OperatorPageModel) {
-    this.baseUri = data?.applianceUrl?.toString();
-    console.log('appliance api service is configuring access token' + this.entityService.configuration.accessToken);
+    var baseUrl = data?.applianceUrl?.toString().replace("/api/","");
+    this.baseUri = baseUrl;
+    console.log('appliance api service is configuring baseUri' + this.baseUri);
 
     this.entityService.configuration.basePath =
-      this.operatorPageModel?.applianceUrl?.toString();
+    baseUrl;
     console.log(
-      'configured easyauth token ' +
-      this.operatorPageModel?.easyAuthAccessToken
+      'configured appliance base path ' +
+      baseUrl
     );
   }
 }
