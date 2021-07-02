@@ -21,6 +21,7 @@ using com.ataxlab.functions.table.retention.entities;
 using com.ataxlab.azure.table.retention.models.models.auth;
 using com.ataxlab.azure.table.retention.models.models.pagemodel;
 using com.ataxlab.azure.table.retention.models.models;
+using System.Linq;
 
 namespace com.ataxlab.functions.table.retention.c2
 {
@@ -172,59 +173,86 @@ namespace com.ataxlab.functions.table.retention.c2
             }
         }
 
-        [FunctionName("EntityChannelFunctions")]
-        //[OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
-        //[OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        //[OpenApiParameter(name: "name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **Name** parameter")]
-        //[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        [FunctionName("GetWorkflowCheckpoint")]
+        public async Task<HttpResponseMessage> GetWorkflowCheckpoint([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetWorkflowCheckpoint"
+                                                                     + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
+            HttpRequestMessage req,
+            [DurableClient] IDurableClient durableClient,
+            [DurableClient] IDurableEntityClient durableEntityClient,
+            string tenantId,
+            string oid,
+          ClaimsPrincipal claimsPrincipal)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("QueryWorkflowEditModeCheckpointStatusEndpoint");
+            bool isAuthorized = false;
+            isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
+            if (isAuthorized)
+            {
+                var response = await this.TableRetentionApplianceEngine.GetWorkflowEditModeCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                return response;
+            }
+            else
+            {
+                // fell through to here because of unauthorized request
+                HttpResponseMessage unauthorizedResp = new HttpResponseMessage();
+                unauthorizedResp.StatusCode = HttpStatusCode.Unauthorized;
+                return unauthorizedResp;
 
-            string name = req.Query["name"];
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            }
         }
 
+        [FunctionName("GetApplianceSessionContext")]
+        public async Task<HttpResponseMessage> GetApplianceSessionContext(
 
-
-        [HttpGet(Name = "GetWorkflowCheckpoint")]
-        public async Task<WorkflowCheckpointDTO> GetWorkflowCheckpoint([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetApplianceSessionContext" +
+                                                                         ControlChannelConstants.ApplianceContextRouteTemplate)] HttpRequestMessage req,
+        string tenantId,
+        string oid,
+        ClaimsPrincipal user,
+        [DurableClient] IDurableClient durableClient,
+        ILogger log)
         {
-            return await Task.FromResult(new WorkflowCheckpointDTO());
+            try
+            {
+
+
+                if (req.Method == HttpMethod.Get)
+                {
+                    log.LogInformation("handling get request for appliance session context");
+                    return await this.TableRetentionApplianceEngine.GetApplianceSessionContextResponseForuser(tenantId, oid, durableClient);
+                }
+                else
+                {
+
+                    HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.NotFound);
+                    resp.Content = new StringContent("");
+                    return resp;
+                }
+            }
+            catch (Exception e)
+            {
+                log.LogError("problem handling applied appliance context {0}", e.Message);
+                HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                resp.Content = new StringContent("");
+                return resp;
+            }
         }
 
-        [HttpGet(Name = "GetApplianceSessionContext")]
-        public async Task<ApplianceSessionContext> GetApplianceSessionContext([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId)
-        {
-            return await Task.FromResult(new ApplianceSessionContext());
-        }
-
-        [HttpPost(Name = "SetApplianceSessionContext")]
+        [FunctionName("SetApplianceSessionContext")]
         public async Task<ApplianceSessionContext> SetApplianceSessionContext([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                                                     [FromBody] ApplianceSessionContext applianceContext)
         {
             return await Task.FromResult(new ApplianceSessionContext());
         }
 
-        [HttpGet(Name = "GetRetentionPolicyForStorageAccount")]
+        [FunctionName("GetRetentionPolicyForStorageAccount")]
         public async Task<TableStorageRetentionPolicy> GetRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                             [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
             return await Task.FromResult(new TableStorageRetentionPolicy());
         }
 
-        [HttpPost(Name = "SetRetentionPolicyForStorageAccount")]
+        [FunctionName("SetRetentionPolicyForStorageAccount")]
         public async Task<TableStorageRetentionPolicy> SetRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                     [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
                      [FromBody] TableStorageRetentionPolicy policy)
@@ -232,14 +260,14 @@ namespace com.ataxlab.functions.table.retention.c2
             return await Task.FromResult(new TableStorageRetentionPolicy());
         }
 
-        [HttpGet(Name = "GetEntityRetentionPolicyForStorageAccount")]
+        [FunctionName("GetEntityRetentionPolicyForStorageAccount")]
         public async Task<TableStorageEntityRetentionPolicy> GetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                      [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
         }
 
-        [HttpPost(Name = "SetEntityRetentionPolicyForStorageAccount")]
+        [FunctionName("SetEntityRetentionPolicyForStorageAccount")]
         public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                     [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
                      [FromBody] TableStorageEntityRetentionPolicy policy)
@@ -247,14 +275,14 @@ namespace com.ataxlab.functions.table.retention.c2
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
         }
 
-        [HttpGet(Name = "GetTableRetentionPolicyForStorageAccount")]
+        [FunctionName("GetTableRetentionPolicyForStorageAccount")]
         public async Task<TableStorageTableRetentionPolicy> GetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
              [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
 
-        [HttpPost(Name = "SetTableRetentionPolicyForStorageAccount")]
+        [FunctionName("SetTableRetentionPolicyForStorageAccount")]
         public async Task<TableStorageTableRetentionPolicy> SetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                     [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
                      [FromBody] TableStorageTableRetentionPolicy policy)
@@ -262,13 +290,6 @@ namespace com.ataxlab.functions.table.retention.c2
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
 
-        [HttpPost(Name = "SetOperatorPageModel")]
-        public async Task<OperatorPageModel> SetOperatorPageModel([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
-                     [FromBody] OperatorPageModel policy)
-        {
-            return await Task.FromResult(new OperatorPageModel());
-        }
     }
 }
 

@@ -88,7 +88,7 @@ namespace com.ataxlab.functions.table.retention.c2
                     {
                         var headers = req.Headers;
 
-                        string impersonationToken = await GetImpersonationTokenFromHeaders(headers);
+                        string impersonationToken = await this.TableRetentionApplianceEngine.GetImpersonationTokenFromHeaders(headers);
                         var response = await this.TableRetentionApplianceEngine.
                                         GetResposeForPostedApplianceSessionContext(impersonationToken,
                                         tenantId, oid, user.Claims.ToList(), durableClient, commandJson);
@@ -126,10 +126,6 @@ namespace com.ataxlab.functions.table.retention.c2
             }
         }
 
-        public async Task<string> GetImpersonationTokenFromHeaders(System.Net.Http.Headers.HttpRequestHeaders headers)
-        {
-            return await this.TableRetentionApplianceEngine.GetImpersonationTokenFromHeaders(headers);
-        }
 
 
         [FunctionName(ControlChannelConstants.ApplicationControlChannelEndpoint)]

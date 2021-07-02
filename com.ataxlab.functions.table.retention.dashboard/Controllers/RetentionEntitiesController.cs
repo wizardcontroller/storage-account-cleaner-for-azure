@@ -19,7 +19,8 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
     {
 
         [HttpGet(Name = "GetWorkflowCheckpoint")]
-        public async Task<WorkflowCheckpointDTO> GetWorkflowCheckpoint([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId)
+        public async Task<WorkflowCheckpointDTO> GetWorkflowCheckpoint(
+            [FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId)
         {
             return await Task.FromResult(new WorkflowCheckpointDTO());
         }

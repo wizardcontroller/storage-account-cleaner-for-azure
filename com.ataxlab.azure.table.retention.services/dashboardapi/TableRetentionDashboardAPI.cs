@@ -151,7 +151,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 oid = GetUserOidFromUserClaims();
                 tenantid = GetTenantIdFromUserClaims();
 
+                // may be null at this point
                 operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+                
                 operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
                 operatorPageModel.Oid = oid;
                 operatorPageModel.Tenantid = tenantid;
@@ -289,7 +291,12 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 {
                     // found a context on the appliance
                     operatorPageModel.ApplianceSessionContext = applianceContext;
+                    
+                    // use the subscription on appliance context
                     selectedSubscription = operatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
+                    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, selectedSubscription);
+                    operatorPageModel.SubscriptionId = selectedSubscription;
+                    operatorPageModel.SelectedSubscriptionId = selectedSubscription;
 
                     try
                     {
