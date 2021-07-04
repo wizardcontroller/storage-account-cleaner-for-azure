@@ -10,6 +10,7 @@ import {
   SubscriptionPoliciesDTO
 } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-SubscriptionsView',
   templateUrl: './SubscriptionsView.component.html',
@@ -28,7 +29,8 @@ export class SubscriptionsViewComponent implements OnInit, ICanBeHiddenFromDispl
 
   constructor(
     private apiConfigSvc: ApiConfigService,
-    private applianceAPiSvc: ApplianceApiService
+    private applianceAPiSvc: ApplianceApiService,
+    private route: ActivatedRoute
   ) {
     this.isShow = false;
 
@@ -45,7 +47,10 @@ private configAuth() : void {
   ngOnDestroy(): void {}
 
   ngOnInit(): void {
-
+    this.route.queryParams.subscribe(params => {
+      var parms = params['id'];
+      
+    });
         // this.operatorPageModel$ = this.apiConfigSvc.operatorPageModelChanges$;
     // push operator page model changes
     // push current subscriptions

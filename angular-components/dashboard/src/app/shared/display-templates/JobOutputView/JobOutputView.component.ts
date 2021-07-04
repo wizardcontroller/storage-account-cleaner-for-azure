@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 
 @Component({
@@ -8,7 +9,7 @@ import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDispla
 })
 export class JobOutputViewComponent implements OnInit, ICanBeHiddenFromDisplay {
 
-  constructor() {
+  constructor( private route: ActivatedRoute) {
     this.isShow = false;
    }
   isShow: boolean;

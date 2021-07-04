@@ -1,7 +1,30 @@
+
 <div [hidden] = "isShow">
-  This is a div which toggles.
-  <p>
-    ApplianceContextView works!
-  </p>
+
+  <p-card header="Appliance Context" >
+    <hr/>
+
+    <p-card header="Appliance Summary" >
+    <fieldset style="float:initial" title="Appliance Summary">
+      <mat-button-toggle style="float: right; width: 30%;" (click)="toggleDisplay()">Toggle Appliance Summary Visibility</mat-button-toggle>
+      <ng-container class="a-ng-container"  *ngIf=" operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
+        <div class="container" *ngIf=isShow>
+          <span class="">Appliance URL</span>
+          <div class="">{{ operatorPageModel?.applianceUrl }}</div>
+          <span class="">Tenant Id</span>
+          <div class="">{{ operatorPageModel?.applianceSessionContext?.tenantId}}</div>
+        </div>
+        <hr/>
+      </ng-container>
+    </fieldset>
+  </p-card>
+
+    <ng-template #noPageModel>
+      no operator data
+    </ng-template>
+    <ng-template pTemplate="footer">
+
+    </ng-template>
+  </p-card>
 </div>
 <button (click) = toggleDisplay()>Toggle</button>

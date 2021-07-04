@@ -15,10 +15,22 @@ import { LoggingConfigurationService } from './display-templates/services/Loggin
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CardModule } from 'primeng/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ButtonModule } from 'primeng/button';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+
+  { path: 'subscriptions', component: SubscriptionsViewComponent },
+  { path: 'workbench', component: ApplianceContextViewComponent },
+  { path: 'storageaccounts', component: StorageAccountViewComponent },
+
+];
 @NgModule({
   imports: [
     CommonModule, TableModule, BrowserModule, CardModule, HttpClientModule,
-    MatButtonToggleModule
+    MatButtonToggleModule, BrowserAnimationsModule, ButtonModule, TableModule,
+    RouterModule.forChild(routes)
   ],
   exports: [
     SharedComponent,
