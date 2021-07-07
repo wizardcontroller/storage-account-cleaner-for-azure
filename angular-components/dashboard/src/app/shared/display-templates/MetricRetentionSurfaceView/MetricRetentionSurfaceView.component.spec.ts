@@ -4,6 +4,11 @@ import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { MetricRetentionSurfaceViewComponent } from './MetricRetentionSurfaceView.component';
+import { MatButtonToggle } from '@angular/material/button-toggle';
+import { CardModule } from 'primeng/card';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ButtonModule } from 'primeng/button';
 
 describe('MetricRetentionSurfaceViewComponent', () => {
   let component: MetricRetentionSurfaceViewComponent;
@@ -11,6 +16,7 @@ describe('MetricRetentionSurfaceViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [ ButtonModule, CardModule, HttpClientTestingModule, RouterTestingModule],
       declarations: [ MetricRetentionSurfaceViewComponent ]
     })
     .compileComponents();

@@ -1,23 +1,13 @@
 
-<div [hidden] = "isShow">
+<div  *ngIf=" applianceContextChanges$ | async as applianceContext else noApplianceContext">
+
+  <ul  aria-label="modules">
+    <li><a [routerLink]="['subscriptions']">subscriptions</a></li>
+
+    <li><a [routerLink]="['storageaccounts']">storage accounts</a></li>
+  </ul>
 
   <p-card header="Appliance Context" >
-    <hr/>
-
-    <p-card header="Appliance Summary" >
-    <fieldset style="float:initial" title="Appliance Summary">
-      <mat-button-toggle style="float: right; width: 30%;" (click)="toggleDisplay()">Toggle Appliance Summary Visibility</mat-button-toggle>
-      <ng-container class="a-ng-container"  *ngIf=" operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
-        <div class="container" *ngIf=isShow>
-          <span class="">Appliance URL</span>
-          <div class="">{{ operatorPageModel?.applianceUrl }}</div>
-          <span class="">Tenant Id</span>
-          <div class="">{{ operatorPageModel?.applianceSessionContext?.tenantId}}</div>
-        </div>
-        <hr/>
-      </ng-container>
-    </fieldset>
-  </p-card>
 
     <ng-template #noPageModel>
       no operator data
@@ -25,6 +15,49 @@
     <ng-template pTemplate="footer">
 
     </ng-template>
+
+    <mat-accordion></mat-accordion>
+   <mat-expansion-panel expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title  style="background-color: rgb(231, 214, 214);">
+          Appliance Summary
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p-card header="Appliance Summary" >
+
+
+        <fieldset style="float:initial" title="Appliance Summary">
+            <ng-container class="a-ng-container"  *ngIf=" operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
+            <div class="container" >
+              <span class="">Appliance URL</span>
+              <div class="">{{ operatorPageModel?.applianceUrl }}</div>
+              <span class="">Tenant Id</span>
+              <div class="">{{ operatorPageModel?.applianceSessionContext?.tenantId}}</div>
+            </div>
+
+          </ng-container>
+
+
+        </fieldset>
+
+
+      </p-card>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel expanded>
+      <mat-expansion-panel-header style="border: aqua 1px; ">
+        <mat-panel-title style="background-color: rgb(231, 214, 214);">
+        Workbench Tool
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <router-outlet></router-outlet>
+    </mat-expansion-panel>
+
+
   </p-card>
 </div>
-<button (click) = toggleDisplay()>Toggle</button>
+
+<ng-template #noApplianceContext>
+  no appliance data
+</ng-template>

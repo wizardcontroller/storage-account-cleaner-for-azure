@@ -1,3 +1,36 @@
-<p>
-  StorageAccountView works!
-</p>
+
+<ng-container *ngIf="storageAccounts$ | async as availableStorageAccounts else noStorageAccounts">
+  <span>Retention</span>
+  <ul  aria-label="retention policies">
+    <li><a [routerLink]="['DiagnosticsRetention']">Diagnostics Retention</a></li>
+
+    <li><a [routerLink]="['MetricRetention']">Metrics Retention</a></li>
+  </ul>
+<p-table
+styleClass="p-datatable-gridlines p-datatable-striped"
+[columns]="cols"
+[value]="availableStorageAccounts"
+>
+<ng-template pTemplate="caption"> Subscriptions </ng-template>
+<ng-template pTemplate="header" let-columns>
+  <tr>
+    <th *ngFor="let col of columns">
+      {{ col.header }}
+    </th>
+  </tr>
+</ng-template>
+<ng-template pTemplate="body" let-car let-columns="columns">
+  <tr>
+    <td *ngFor="let col of columns">
+      {{ car[col.field] }}
+    </td>
+  </tr>
+</ng-template>
+</p-table>
+<router-outlet></router-outlet>
+</ng-container>
+
+<ng-template  #noStorageAccounts>
+  <span>no storage accounts available</span>
+</ng-template>
+

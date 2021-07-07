@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedComponent } from './shared.component';
 import { SubscriptionsViewComponent } from './display-templates/SubscriptionsView/SubscriptionsView.component';
-import {TableModule} from 'primeng/table';
+import { TableModule } from 'primeng/table';
 import { BrowserModule } from '@angular/platform-browser';
 import { ApplianceContextViewComponent } from './display-templates/ApplianceContextView/ApplianceContextView.component';
 import { StorageAccountViewComponent } from './display-templates/StorageAccountView/StorageAccountView.component';
@@ -18,19 +18,24 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { RouterModule, Routes } from '@angular/router';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatAccordion } from '@angular/material/expansion';
+import {MatMenuModule, MatMenu} from '@angular/material/menu';
+import {MatToolbarModule, MatToolbar} from '@angular/material/toolbar';
 
-const routes: Routes = [
-
-  { path: 'subscriptions', component: SubscriptionsViewComponent },
-  { path: 'workbench', component: ApplianceContextViewComponent },
-  { path: 'storageaccounts', component: StorageAccountViewComponent },
-
-];
 @NgModule({
   imports: [
-    CommonModule, TableModule, BrowserModule, CardModule, HttpClientModule,
-    MatButtonToggleModule, BrowserAnimationsModule, ButtonModule, TableModule,
-    RouterModule.forChild(routes)
+    CommonModule,
+    TableModule,
+    BrowserModule,
+    CardModule,
+    HttpClientModule,
+    MatButtonToggleModule,
+    BrowserAnimationsModule,
+    ButtonModule,
+    TableModule,
+    MatExpansionModule,
+    RouterModule
   ],
   exports: [
     SharedComponent,
@@ -38,7 +43,7 @@ const routes: Routes = [
     ApplianceContextViewComponent,
     StorageAccountViewComponent,
     RetentionPolicyEditorComponent,
-    DiagnosticsRetentionSurfaceViewComponent
+    DiagnosticsRetentionSurfaceViewComponent,
   ],
   declarations: [
     SharedComponent,
@@ -46,12 +51,13 @@ const routes: Routes = [
     ApplianceContextViewComponent,
     StorageAccountViewComponent,
     RetentionPolicyEditorComponent,
-    DiagnosticsRetentionSurfaceViewComponent
+    DiagnosticsRetentionSurfaceViewComponent,
   ],
   providers: [
     LoggingConfigurationService,
     HomeGrownLoggingService,
     ApplianceContextService,
-    ApplianceApiService]
+    ApplianceApiService,
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}

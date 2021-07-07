@@ -2,7 +2,7 @@ import { ApplianceApiService } from './../../services/appliance-api.service';
 import { Component, OnInit } from '@angular/core';
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/';
 import { Observable, ReplaySubject } from 'rxjs';
-import { ApiConfigService } from 'src/app/core/ApiConfig.service';
+import { ApiConfigService } from '../../../core/ApiConfig.service'
 import { TableModule } from 'primeng/table';
 import { BrowserModule } from '@angular/platform-browser';
 import {
@@ -16,6 +16,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './SubscriptionsView.component.html',
   styleUrls: ['./SubscriptionsView.component.css']
 })
+
 export class SubscriptionsViewComponent implements OnInit, ICanBeHiddenFromDisplay {
   operatorPageModel! : OperatorPageModel;
   cols!: any[];
@@ -32,7 +33,7 @@ export class SubscriptionsViewComponent implements OnInit, ICanBeHiddenFromDispl
     private applianceAPiSvc: ApplianceApiService,
     private route: ActivatedRoute
   ) {
-    this.isShow = false;
+    this.isShow = true;
 
 }
   isShow: boolean;
@@ -49,7 +50,7 @@ private configAuth() : void {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       var parms = params['id'];
-      
+
     });
         // this.operatorPageModel$ = this.apiConfigSvc.operatorPageModelChanges$;
     // push operator page model changes
@@ -57,6 +58,12 @@ private configAuth() : void {
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       console.log("subscriptionviewcomponent has current subscriptions");
       var subscriptions = data.subscriptions as SubscriptionDTO[] | undefined;
+
+      // if only one then is selected
+      if(subscriptions?.length == 1){
+          subscriptions[0].isSelected = true;
+      }
+
       this.subscriptionSource.next(subscriptions);
       this.operatorPageModel = data;
       this.configAuth();

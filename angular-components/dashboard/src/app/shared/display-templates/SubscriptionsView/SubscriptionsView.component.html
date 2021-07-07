@@ -1,8 +1,7 @@
 <p-card header="Subscriptions Summary" >
 
 
-  <mat-button-toggle style="float:right; width: 30%;" (click)="toggleDisplay()">Toggle Subscription Summary Visibility</mat-button-toggle>
-  <fieldset style="float:initial" *ngIf="isShow" title="Appliance Summary">
+    <fieldset style="float:initial" title="Appliance Summary">
     <ng-container *ngIf="subscriptions$ | async as availableSubscriptions else noSubscriptions">
       <ng-container  >
         <span>Tenant: {{ operatorPageModel.applianceSessionContext?.tenantId }}</span>
