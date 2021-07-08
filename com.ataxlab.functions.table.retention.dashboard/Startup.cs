@@ -46,6 +46,18 @@ using static System.Net.WebRequestMethods;
 namespace com.ataxlab.functions.table.retention.dashboard
 {
     /// <summary>
+    /// handle camelCase PropertiesOf[].properties for typescript
+    /// </summary>
+    public class CamelCasingPropertiesFilter : ISchemaFilter
+    {
+        public void Apply(OpenApiSchema model, SchemaFilterContext context)
+        {
+            model.Properties =
+                model.Properties.ToDictionary(d => d.Key.Substring(0, 1).ToLower() + d.Key.Substring(1), d => d.Value);
+        }
+    }
+
+    /// <summary>
     /// as per https://stackoverflow.com/questions/29701573/how-to-omit-methods-from-swagger-documentation-on-webapi-using-swashbuckle
     /// </summary>
     class RemoveVerbsFilter : IDocumentFilter
@@ -169,7 +181,10 @@ namespace com.ataxlab.functions.table.retention.dashboard
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Storage Account Cleaner For Azure", Version = "v1" });
                 // as per https://stackoverflow.com/questions/29701573/how-to-omit-methods-from-swagger-documentation-on-webapi-using-swashbuckle
                 c.DocumentFilter<RemoveVerbsFilter>();
+                // as per https://stackoverflow.com/questions/60954335/camelcase-in-swagger-documentation
+                c.SchemaFilter<CamelCasingPropertiesFilter>();
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                c.IgnoreObsoleteProperties();
             });
 
             // as per https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/tree/master/3-WebApp-multi-APIs

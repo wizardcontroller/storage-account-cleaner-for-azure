@@ -4,6 +4,7 @@ import {
   ConfigService,
   OperatorPageModel,
   RetentionEntitiesService,
+  StorageAccountDTO,
   WorkflowCheckpointDTO,
 } from '@wizardcontroller/sac-appliance-lib';
 
@@ -27,6 +28,10 @@ export class ApplianceApiService {
   private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
 
+  storageAccounts!: StorageAccountDTO[];
+  private storageAccountsSource = new ReplaySubject<StorageAccountDTO[]  | undefined | null>();
+  storageAccountChanges$ = this.storageAccountsSource.asObservable();
+
   baseUri: string | undefined;
 
   constructor(
@@ -44,6 +49,11 @@ export class ApplianceApiService {
     this.entityService.getApplianceSessionContext(tenantId,oid,subscriptionId).subscribe(data =>{
       console.log("apliance session context updated");
       this.currentApplianceSessionContextSource.next(data);
+
+
+      var accounts = data.selectedStorageAccounts as StorageAccountDTO[];
+
+      this.storageAccountsSource.next(accounts);
     }, error => {
       console.log("error getting session context: " + (error as Error).message);
     });
