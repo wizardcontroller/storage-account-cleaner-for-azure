@@ -91,18 +91,16 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return await Task.FromResult(new OperatorPageModel());
         }
 
-        [HttpPost(Name = "GetMetricsRetentionPolicyEnforcementResult")]
+        [HttpGet(Name = "GetMetricsRetentionPolicyEnforcementResult")]
         public async Task<TableStorageEntityRetentionPolicyEnforcementResult> GetMetricsRetentionPolicyEnforcementResult([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-            [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
-             [FromBody] OperatorPageModel policy)
+            [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicyEnforcementResult());
         }
 
-        [HttpPost(Name = "GetDiagnosticsRetentionPolicyEnforcementResult")]
+        [HttpGet(Name = "GetDiagnosticsRetentionPolicyEnforcementResult")]
         public async Task<TableStorageTableRetentionPolicyEnforcementResult> GetDiagnosticsRetentionPolicyEnforcementResult([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-            [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
-            [FromBody] OperatorPageModel policy)
+            [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicyEnforcementResult());
         }
