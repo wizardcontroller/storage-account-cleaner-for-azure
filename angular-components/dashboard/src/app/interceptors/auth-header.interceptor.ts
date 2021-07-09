@@ -8,7 +8,9 @@ import {
 import { Observable } from 'rxjs';
 import { ApiConfigService } from '../core/ApiConfig.service';
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/';
-
+import { ApplianceApiService } from '../shared/services/appliance-api.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import {CoreModule} from '../core/core.module'
 @Injectable()
 export class AuthHeaderInterceptor implements HttpInterceptor {
   private pageModel!: OperatorPageModel;
@@ -25,6 +27,8 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
       this.applianceUrl = this.pageModel?.applianceUrl?.toString() as string;
       this.interceptorIsReady = true;
     });
+
+
   }
 
   intercept(
@@ -52,6 +56,7 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
         this.HEADER_IMPERSONATION_TOKEN,
         this.pageModel?.impersonationToken?.toString() as string
       );
+
     }}
     return next.handle(requestClone);
   }

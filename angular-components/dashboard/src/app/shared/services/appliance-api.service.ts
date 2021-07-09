@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+  ApplianceJobOutput,
   ApplianceSessionContext,
   ConfigService,
   OperatorPageModel,
@@ -25,6 +26,10 @@ export class ApplianceApiService {
   private currentApplianceSessionContextSource = new ReplaySubject<ApplianceSessionContext>();
   applianceSessionContextChanges$ = this.currentApplianceSessionContextSource.asObservable();
 
+  currentJobOutput! : ApplianceJobOutput | null;
+  private currentJobOutputSource = new ReplaySubject<ApplianceJobOutput>();
+  currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
+
   workflowCheckPoint!: WorkflowCheckpointDTO | null;
   private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
@@ -34,6 +39,7 @@ export class ApplianceApiService {
   storageAccountChanges$ = this.storageAccountsSource.asObservable();
 
   // support action stream of storage accounts selections
+
   public selectedStorageAccountSource = new BehaviorSubject<string>("");
   selectedStorageAccountAction$ = this.selectedStorageAccountSource.asObservable();
   selectedStorageAccount$ = combineLatest(
@@ -45,8 +51,8 @@ export class ApplianceApiService {
   .pipe(
     map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
       filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)));
- 
-  
+
+
   baseUri: string | undefined;
 
   constructor(
@@ -64,7 +70,7 @@ export class ApplianceApiService {
     this.entityService.getApplianceSessionContext(tenantId,oid,subscriptionId).subscribe(data =>{
       console.log("apliance session context updated");
       this.currentApplianceSessionContextSource.next(data);
-
+      this.currentJobOutputSource.next(data.currentJobOutput);
 
       var accounts = data.selectedStorageAccounts as StorageAccountDTO[];
 

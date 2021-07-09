@@ -2,7 +2,8 @@ import { JsonpClientBackend } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StorageAccountDTO } from '@wizardcontroller/sac-appliance-lib';
-import { ReplaySubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, ReplaySubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -19,7 +20,8 @@ export class StorageAccountViewComponent implements OnInit, ICanBeHiddenFromDisp
   storageAccounts$ = this.storageAccountSource.asObservable();
 
   selectedStorageAccount! : StorageAccountDTO;
-  
+
+
   constructor(     private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService,private route: ActivatedRoute) {
     this.isShow = false;
