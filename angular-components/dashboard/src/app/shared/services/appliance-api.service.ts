@@ -6,6 +6,7 @@ import {
   OperatorPageModel,
   RetentionEntitiesService,
   StorageAccountDTO,
+  TableStorageEntityRetentionPolicy,
   WorkflowCheckpointDTO,
 } from '@wizardcontroller/sac-appliance-lib';
 
@@ -14,6 +15,7 @@ import { BehaviorSubject, combineLatest, config, ReplaySubject, Subject } from '
 import { map} from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
+import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
 
 @Injectable({
   providedIn: 'root',
@@ -53,12 +55,15 @@ export class ApplianceApiService {
       filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)));
 
 
+      private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();
+      entityRetentionPolicyChanges$ = this.entityRetentionPolicySource.asObservable();
+
   baseUri: string | undefined;
 
   constructor(
     private apiConfigService: ApiConfigService,
     private configService: ConfigService,
-    private entityService: RetentionEntitiesService
+    public entityService: RetentionEntitiesService
   ) {
     console.log('ApplianceApiService is starting');
 
@@ -76,6 +81,24 @@ export class ApplianceApiService {
 
       this.storageAccounts = accounts;
       this.storageAccountsSource.next(accounts);
+
+      // can listen selected storage account changes
+      // required for calls to retention service that require storage account header
+      this.selectedStorageAccount$.subscribe(selectedAcct => {
+        var acct = selectedAcct.pop();
+
+        console.log("using account name " + acct?.name);
+        // set the storage account header
+        this.entityService.defaultHeaders.append(GlobalOhNoConstants.HEADER_CURRENT_STORAGE_ACCOUNT,
+          acct?.id as string);
+
+          this.entityService.getMetricsRetentionPolicyEnforcementResult(tenantId,oid,
+            acct?.subscriptionId as string, acct?.id as string ).subscribe(data =>{
+
+          }, error => {
+
+          });
+      });
     }, error => {
       console.log("error getting session context: " + (error as Error).message);
     });

@@ -22,7 +22,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatAccordion } from '@angular/material/expansion';
 import {MatMenuModule, MatMenu} from '@angular/material/menu';
 import {MatToolbarModule, MatToolbar} from '@angular/material/toolbar';
-
+import {RetentionEntitiesService} from '@wizardcontroller/sac-appliance-lib'
 @NgModule({
   imports: [
     CommonModule,

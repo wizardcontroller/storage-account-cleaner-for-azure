@@ -13,7 +13,7 @@ import { environment } from '../environments/environment';
 import {CardModule} from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ApiModule } from '@wizardcontroller/sac-appliance-lib/'
-import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api/index';
+import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/';
 import { TableModule } from 'primeng/table';
 import { AuthHeaderInterceptor } from './interceptors/auth-header.interceptor';
 import { ApiConfigService } from './core/ApiConfig.service';

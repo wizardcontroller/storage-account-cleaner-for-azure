@@ -4,7 +4,7 @@ import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
 import { CommonModule } from '@angular/common';
-import { RetentionEntitiesService, StorageAccountDTO, TableStorageEntityRetentionPolicy, TableStorageEntityRetentionPolicyEnforcementResult } from '@wizardcontroller/sac-appliance-lib';
+import { OperatorPageModel, RetentionEntitiesService, StorageAccountDTO, TableStorageEntityRetentionPolicy, TableStorageEntityRetentionPolicyEnforcementResult } from '@wizardcontroller/sac-appliance-lib';
 import { ReplaySubject } from 'rxjs';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 @Component({
@@ -24,9 +24,9 @@ export class MetricRetentionSurfaceViewComponent implements OnInit, ICanBeHidden
   entityRetentionPolicyChanges$ = this.entityRetentionPolicySource.asObservable();
 
   selectedStorageAccount! : StorageAccountDTO;
+  operatorPageModel!: OperatorPageModel;
   constructor(    private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService,
-    private entitySvc : RetentionEntitiesService,
     private route: ActivatedRoute) {
     this.isShow = false;
    }
@@ -38,9 +38,16 @@ export class MetricRetentionSurfaceViewComponent implements OnInit, ICanBeHidden
 
   ngOnInit() {
 
-    this.applianceAPiSvc.currentJobOutputChanges$.subscribe(data => {
-      // potentially obsolete
-    });
+
+    this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
+      this.operatorPageModel = data;
+
+      var tenantId = data.tenantid as string;
+      var oid = data.oid as string;
+
+      console.log("tenantid is " + tenantId);
+      console.log("oid is " + oid);
+
 
     this.applianceAPiSvc.storageAccountChanges$.subscribe(storageAccounts => {
 
@@ -50,13 +57,22 @@ export class MetricRetentionSurfaceViewComponent implements OnInit, ICanBeHidden
         this.selectedStorageAccount = acct as StorageAccountDTO;
 
         // configure retention service with selected storage account
-        this.entitySvc.defaultHeaders.append(GlobalOhNoConstants.HEADER_CURRENT_STORAGE_ACCOUNT,
+        this.applianceAPiSvc.entityService.defaultHeaders.append(GlobalOhNoConstants.HEADER_CURRENT_STORAGE_ACCOUNT,
           this.selectedStorageAccount.id as string);
 
-        // get the retention entitites for the selected storage account
+          this.applianceAPiSvc.entityService.getMetricsRetentionPolicyEnforcementResult(tenantId,oid).subscribe(data =>{
+
+          }, error => {
+
+          });
+
 
       });
     });
+
+
+    });
+
 
   }
 

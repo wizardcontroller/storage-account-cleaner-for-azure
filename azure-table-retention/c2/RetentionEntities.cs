@@ -26,7 +26,7 @@ using System.Net.Http.Formatting;
 using Newtonsoft.Json.Serialization;
 using System.Security.Cryptography;
 using System.ComponentModel.DataAnnotations;
-
+using com.ataxlab.azure.table.retention.models.extensions;
 namespace com.ataxlab.functions.table.retention.c2
 {
 
@@ -300,7 +300,7 @@ namespace com.ataxlab.functions.table.retention.c2
 
 
         [FunctionName("GetMetricsRetentionPolicyEnforcementResult")]
-        public async Task<TableStorageEntityRetentionPolicyEnforcementResultEntity> GetMetricsRetentionPolicyEnforcementResult([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetWorkflowCheckpoint"
+        public async Task<HttpResponseMessage> GetMetricsRetentionPolicyEnforcementResult([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetMetricsRetentionPolicyEnforcementResult"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
              HttpRequestMessage req,
             [DurableClient] IDurableClient durableClient,
@@ -313,17 +313,27 @@ namespace com.ataxlab.functions.table.retention.c2
 
             var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
             var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
-            return res.TableStorageEntityPolicyEnforcementResult;
+
+            HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
+            resp.Content = new StringContent(await res.ToJSONStringAsync());
+            return resp;
         }
 
         [HttpPost(Name = "GetDiagnosticsRetentionPolicyEnforcementResult")]
-        public async Task<TableStorageTableRetentionPolicyEnforcementResult> GetDiagnosticsRetentionPolicyEnforcementResult(HttpRequestMessage req,
+        public async Task<TableStorageTableRetentionPolicyEnforcementResultEntity> GetDiagnosticsRetentionPolicyEnforcementResult(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetDiagnosticsRetentionPolicyEnforcementResult"
+                                                                     + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
+            HttpRequestMessage req,
             [DurableClient] IDurableClient durableClient,
             [DurableClient] IDurableEntityClient durableEntityClient,
             string tenantId,
             string oid)
         {
-            return await Task.FromResult(new TableStorageTableRetentionPolicyEnforcementResult());
+            var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+
+            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
+            var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
+            return res.TableStoragePolicyEnforcementResult;
         }
 
     }
