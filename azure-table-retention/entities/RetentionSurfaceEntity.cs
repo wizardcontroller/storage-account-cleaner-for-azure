@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +10,8 @@ namespace com.ataxlab.functions.table.retention.entities
     /// aggregates windows azure metrics table descriptors
     /// managed by retention policies
     /// </summary>
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class MetricRetentionSurfaceEntity
     {
         public MetricRetentionSurfaceEntity()
@@ -26,6 +30,8 @@ namespace com.ataxlab.functions.table.retention.entities
     /// aggregates windows azure diagnostics table descriptors
     /// managed by retention policies
     /// </summary>
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class DiagnosticsRetentionSurfaceEntity
     {
         public DiagnosticsRetentionSurfaceEntity()
@@ -130,6 +136,8 @@ namespace com.ataxlab.functions.table.retention.entities
         WADETWEventTable,
         WADDiagnosticInfrastructureLogsTable
     }
+
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
 
     public class RetentionSurfaceItemBase
     {

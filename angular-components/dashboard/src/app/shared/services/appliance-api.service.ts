@@ -9,7 +9,8 @@ import {
 } from '@wizardcontroller/sac-appliance-lib';
 
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { config, ReplaySubject, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, config, ReplaySubject, Subject } from 'rxjs';
+import { map} from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
 
@@ -28,10 +29,24 @@ export class ApplianceApiService {
   private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
 
-  storageAccounts!: StorageAccountDTO[];
+  storageAccounts: StorageAccountDTO[] = [];
   private storageAccountsSource = new ReplaySubject<StorageAccountDTO[]  | undefined | null>();
   storageAccountChanges$ = this.storageAccountsSource.asObservable();
 
+  // support action stream of storage accounts selections
+  public selectedStorageAccountSource = new BehaviorSubject<string>("");
+  selectedStorageAccountAction$ = this.selectedStorageAccountSource.asObservable();
+  selectedStorageAccount$ = combineLatest(
+    [
+      this.storageAccountChanges$,
+      this.selectedStorageAccountAction$
+    ]
+  )
+  .pipe(
+    map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
+      filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)));
+ 
+  
   baseUri: string | undefined;
 
   constructor(
@@ -53,6 +68,7 @@ export class ApplianceApiService {
 
       var accounts = data.selectedStorageAccounts as StorageAccountDTO[];
 
+      this.storageAccounts = accounts;
       this.storageAccountsSource.next(accounts);
     }, error => {
       console.log("error getting session context: " + (error as Error).message);

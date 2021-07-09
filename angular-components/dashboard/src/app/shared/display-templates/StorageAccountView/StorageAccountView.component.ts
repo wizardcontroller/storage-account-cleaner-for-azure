@@ -18,6 +18,8 @@ export class StorageAccountViewComponent implements OnInit, ICanBeHiddenFromDisp
   private storageAccountSource = new ReplaySubject<StorageAccountDTO[]  | undefined | null>();
   storageAccounts$ = this.storageAccountSource.asObservable();
 
+  selectedStorageAccount! : StorageAccountDTO;
+  
   constructor(     private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService,private route: ActivatedRoute) {
     this.isShow = false;
@@ -51,11 +53,16 @@ export class StorageAccountViewComponent implements OnInit, ICanBeHiddenFromDisp
 
   }
 
+  selectStorageAccount(storageAccount: StorageAccountDTO) {
+    // this.messageService.add({severity:'info', summary:'Product Selected', detail: product.name});
+    console.log("account selected : " + storageAccount.id );
+    this.applianceAPiSvc.selectedStorageAccountSource.next(storageAccount.id as string);
+}
 
   private ensureStorageAccountsPTable() {
     this.cols = [
       { field: 'isSelected', header: 'Is Selected' },
-      { field: 'Name', header: 'Name' },
+      { field: 'name', header: 'Name' },
       { field: 'id', header: 'Account ID' },
       { field: 'tenantId', header: 'Tenant Id' }
     ];

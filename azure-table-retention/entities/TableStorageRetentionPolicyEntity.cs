@@ -6,11 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
 
 namespace com.ataxlab.functions.table.retention.entities
 {
 
-    [JsonObject(MemberSerialization.OptOut)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class TableStorageEntityRetentionPolicyEnforcementResultEntity
     {
         public TableStorageEntityRetentionPolicyEnforcementResultEntity()
@@ -23,15 +25,16 @@ namespace com.ataxlab.functions.table.retention.entities
         [JsonIgnore]
         public Guid Id { get; set; }
 
-        [JsonProperty("Policy")]
+        [JsonProperty("policy")]
         public TableStorageEntityRetentionPolicyEntity Policy { get; set; }
 
-        [JsonProperty("PolicyTriggerCount")]
+        [JsonProperty("policyTriggerCount")]
         public int PolicyTriggerCount { get; set; }
 
     }
 
-    [JsonObject(MemberSerialization.OptOut)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class TableStorageTableRetentionPolicyEnforcementResultEntity
     {
         public TableStorageTableRetentionPolicyEnforcementResultEntity()
@@ -42,10 +45,10 @@ namespace com.ataxlab.functions.table.retention.entities
 
         public Guid Id { get; set; }
 
-        [JsonProperty("Policy")]
+        [JsonProperty("policy")]
         public TableStorageTableRetentionPolicyEntity Policy { get; set; }
 
-        [JsonProperty("PolicyTriggerCount")]
+        [JsonProperty("policyTriggerCount")]
         public int PolicyTriggerCount { get; set; }
     }
 
@@ -54,7 +57,8 @@ namespace com.ataxlab.functions.table.retention.entities
     /// <summary>
     /// 
     /// </summary>
-    [JsonObject(MemberSerialization.OptOut)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class TableStorageTableRetentionPolicyEntity
     {
         public TableStorageTableRetentionPolicyEntity()
@@ -72,7 +76,9 @@ namespace com.ataxlab.functions.table.retention.entities
         /// <summary>
         /// rendered list of yyyyMM strings represented by the policy delete age
         /// </summary>
+        [JsonProperty("wADMetricsTableNames")] 
         public List<String> WADMetricsTableNames { get; private set; }
+        
         public async Task<int> InitializeWADMetricsTableNames()
         {
             var tableNames = 0;
@@ -101,33 +107,38 @@ namespace com.ataxlab.functions.table.retention.entities
             return await Task.FromResult<int>(tableNames);
         }
 
+        [JsonProperty("id")]
         public Guid Id { get; set; }
+
+        [JsonProperty("wADMetricsTableNamePrefix")]
         public string WADMetricsTableNamePrefix { get; set; }
 
+        [JsonProperty("metricRetentionSurface")]
         public MetricRetentionSurfaceEntity MetricRetentionSurface { get; set; }
 
-        [JsonProperty("PolicyEnforcementMode")]
+        [JsonProperty("policyEnforcementMode")]
         public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case man
         /// </summary>
-        [JsonProperty("DeleteOlderTablesThanCurrentMonthMinusThis")]
+        [JsonProperty("deleteOlderTablesThanCurrentMonthMinusThis")]
         public int DeleteOlderTablesThanCurrentMonthMinusThis { get; set; }
 
-
+        [JsonProperty("oldestRetainedTable")]
         public DateTime OldestRetainedTable {get; set;}
 
+        [JsonProperty("mostRecentRetainedTable")]
         public DateTime MostRecentRetainedTable {get; set;}
         /// <summary>
         /// you'd be better off supplying these
         /// </summary>
-        [JsonProperty("TableNames")]
+        [JsonProperty("tableNames")]
         public List<String> TableNames
         {
             get
             {
-                return MetricRetentionSurface?.MetricsRetentionSurfaceItemEntities?.Select(s => s.TableName).ToList();
+                return MetricRetentionSurface?.MetricsRetentionSurfaceItemEntities?.Select(s => s.TableName).Distinct().ToList();
             }
         }
 
@@ -176,7 +187,8 @@ namespace com.ataxlab.functions.table.retention.entities
         }
     }
 
-    [JsonObject(MemberSerialization.OptOut)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class TableStorageEntityRetentionPolicyEntity
     {
         public TableStorageEntityRetentionPolicyEntity()
@@ -267,7 +279,8 @@ namespace com.ataxlab.functions.table.retention.entities
     /// 
     /// that's why github has discussion forums and issue lists
     /// </summary>
-    [JsonObject(MemberSerialization.OptOut)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class TableStorageRetentionPolicyEntity
     {
         public TableStorageRetentionPolicyEntity()
@@ -277,12 +290,13 @@ namespace com.ataxlab.functions.table.retention.entities
             Id = Guid.NewGuid();
         }
 
+        [JsonProperty("id")]
         public Guid Id { get; set; }
 
-        [JsonProperty("TableStorageEntityRetentionPolicy")]
+        [JsonProperty("tableStorageEntityRetentionPolicy")]
         public TableStorageEntityRetentionPolicyEntity TableStorageEntityRetentionPolicy { get; set; }
 
-        [JsonProperty("TableStorageTableRetentionPolicy")]
+        [JsonProperty("tableStorageTableRetentionPolicy")]
         public TableStorageTableRetentionPolicyEntity TableStorageTableRetentionPolicy { get; set; }
     }
 }

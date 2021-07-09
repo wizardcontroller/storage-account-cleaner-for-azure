@@ -12,6 +12,7 @@ using com.ataxlab.functions.table.retention.services;
 using com.ataxlab.azure.table.retention.models;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Serialization;
 
 namespace com.ataxlab.azure.table.retention.state.entities
 {
@@ -53,7 +54,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
     /// the appliance session context dto
     /// </summary>
     // public class ApplianceSessionContextEntity : ApplianceSessionContext, IApplianceSessionContextEntity
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class ApplianceSessionContextEntity : ApplianceSessionContextEntityBase, IApplianceSessionContextEntity
     {
 
@@ -161,7 +162,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
         /// <param name="tuples"></param>
         public void InitializeCurrentJobOutput(List<Tuple<TableStorageRetentionPolicyEntity, StorageAccountEntity>> tuples)
         {
-            CurrentJobOutput.RetentionPolicyJobs.Clear();
+            CurrentJobOutput.retentionPolicyJobs.Clear();
 
             if (tuples == null) return;
 
@@ -171,7 +172,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
                 {
                     try
                     {
-                        CurrentJobOutput.RetentionPolicyJobs.Add(new RetentionPolicyTupleContainerEntity()
+                        CurrentJobOutput.retentionPolicyJobs.Add(new RetentionPolicyTupleContainerEntity()
                         {
                             Id = Guid.NewGuid(),
                             SourceTuple = tuple,
@@ -207,11 +208,11 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
             try
             {
-                var poisonedOutput = CurrentJobOutput.RetentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
+                var poisonedOutput = CurrentJobOutput.retentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
                 foreach (var item in poisonedOutput)
                 {
                     System.Diagnostics.Trace.TraceError("warning: poisoned properties found");
-                    CurrentJobOutput.RetentionPolicyJobs.Remove(item);
+                    CurrentJobOutput.retentionPolicyJobs.Remove(item);
                 }
             }
             catch (Exception e)
@@ -223,7 +224,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
             try
             {
                 // expect only 1
-                var matchingAccount = CurrentJobOutput.RetentionPolicyJobs.Find(f => f.StorageAccount.Id.Equals(storageAccount.Id));
+                var matchingAccount = CurrentJobOutput.retentionPolicyJobs.Find(f => f.StorageAccount.Id.Equals(storageAccount.Id));
                 if (matchingAccount != null && matchingAccount.Id.Equals(storageAccount.Id))
                 {
                     result = matchingAccount.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy;
@@ -253,11 +254,11 @@ namespace com.ataxlab.azure.table.retention.state.entities
             // side effect - if nulls in collection, clear them
             try
             {
-                var poisonedOutput = CurrentJobOutput.RetentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
+                var poisonedOutput = CurrentJobOutput.retentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
                 foreach (var item in poisonedOutput)
                 {
                     System.Diagnostics.Trace.TraceError("warning: poisoned properties found");
-                    CurrentJobOutput.RetentionPolicyJobs.Remove(item);
+                    CurrentJobOutput.retentionPolicyJobs.Remove(item);
                 }
             }
             catch(Exception e)
@@ -268,7 +269,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
             try
             {
                 // expect only 1
-                var matchingJob = CurrentJobOutput.RetentionPolicyJobs.Find(f => f.StorageAccount.Id.Equals(storageAccount.Id));
+                var matchingJob = CurrentJobOutput.retentionPolicyJobs.Find(f => f.StorageAccount.Id.Equals(storageAccount.Id));
                 if (matchingJob != null && matchingJob.StorageAccount.Id.Equals(storageAccount.Id))
                 {
                     result = matchingJob.TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy;
@@ -287,11 +288,11 @@ namespace com.ataxlab.azure.table.retention.state.entities
             var result = new TableStorageTableRetentionPolicyEnforcementResultEntity();
             try
             {
-                var poisonedOutput = CurrentJobOutput.RetentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
+                var poisonedOutput = CurrentJobOutput.retentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
                 foreach (var item in poisonedOutput)
                 {
                     System.Diagnostics.Trace.TraceError("warning: poisoned properties found");
-                    CurrentJobOutput.RetentionPolicyJobs.Remove(item);
+                    CurrentJobOutput.retentionPolicyJobs.Remove(item);
                 }
             }
             catch (Exception e)
@@ -302,7 +303,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
             try
             {
                 // expect only 1
-                var matchingJob = CurrentJobOutput.RetentionPolicyJobs.Find(f => f.StorageAccount.Id.Equals(storageAccount.Id));
+                var matchingJob = CurrentJobOutput.retentionPolicyJobs.Find(f => f.StorageAccount.Id.Equals(storageAccount.Id));
                 if (matchingJob != null && matchingJob.StorageAccount.Id.Equals(storageAccount.Id))
                 {
                     result = matchingJob.TableStoragePolicyEnforcementResult;
@@ -326,11 +327,11 @@ namespace com.ataxlab.azure.table.retention.state.entities
             }
             try
             {
-                var poisonedOutput = CurrentJobOutput.RetentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
+                var poisonedOutput = CurrentJobOutput.retentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
                 foreach (var item in poisonedOutput)
                 {
                     System.Diagnostics.Trace.TraceError("warning: poisoned properties found");
-                    CurrentJobOutput.RetentionPolicyJobs.Remove(item);
+                    CurrentJobOutput.retentionPolicyJobs.Remove(item);
                 }
             }
             catch (Exception e)
@@ -342,7 +343,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
             try
             {
                 // expect only 1
-                var matchingJob = CurrentJobOutput.RetentionPolicyJobs.Find(f => f.StorageAccount.Id.Equals(storageAccount.Id));
+                var matchingJob = CurrentJobOutput.retentionPolicyJobs.Find(f => f.StorageAccount.Id.Equals(storageAccount.Id));
                 if (matchingJob != null && matchingJob.StorageAccount.Id.Equals(storageAccount.Id))
                 {
                     result = matchingJob.TableStorageEntityPolicyEnforcementResult;
@@ -363,11 +364,11 @@ namespace com.ataxlab.azure.table.retention.state.entities
             var ret = new List<Tuple<TableStorageRetentionPolicyEntity, StorageAccountEntity>>();
             try
             {
-                var poisonedOutput = CurrentJobOutput.RetentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
+                var poisonedOutput = CurrentJobOutput.retentionPolicyJobs.FindAll(f => f.StorageAccount.Id == null);
                 foreach (var item in poisonedOutput)
                 {
                     System.Diagnostics.Trace.TraceError("warning: poisoned properties found");
-                    CurrentJobOutput.RetentionPolicyJobs.Remove(item);
+                    CurrentJobOutput.retentionPolicyJobs.Remove(item);
                 }
             }
             catch (Exception e)
@@ -378,7 +379,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
             try
             {
-                foreach (var job in CurrentJobOutput.RetentionPolicyJobs)
+                foreach (var job in CurrentJobOutput.retentionPolicyJobs)
                 {
                     ret.Add(job.SourceTuple);
                 }
@@ -398,11 +399,11 @@ namespace com.ataxlab.azure.table.retention.state.entities
     [JsonObject(MemberSerialization.OptOut)]
     public class ApplianceContextPersistResult
     {
-        public AppliancePersistResultType PersistResult { get; set; }
+        public AppliancePersistResultType persistResult { get; set; }
         public string ErrorMessage { get; set; }
     }
 
-    [JsonObject(MemberSerialization.OptOut)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class ApplianceSessionContextEntityBase
     {
         public ApplianceSessionContextEntityBase()
@@ -419,33 +420,33 @@ namespace com.ataxlab.azure.table.retention.state.entities
         /// <summary>
         /// represents a hash of all the other properties
         /// </summary>
-        [JsonProperty("Id")]
+        [JsonProperty("id")]
         public string Id { get; set; }
 
-        [JsonProperty("SelectedSubscriptionId")]
+        [JsonProperty("selectedSubscriptionId")]
         public string SelectedSubscriptionId { get; set; }
 
 
-        [JsonProperty("SelectedStorageAccounts")]
+        [JsonProperty("selectedStorageAccounts")]
         public List<StorageAccountEntity> SelectedStorageAccounts { get; set; }
 
-        [JsonProperty("UserOid")]
+        [JsonProperty("userOid")]
         public string UserOid { get; set; }
 
-        [JsonProperty("TenantId")]
+        [JsonProperty("tenantId")]
         public string TenantId { get; set; }
 
         /// <summary>
         /// what happened last time the appliance tried
         /// to crud the entity
         /// </summary>
-        [JsonProperty("OperationResult")]
+        [JsonProperty("operationResult")]
         public ApplianceContextPersistResult OperationResult { get; set; }
 
-        [JsonProperty("JobOutput")]
+        [JsonProperty("jobOutput")]
         public List<ApplianceJobOutputEntity> JobOutput { get; set; }
 
-        [JsonProperty("CurrentJobOutput")]
+        [JsonProperty("currentJobOutput")]
         public ApplianceJobOutputEntity CurrentJobOutput { get; set; }
 
     }

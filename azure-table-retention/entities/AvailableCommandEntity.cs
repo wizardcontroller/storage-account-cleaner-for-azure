@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,11 +29,13 @@ namespace com.ataxlab.functions.table.retention.entities
     /// the dashboard with a message for display
     /// in a menu
     /// </summary>
-    [JsonObject("MemberSerialization.OptOut")]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
 
     public class AvailableCommandEntity
     {
         public AvailableCommandEntity() { }
+
 
         public string AvailableCommandId { get; set; }
 

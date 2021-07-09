@@ -3,6 +3,7 @@ using com.ataxlab.functions.table.retention.entities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -59,7 +60,8 @@ namespace com.ataxlab.azure.table.retention.state.entities
     /// <summary>
     /// the live configuration
     /// </summary>
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class WorkflowCheckpoint : IWorkflowCheckpoint, IWorkflowCheckpointProperties
     {
         [JsonProperty("TimeStamp")]
@@ -148,7 +150,8 @@ namespace com.ataxlab.azure.table.retention.state.entities
     /// <summary>
     /// the staging configuration
     /// </summary>
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class WorkflowCheckpointEditMode : IWorkflowCheckpoint, IWorkflowCheckpointProperties
     {
         [JsonProperty("TimeStamp")]
@@ -236,6 +239,9 @@ namespace com.ataxlab.azure.table.retention.state.entities
             return Task.FromResult(SubscriptionName);
         }
     }
+
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class WorkflowCheckpointStatus
     {
         public WorkflowCheckpoint Checkpoint { get; set; }

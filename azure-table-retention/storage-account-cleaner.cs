@@ -385,7 +385,7 @@ namespace com.ataxlab.functions.table.retention
                 log.LogInformation("applying retention policy tuples. getting activity input");
                 input = context.GetInput<ActivityConfig>();
                 var jobOutput = await input.ActivityContext.GetCurrentJobOutput();
-                policies = jobOutput.RetentionPolicyJobs.Select(s => s.SourceTuple).ToList();
+                policies = jobOutput.retentionPolicyJobs.Select(s => s.SourceTuple).ToList();
 
                 foreach (var policyTuple in policies)
                 {
@@ -430,7 +430,7 @@ namespace com.ataxlab.functions.table.retention
                         var currentJobOutput = await currentState.EntityState.GetCurrentJobOutput();
                         var jobHistory = await currentState.EntityState.GetJobOutputHistory();
                         // currentJobOutput.TableEntityRetentionResult = entityResult;
-                        currentJobOutput.RetentionPolicyJobs.Add(new RetentionPolicyTupleContainerEntity()
+                        currentJobOutput.retentionPolicyJobs.Add(new RetentionPolicyTupleContainerEntity()
                         {
                             Id = Guid.NewGuid(),
                             SourceTuple = policyTuple,

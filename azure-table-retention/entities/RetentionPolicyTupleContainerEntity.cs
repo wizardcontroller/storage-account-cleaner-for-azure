@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using com.ataxlab.azure.table.retention.state.entities;
+using Newtonsoft.Json.Serialization;
 
 namespace com.ataxlab.functions.table.retention.entities
 {
@@ -14,6 +15,8 @@ namespace com.ataxlab.functions.table.retention.entities
     /// container for job input and output
     /// per storage account
     /// </summary>
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class RetentionPolicyTupleContainerEntity
     {
         public RetentionPolicyTupleContainerEntity()

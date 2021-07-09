@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,7 +10,8 @@ using System.Text.Json.Serialization;
 namespace com.ataxlab.azure.table.retention.state.entities
 {
 
-    [JsonObject(MemberSerialization.OptOut)]
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
     public class StorageAccountEntity
     {
         public StorageAccountEntity()
@@ -19,7 +21,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
         /// which user retrieved these results
         /// </summary>
 
-        [JsonProperty("RequestingAzureAdUserOid")]
+        [JsonProperty("requestingAzureAdUserOid")]
         public string RequestingAzureAdUserOid { get; set; }
 
         /// <summary>
@@ -31,28 +33,29 @@ namespace com.ataxlab.azure.table.retention.state.entities
         /// v2 or what
         /// </summary>
 
-        [JsonProperty("StorageAccountKind")]
+        [JsonProperty("storageAccountKind")]
         public string StorageAccountKind { get; set; }
 
-        [JsonProperty("SubscriptionId")]
+        [JsonProperty("subscriptionId")]
         public string SubscriptionId { get; set; }
 
+        [JsonProperty("id")]
         public string Id { get; set; }
 
-        [JsonProperty("Location")]
+        [JsonProperty("location")]
         public string Location { get; set; }
 
-        [JsonProperty("Name")]
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("StorageAccountType")]
+        [JsonProperty("storageAccountType")]
         public string StorageAccountType { get; set; }
 
 
-        [JsonProperty("SkuName")]
+        [JsonProperty("skuName")]
         public string SkuName { get; set; }
 
-        [JsonProperty("TenantId")]
+        [JsonProperty("tenantId")]
         public string TenantId { get; set; }
 
         /// <summary>

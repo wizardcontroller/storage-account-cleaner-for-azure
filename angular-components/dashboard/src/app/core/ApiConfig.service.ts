@@ -1,7 +1,7 @@
 
 import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ConfigService, OperatorPageModel } from 'index';
+import { ConfigService, OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 @Injectable({

@@ -22,15 +22,20 @@ using com.ataxlab.azure.table.retention.models.models.auth;
 using com.ataxlab.azure.table.retention.models.models.pagemodel;
 using com.ataxlab.azure.table.retention.models.models;
 using System.Linq;
+using System.Net.Http.Formatting;
+using Newtonsoft.Json.Serialization;
 
 namespace com.ataxlab.functions.table.retention.c2
 {
+
+
     /// <summary>
     /// functions that emit raw json entities
     /// </summary>
     [Route("RetentionEntities")]
     public class RetentionEntities
     {
+
 
         private ITableRetentionApplianceEngine TableRetentionApplianceEngine { get; set; }
 
@@ -173,6 +178,7 @@ namespace com.ataxlab.functions.table.retention.c2
             }
         }
 
+        
         [FunctionName("GetWorkflowCheckpoint")]
         public async Task<HttpResponseMessage> GetWorkflowCheckpoint([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetWorkflowCheckpoint"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
@@ -289,6 +295,7 @@ namespace com.ataxlab.functions.table.retention.c2
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
+
 
     }
 }

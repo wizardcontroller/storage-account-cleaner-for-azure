@@ -28,6 +28,8 @@ using Microsoft.Azure.Management.Storage;
 using System.Net.Http.Headers;
 using com.ataxlab.functions.table.retention.entities;
 using WorkflowOperation = com.ataxlab.functions.table.retention.entities.WorkflowOperation;
+using Newtonsoft.Json.Serialization;
+using System.Net.Http.Formatting;
 
 namespace com.ataxlab.functions.table.retention.services
 {
@@ -610,7 +612,7 @@ namespace com.ataxlab.functions.table.retention.services
             {
                 ApplianceSessionContextEntityBase result = new ApplianceSessionContextEntityBase();
 
-               
+
                 log.LogInformation("appliance context validation succeeded. persisting context");
                 try
                 {
@@ -641,7 +643,7 @@ namespace com.ataxlab.functions.table.retention.services
                     log.LogError("problem setting appliance context for user {0}", e.Message);
                 }
 
-                if (result.OperationResult.PersistResult == AppliancePersistResultType.SUCEEDED)
+                if (result.OperationResult.persistResult == AppliancePersistResultType.SUCEEDED)
                 {
                     log.LogInformation("appliance context persisted");
 
@@ -686,14 +688,17 @@ namespace com.ataxlab.functions.table.retention.services
         {
             // handle the case of wanting to get the appliance context
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.Accepted);
+            var formatter = await this.GetJsonFormatter();
             var currentState = await this.GetApplianceContextForUser(tenantId, oid, durableClient);
             if (currentState.EntityExists == true)
             {
-                var currentPolicyJobs = currentState.EntityState.CurrentJobOutput.RetentionPolicyJobs;
+                var currentPolicyJobs = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs;
                 var metricsItems = currentPolicyJobs.SelectMany(s => s.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities).Count(); // .Select(s => s.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities).ToList().Count();
                 var diagnosticsItems = currentPolicyJobs.SelectMany(s => s.TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities).Count();
                 // found the entity return it
-                resp.Content = new StringContent(await currentState.EntityState.ToJSONStringAsync());
+                // resp.Content = new StringContent(await currentState.EntityState.ToJSONStringAsync());
+                var content = currentState.EntityState;
+                resp.Content = new StringContent(JsonConvert.SerializeObject(content, formatter.SerializerSettings));
                 log.LogWarning($"diagnostics retention surface {diagnosticsItems} items");
                 log.LogWarning($"metrics retention surface {metricsItems} items");
 
@@ -763,7 +768,7 @@ namespace com.ataxlab.functions.table.retention.services
                 //log.LogInformation("updating workflow checkpoints for user");
                 //var workflow = await this.GetStateForUpdateWorkflowCheckpoints(durableEntityClient, tenantId, ctx.SelectedSubscriptionId, oid, WorkflowOperation.ProvisionAppliance);
 
-                var persistResult = new ApplianceContextPersistResult() { PersistResult = AppliancePersistResultType.SUCEEDED };
+                var persistResult = new ApplianceContextPersistResult() { persistResult = AppliancePersistResultType.SUCEEDED };
                 ctx.OperationResult = persistResult;
 
                 log.LogInformation("finished deploying new application context");
@@ -774,7 +779,7 @@ namespace com.ataxlab.functions.table.retention.services
                 // signal failure by returning an uninitialized object
                 var persistResult = new ApplianceContextPersistResult()
                 {
-                    PersistResult = AppliancePersistResultType.FAILED,
+                    persistResult = AppliancePersistResultType.FAILED,
                     ErrorMessage = e.Message
                 };
                 ctx.OperationResult = persistResult;
@@ -794,7 +799,7 @@ namespace com.ataxlab.functions.table.retention.services
         private async Task DeployApplianceContext(ApplianceSessionContextEntityBase ctx, IDurableClient durableEntityClient, EntityId ctxEntitId)
         {
 
-            foreach(var job in ctx.CurrentJobOutput.RetentionPolicyJobs)
+            foreach (var job in ctx.CurrentJobOutput.retentionPolicyJobs)
             {
                 // init results
                 job.TableStorageEntityPolicyEnforcementResult = new TableStorageEntityRetentionPolicyEnforcementResultEntity();
@@ -1571,6 +1576,7 @@ namespace com.ataxlab.functions.table.retention.services
 
             try
             {
+
                 var applianceContext = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient);
                 if (applianceContext.EntityExists == true)
                 {
@@ -1631,6 +1637,8 @@ namespace com.ataxlab.functions.table.retention.services
         /// <returns></returns>
         private async Task<HttpResponseMessage> HandleCurrentWorkflowCheckpointResponse(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, EntityStateResponse<WorkflowCheckpoint> result)
         {
+            var formatter = await this.GetJsonFormatter();
+
             if (result.EntityState == null ||
                 result.EntityExists != true ||
                 (await result.EntityState.GetAvailableCommands()) == null ||
@@ -1650,7 +1658,11 @@ namespace com.ataxlab.functions.table.retention.services
                 {
                     if (result.EntityState != null)
                     {
-                        normalResp.Content = new StringContent(await result.EntityState.ToJSONStringAsync());
+                        //  normalResp.Content = new StringContent(await result.EntityState.ToJSONStringAsync());
+
+                        var content = result.EntityState;
+                        normalResp.Content = new StringContent(JsonConvert.SerializeObject(content, formatter.SerializerSettings));
+
                     }
                 }
                 catch (Exception e)
@@ -1672,8 +1684,12 @@ namespace com.ataxlab.functions.table.retention.services
                     log.LogTrace("orchestration not running. getting checkpoint for oid {0}, tenantid {1}", oid, tenantId);
 
                     HttpResponseMessage normalResp = new HttpResponseMessage();
-                    normalResp.Content = new StringContent(await result.EntityState.ToJSONStringAsync());
+                    // normalResp.Content = new StringContent(await result.EntityState.ToJSONStringAsync());
                     normalResp.StatusCode = HttpStatusCode.OK;
+
+                    var content = result.EntityState;
+                    normalResp.Content = new StringContent(JsonConvert.SerializeObject(content, formatter.SerializerSettings));
+
                     return normalResp;
                 }
                 else if (orchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Failed
@@ -1681,11 +1697,11 @@ namespace com.ataxlab.functions.table.retention.services
                     orchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed)
                 {
                     var currentEntity = result.EntityState;
-                    if(orchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed)
+                    if (orchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed)
                     {
                         var commands = await currentEntity.GetAvailableCommands();
                         var removeList = commands.Where(
-                                            w => w.WorkflowOperation == WorkflowOperation.BeginWorkflow 
+                                            w => w.WorkflowOperation == WorkflowOperation.BeginWorkflow
                                         || w.WorkflowOperation == WorkflowOperation.ProvisionAppliance).ToList();
 
                         // mutate the outgoing results but not the stored entity
@@ -1695,7 +1711,7 @@ namespace com.ataxlab.functions.table.retention.services
                     else if (orchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Pending)
                     {
                         var commands = await currentEntity.GetAvailableCommands();
-                        var removeList = commands.Where( w => w.WorkflowOperation == WorkflowOperation.CancelWorkflow).ToList();
+                        var removeList = commands.Where(w => w.WorkflowOperation == WorkflowOperation.CancelWorkflow).ToList();
 
                         // mutate the outgoing results but not the stored entity
                         currentEntity.AvailableCommands = removeList;
@@ -1712,7 +1728,11 @@ namespace com.ataxlab.functions.table.retention.services
                     {
                         if (result.EntityState != null)
                         {
-                            normalResp.Content = new StringContent(await currentEntity.ToJSONStringAsync());
+                            // normalResp.Content = new StringContent(await currentEntity.ToJSONStringAsync());
+
+                            var content = result.EntityState;
+                            normalResp.Content = new StringContent(JsonConvert.SerializeObject(content, formatter.SerializerSettings));
+
                         }
                     }
                     catch (Exception e)
@@ -1733,7 +1753,10 @@ namespace com.ataxlab.functions.table.retention.services
                     {
                         if (result.EntityState != null)
                         {
-                            normalResp.Content = new StringContent(await result.EntityState.ToJSONStringAsync());
+                            // normalResp.Content = new StringContent(await result.EntityState.ToJSONStringAsync());
+                            var content = result.EntityState;
+                            normalResp.Content = new StringContent(JsonConvert.SerializeObject(content, formatter.SerializerSettings));
+
                         }
                     }
                     catch (Exception e)
@@ -1748,6 +1771,7 @@ namespace com.ataxlab.functions.table.retention.services
 
         public async Task<HttpResponseMessage> GetWorkflowEditModeCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid)
         {
+            var formatter = await this.GetJsonFormatter();
             var applianceContext = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient);
             if (applianceContext.EntityExists == true)
             {
@@ -1768,7 +1792,10 @@ namespace com.ataxlab.functions.table.retention.services
                     log.LogInformation("workflow checkpoint found for user");
                     HttpResponseMessage resp = new HttpResponseMessage();
                     resp.StatusCode = HttpStatusCode.OK;
-                    resp.Content = new StringContent(await result.EntityState.ToJSONStringAsync());
+                    // resp.Content = new StringContent(await result.EntityState.ToJSONStringAsync());
+                    var content = result.EntityState;
+                    resp.Content = new StringContent(JsonConvert.SerializeObject(content, formatter.SerializerSettings));
+
                     return resp;
                 }
             }
@@ -1937,5 +1964,20 @@ namespace com.ataxlab.functions.table.retention.services
             throw new NotImplementedException();
         }
 
+        private async Task<JsonMediaTypeFormatter> GetJsonFormatter()
+        {
+            return await Task.FromResult(
+                new JsonMediaTypeFormatter
+                {
+                    SerializerSettings = new JsonSerializerSettings
+                    {
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    }
+                    ,
+                    UseDataContractJsonSerializer = false
+                }
+
+                );
+        }
     }
 }
