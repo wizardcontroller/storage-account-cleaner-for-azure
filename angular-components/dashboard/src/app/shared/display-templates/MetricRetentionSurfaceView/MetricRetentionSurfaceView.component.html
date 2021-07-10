@@ -1,16 +1,31 @@
-<p>
-  MetricRetentionSurfaceView works!
-</p>
+<p>MetricRetentionSurfaceView works!</p>
 
-<ng-container >
+<ng-container *ngIf="currentJobOutputChanges$ | async as jobs; else noAccount">
+  <p-dataView [value]="jobs">
 
-  <div>
+    <ng-template pTemplate="header">
+      <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+    </ng-template>
 
-  </div>
+    <ng-template let-job pTemplate="listItem">
+      <div>
+        {{ job.id }}
+      </div>
+    </ng-template>
 
+    <ng-template let-job pTemplate="gridItem">
+      <div class="p-col-12 p-md-3">
+        {{ job.year }}
+      </div>
+    </ng-template>
 
+    <ng-template pTemplate="footer">
+      <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+  </ng-template>
+
+  </p-dataView>
 </ng-container>
 
-<ng-template  #noAccount>
-  <span>no storage accounts available</span>
+<ng-template #noAccount>
+  <span>no retention jobs available</span>
 </ng-template>

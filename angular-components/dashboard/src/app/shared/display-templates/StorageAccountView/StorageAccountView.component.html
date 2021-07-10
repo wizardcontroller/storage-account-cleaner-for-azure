@@ -6,7 +6,7 @@ styleClass="p-datatable-gridlines p-datatable-striped"
 [columns]="cols"
 [value]="availableStorageAccounts"
 [scrollable]="true" scrollHeight="200px"
-selectionMode="single" [(selection)]="selectedStorageAccount" 
+selectionMode="single" [(selection)]="selectedStorageAccount"
 >
 <ng-template pTemplate="caption"> Storage Accounts </ng-template>
 <ng-template pTemplate="header" let-columns>
@@ -15,7 +15,7 @@ selectionMode="single" [(selection)]="selectedStorageAccount"
       {{ col.header }}
     </th>
     <th style="width:4rem">
-      
+
     </th>
   </tr>
 </ng-template>
@@ -39,9 +39,9 @@ selectionMode="single" [(selection)]="selectedStorageAccount"
   <hr/>
   <span>Retention</span>
   <ul  aria-label="retention policies">
-    <li><a [routerLink]="['DiagnosticsRetention']">Diagnostics Retention</a></li>
+    <li><a [routerLink]="['./DiagnosticsRetention']">Diagnostics Retention</a></li>
 
-    <li><a [routerLink]="['MetricRetention']">Metrics Retention</a></li>
+    <li><a [routerLink]="['./MetricRetention']">Metrics Retention</a></li>
   </ul>
 </div>
 <ng-container  >

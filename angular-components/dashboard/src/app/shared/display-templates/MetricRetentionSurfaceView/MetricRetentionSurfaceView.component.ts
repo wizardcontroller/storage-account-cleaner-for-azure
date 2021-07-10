@@ -5,7 +5,7 @@ import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDispla
 import { ApplianceApiService } from '../../services/appliance-api.service';
 
 import {
-  ApplianceJobOutput,
+
   OperatorPageModel,
   RetentionEntitiesService,
   StorageAccountDTO,
@@ -15,6 +15,7 @@ import {
 import { ReplaySubject } from 'rxjs';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
+import { ApplianceJobOutput } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
 
 @Component({
   templateUrl: './MetricRetentionSurfaceView.component.html',
@@ -39,7 +40,11 @@ export class MetricRetentionSurfaceViewComponent
 
   selectedStorageAccount!: StorageAccountDTO;
   operatorPageModel!: OperatorPageModel;
-  currentJobOutput: ApplianceJobOutput | undefined;
+
+  currentJobOutput: ApplianceJobOutput[] | undefined;
+  private currentJobOutputSource = new ReplaySubject<ApplianceJobOutput[]>();
+  currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
+
   constructor(
     private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService,
@@ -80,8 +85,12 @@ export class MetricRetentionSurfaceViewComponent
               GlobalOhNoConstants.HEADER_CURRENT_STORAGE_ACCOUNT,
               this.selectedStorageAccount.id as string);
 
-              this.applianceAPiSvc.entityService.getCurrentJobOutput("","","","").subscribe(jobOutput =>{
+              this.applianceAPiSvc.entityService.getCurrentJobOutput(tenantId,oid,
+                this.selectedStorageAccount.subscriptionId as string,
+                this.selectedStorageAccount.id as string).subscribe((jobOutput: ApplianceJobOutput[]) =>{
 
+                  console.log("current job output is available for storage account id " + this.selectedStorageAccount.id);
+                  this.currentJobOutput = jobOutput;
               });
           });
         }
