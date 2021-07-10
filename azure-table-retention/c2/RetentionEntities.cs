@@ -339,8 +339,8 @@ namespace com.ataxlab.functions.table.retention.c2
             return resp;
         }
 
-        [FunctionName("GetCurrentJobOutput")]
-        public async Task<HttpResponseMessage> GetCurrentJobOutput([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetCurrentJobOutput"
+        [FunctionName("GetRetentionPolicyTuples")]
+        public async Task<HttpResponseMessage> GetCurrentJobOutput([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetRetentionPolicyTuples"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
              HttpRequestMessage req,
             [DurableClient] IDurableClient durableClient,
@@ -369,10 +369,10 @@ namespace com.ataxlab.functions.table.retention.c2
         /// <param name="oid"></param>
         /// <param name="claimsPrincipal"></param>
         /// <returns></returns>
-        [FunctionName("RetentionPolicyTupleContainer")]
+        [FunctionName("GetCurrentJobOutput")]
         [Obsolete]
        
-        public async Task<HttpResponseMessage> RetentionPolicyTupleContainer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/RetentionPolicyTupleContainer"
+        public async Task<HttpResponseMessage> RetentionPolicyTupleContainer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetCurrentJobOutput"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
              HttpRequestMessage req,
             [DurableClient] IDurableClient durableClient,
@@ -384,7 +384,7 @@ namespace com.ataxlab.functions.table.retention.c2
             var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
 
             var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
-            var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).ToList();
+            var res = currentState.EntityState.CurrentJobOutput;
 
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
             resp.Content = new StringContent(await res.ToJSONStringAsync());

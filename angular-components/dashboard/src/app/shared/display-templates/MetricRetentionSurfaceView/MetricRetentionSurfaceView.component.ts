@@ -15,7 +15,7 @@ import {
 import { ReplaySubject } from 'rxjs';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { ApplianceJobOutput } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
+import { ApplianceJobOutput, MetricsRetentionSurfaceItemEntity } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
 
 @Component({
   templateUrl: './MetricRetentionSurfaceView.component.html',
@@ -45,6 +45,9 @@ export class MetricRetentionSurfaceViewComponent
   private currentJobOutputSource = new ReplaySubject<ApplianceJobOutput[]>();
   currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
 
+  metricsRetentionSurfaceEntities: MetricsRetentionSurfaceItemEntity[] | undefined;
+  private metricsRetentionSurfaceEntitiesSource = new ReplaySubject<MetricsRetentionSurfaceItemEntity[]>();
+  metricsRetentionSurfaceEntityChanges$ = this.metricsRetentionSurfaceEntitiesSource.asObservable();
   constructor(
     private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService,
@@ -91,6 +94,24 @@ export class MetricRetentionSurfaceViewComponent
 
                   console.log("current job output is available for storage account id " + this.selectedStorageAccount.id);
                   this.currentJobOutput = jobOutput;
+                  this.currentJobOutputSource.next(jobOutput);
+
+                  var newEntities : MetricsRetentionSurfaceItemEntity[];
+                  // emit metricsRetentionEntities
+                  this.currentJobOutput.forEach((entity) => {
+                    entity.retentionPolicyJobs?.forEach((job) =>{
+                      job.tableStorageRetentionPolicy?.
+                          tableStorageTableRetentionPolicy?.
+                            metricRetentionSurface?.
+                              metricsRetentionSurfaceItemEntities?.forEach((metricEntity) =>{
+                                console.log("metric retention entity : " + metricEntity.itemDescription);
+                                newEntities.push(metricEntity);
+                                this.metricsRetentionSurfaceEntitiesSource.next(newEntities);
+                              });
+                    });
+                  })
+
+                  this.entityEnforcementResultSource.next()
               });
           });
         }

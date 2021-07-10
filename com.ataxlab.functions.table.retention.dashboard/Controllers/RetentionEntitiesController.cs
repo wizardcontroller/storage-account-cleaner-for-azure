@@ -105,18 +105,18 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return await Task.FromResult(new TableStorageTableRetentionPolicyEnforcementResult());
         }
 
-        [HttpGet(Name = "GetCurrentJobOutput")]
-        public async Task<List<ApplianceJobOutput>> GetCurrentJobOutput([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-        [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
-        {
-            return await Task.FromResult(new List<ApplianceJobOutput>());
-        }
-
-        [HttpGet(Name = "RetentionPolicyTupleContainer")]
-        public async Task<List<RetentionPolicyTupleContainer>> RetentionPolicyTupleContainer([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
+        [HttpGet(Name = "GetRetentionPolicyTuples")]
+        public async Task<List<RetentionPolicyTupleContainer>> GetRetentionPolicyTuples([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
         [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
             return await Task.FromResult(new List<RetentionPolicyTupleContainer>());
+        }
+
+        [HttpGet(Name = "GetCurrentJobOutput")]
+        public async Task<ApplianceJobOutput> RetentionPolicyTupleContainer([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
+        [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
+        {
+            return await Task.FromResult(new ApplianceJobOutput());
         }
     }
 }

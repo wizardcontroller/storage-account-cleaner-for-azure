@@ -1,6 +1,6 @@
 <p>MetricRetentionSurfaceView works!</p>
 
-<ng-container *ngIf="currentJobOutputChanges$ | async as jobs; else noAccount">
+<ng-container *ngIf="metricsRetentionSurfaceEntityChanges$ | async as jobs; else noAccount">
   <p-dataView [value]="jobs">
 
     <ng-template pTemplate="header">
@@ -15,7 +15,7 @@
 
     <ng-template let-job pTemplate="gridItem">
       <div class="p-col-12 p-md-3">
-        {{ job.year }}
+        {{ job.retentionPolicyJobs }}
       </div>
     </ng-template>
 
