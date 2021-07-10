@@ -111,5 +111,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         {
             return await Task.FromResult(new ApplianceJobOutput());
         }
+
+        [HttpGet(Name = "RetentionPolicyTupleContainer")]
+        public async Task<RetentionPolicyTupleContainer> RetentionPolicyTupleContainer([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
+        [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
+        {
+            return await Task.FromResult(new RetentionPolicyTupleContainer());
+        }
     }
 }

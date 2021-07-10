@@ -319,7 +319,7 @@ namespace com.ataxlab.functions.table.retention.c2
             return resp;
         }
 
-        [HttpPost(Name = "GetDiagnosticsRetentionPolicyEnforcementResult")]
+        [FunctionName("GetDiagnosticsRetentionPolicyEnforcementResult")]
         public async Task<HttpResponseMessage> GetDiagnosticsRetentionPolicyEnforcementResult(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetDiagnosticsRetentionPolicyEnforcementResult"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
@@ -339,6 +339,25 @@ namespace com.ataxlab.functions.table.retention.c2
             return resp;
         }
 
+        [FunctionName("GetCurrentJobOutput")]
+        public async Task<HttpResponseMessage> GetCurrentJobOutput([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetCurrentJobOutput"
+                                                                     + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
+             HttpRequestMessage req,
+            [DurableClient] IDurableClient durableClient,
+            [DurableClient] IDurableEntityClient durableEntityClient,
+            string tenantId,
+            string oid,
+            ClaimsPrincipal claimsPrincipal)
+        {
+            var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+
+            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
+            var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
+
+            HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
+            resp.Content = new StringContent(await res.TableStoragePolicyEnforcementResult.ToJSONStringAsync());
+            return resp;
+        }
     }
 }
 

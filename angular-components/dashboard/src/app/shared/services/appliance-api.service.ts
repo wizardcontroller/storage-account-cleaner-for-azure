@@ -90,15 +90,6 @@ export class ApplianceApiService {
          // this is where this code would go if needed
         console.log("using account name " + acct?.name);
         // set the storage account header
-        this.entityService.defaultHeaders.append(GlobalOhNoConstants.HEADER_CURRENT_STORAGE_ACCOUNT,
-          acct?.id as string);
-
-          this.entityService.getMetricsRetentionPolicyEnforcementResult(tenantId,oid,
-            acct?.subscriptionId as string, acct?.id as string ).subscribe(data =>{
-
-          }, error => {
-
-          });
 
       });
     }, error => {
