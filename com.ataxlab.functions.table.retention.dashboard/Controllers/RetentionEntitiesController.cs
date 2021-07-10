@@ -106,17 +106,17 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         }
 
         [HttpGet(Name = "GetCurrentJobOutput")]
-        public async Task<ApplianceJobOutput> GetCurrentJobOutput([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
+        public async Task<List<ApplianceJobOutput>> GetCurrentJobOutput([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
         [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
-            return await Task.FromResult(new ApplianceJobOutput());
+            return await Task.FromResult(new List<ApplianceJobOutput>());
         }
 
         [HttpGet(Name = "RetentionPolicyTupleContainer")]
-        public async Task<RetentionPolicyTupleContainer> RetentionPolicyTupleContainer([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
+        public async Task<List<RetentionPolicyTupleContainer>> RetentionPolicyTupleContainer([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
         [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
-            return await Task.FromResult(new RetentionPolicyTupleContainer());
+            return await Task.FromResult(new List<RetentionPolicyTupleContainer>());
         }
     }
 }

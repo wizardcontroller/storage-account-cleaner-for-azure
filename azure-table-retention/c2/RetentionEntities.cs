@@ -352,10 +352,42 @@ namespace com.ataxlab.functions.table.retention.c2
             var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
 
             var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
-            var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
+            var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).ToList();
 
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
-            resp.Content = new StringContent(await res.TableStoragePolicyEnforcementResult.ToJSONStringAsync());
+            resp.Content = new StringContent(await res.ToJSONStringAsync());
+            return resp;
+        }
+
+        /// <summary>
+        /// this function might be dead on arrival we'll see
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="durableClient"></param>
+        /// <param name="durableEntityClient"></param>
+        /// <param name="tenantId"></param>
+        /// <param name="oid"></param>
+        /// <param name="claimsPrincipal"></param>
+        /// <returns></returns>
+        [FunctionName("RetentionPolicyTupleContainer")]
+        [Obsolete]
+       
+        public async Task<HttpResponseMessage> RetentionPolicyTupleContainer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/RetentionPolicyTupleContainer"
+                                                                     + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
+             HttpRequestMessage req,
+            [DurableClient] IDurableClient durableClient,
+            [DurableClient] IDurableEntityClient durableEntityClient,
+            string tenantId,
+            string oid,
+            ClaimsPrincipal claimsPrincipal)
+        {
+            var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+
+            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
+            var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).ToList();
+
+            HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
+            resp.Content = new StringContent(await res.ToJSONStringAsync());
             return resp;
         }
     }
