@@ -5,7 +5,7 @@ import { DebugElement } from '@angular/core';
 
 import { MetricRetentionSurfaceViewComponent } from './MetricRetentionSurfaceView.component';
 import { MatButtonToggle } from '@angular/material/button-toggle';
-import { CardModule } from 'primeng/card';
+import { CardModule, Card } from 'primeng/card';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ButtonModule } from 'primeng/button';

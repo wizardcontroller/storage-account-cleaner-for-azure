@@ -10,7 +10,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BASE_PATH } from '@wizardcontroller/sac-appliance-lib/';
 import { environment } from '../environments/environment';
-import {CardModule} from 'primeng/card';
+import {CardModule,Card} from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ApiModule } from '@wizardcontroller/sac-appliance-lib/'
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/';
@@ -20,6 +20,7 @@ import { ApiConfigService } from './core/ApiConfig.service';
 import { MockOperatorPageModelInterceptor } from './interceptors/mock-operator-page-model.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { CommonModule } from '@angular/common';
 @NgModule({
   declarations: [
     AppComponent
@@ -27,6 +28,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
   imports: [
     ApiModule,
     CoreModule,
+    CommonModule,
     SharedModule,
     BrowserModule,
     AppRoutingModule,

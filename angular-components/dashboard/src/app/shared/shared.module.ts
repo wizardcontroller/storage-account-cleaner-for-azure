@@ -13,22 +13,26 @@ import { ApplianceContextService } from './display-templates/services/ApplianceC
 import { HomeGrownLoggingService } from './display-templates/services/HomeGrownLogging.service';
 import { LoggingConfigurationService } from './display-templates/services/LoggingConfiguration.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { CardModule } from 'primeng/card';
+import { CardModule, Card } from 'primeng/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { RouterModule, Routes } from '@angular/router';
 import { MatExpansionModule } from '@angular/material/expansion';
+import {DataViewModule } from 'primeng/dataview'
 import { MatAccordion } from '@angular/material/expansion';
 import {MatMenuModule, MatMenu} from '@angular/material/menu';
 import {MatToolbarModule, MatToolbar} from '@angular/material/toolbar';
 import {RetentionEntitiesService} from '@wizardcontroller/sac-appliance-lib'
+import { MetricRetentionSurfaceViewComponent } from './display-templates/MetricRetentionSurfaceView/MetricRetentionSurfaceView.component';
 @NgModule({
   imports: [
     CommonModule,
     TableModule,
     BrowserModule,
+    BrowserAnimationsModule,
     CardModule,
+    DataViewModule,
     HttpClientModule,
     MatButtonToggleModule,
     BrowserAnimationsModule,
@@ -44,6 +48,7 @@ import {RetentionEntitiesService} from '@wizardcontroller/sac-appliance-lib'
     StorageAccountViewComponent,
     RetentionPolicyEditorComponent,
     DiagnosticsRetentionSurfaceViewComponent,
+    MetricRetentionSurfaceViewComponent
   ],
   declarations: [
     SharedComponent,
@@ -52,6 +57,7 @@ import {RetentionEntitiesService} from '@wizardcontroller/sac-appliance-lib'
     StorageAccountViewComponent,
     RetentionPolicyEditorComponent,
     DiagnosticsRetentionSurfaceViewComponent,
+    MetricRetentionSurfaceViewComponent
   ],
   providers: [
     LoggingConfigurationService,

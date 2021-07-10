@@ -1,18 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
-import { CommonModule } from '@angular/common';
-import { OperatorPageModel, RetentionEntitiesService, StorageAccountDTO, TableStorageEntityRetentionPolicy, TableStorageEntityRetentionPolicyEnforcementResult } from '@wizardcontroller/sac-appliance-lib';
+
+import { ApplianceJobOutput, OperatorPageModel, RetentionEntitiesService, StorageAccountDTO, TableStorageEntityRetentionPolicy, TableStorageEntityRetentionPolicyEnforcementResult } from '@wizardcontroller/sac-appliance-lib';
 import { ReplaySubject } from 'rxjs';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
+import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
+
 @Component({
-  selector: 'lib-MetricRetentionSurfaceView',
+
   templateUrl: './MetricRetentionSurfaceView.component.html',
   styleUrls: ['./MetricRetentionSurfaceView.component.css']
 })
-export class MetricRetentionSurfaceViewComponent implements OnInit, ICanBeHiddenFromDisplay {
+
+@AutoUnsubscribe()
+export class MetricRetentionSurfaceViewComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
 
   private acctSubject = new ReplaySubject<StorageAccountDTO>();
   selectedAccountChanges$ = this.acctSubject.asObservable();
@@ -25,11 +29,17 @@ export class MetricRetentionSurfaceViewComponent implements OnInit, ICanBeHidden
 
   selectedStorageAccount! : StorageAccountDTO;
   operatorPageModel!: OperatorPageModel;
+  currentJobOutput: ApplianceJobOutput | undefined;
   constructor(    private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService,
     private route: ActivatedRoute) {
     this.isShow = false;
+
+
    }
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
+  }
 
   isShow: boolean;
   toggleDisplay(): void {
@@ -38,6 +48,9 @@ export class MetricRetentionSurfaceViewComponent implements OnInit, ICanBeHidden
 
   ngOnInit() {
 
+    this.applianceAPiSvc.applianceSessionContextChanges$.subscribe(applianceContext => {
+
+    });
 
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       this.operatorPageModel = data;
@@ -47,6 +60,7 @@ export class MetricRetentionSurfaceViewComponent implements OnInit, ICanBeHidden
 
       console.log("tenantid is " + tenantId);
       console.log("oid is " + oid);
+
 
 
     this.applianceAPiSvc.storageAccountChanges$.subscribe(storageAccounts => {
