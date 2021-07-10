@@ -79,6 +79,7 @@ namespace com.ataxlab.functions.table.retention.entities
         [JsonProperty("wADMetricsTableNames")] 
         public List<String> WADMetricsTableNames { get; private set; }
         
+        [Obsolete]
         public async Task<int> InitializeWADMetricsTableNames()
         {
             var tableNames = 0;

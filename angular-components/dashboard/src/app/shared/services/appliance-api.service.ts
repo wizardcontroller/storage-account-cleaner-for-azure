@@ -87,6 +87,7 @@ export class ApplianceApiService {
       this.selectedStorageAccount$.subscribe(selectedAcct => {
         var acct = selectedAcct.pop();
 
+         // this is where this code would go if needed
         console.log("using account name " + acct?.name);
         // set the storage account header
         this.entityService.defaultHeaders.append(GlobalOhNoConstants.HEADER_CURRENT_STORAGE_ACCOUNT,
@@ -98,10 +99,12 @@ export class ApplianceApiService {
           }, error => {
 
           });
+
       });
     }, error => {
       console.log("error getting session context: " + (error as Error).message);
     });
+
   }
 
   public ensureWorkflowSessionContextSubject(tenantId: string, subscriptionId: string, oid: string) : void{

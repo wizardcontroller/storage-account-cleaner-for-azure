@@ -618,7 +618,7 @@ namespace com.ataxlab.functions.table.retention.services
             var ret = new MetricRetentionSurfaceEntity();
 
             // render the date range strings for the associated table names
-            var suffixCount = await policy.InitializeWADMetricsTableNames();
+            // var suffixCount = await policy.InitializeWADMetricsTableNames();
 
             log.LogInformation("calculating table names");
             try

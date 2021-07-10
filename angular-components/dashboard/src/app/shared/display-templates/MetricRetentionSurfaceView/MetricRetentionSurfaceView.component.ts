@@ -61,7 +61,7 @@ export class MetricRetentionSurfaceViewComponent implements OnInit, ICanBeHidden
           this.selectedStorageAccount.id as string);
 
           this.applianceAPiSvc.entityService.getMetricsRetentionPolicyEnforcementResult(tenantId,oid).subscribe(data =>{
-
+            console.log("metrics retention result available " + data.id)
           }, error => {
 
           });

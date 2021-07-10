@@ -315,12 +315,12 @@ namespace com.ataxlab.functions.table.retention.c2
             var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
 
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
-            resp.Content = new StringContent(await res.ToJSONStringAsync());
+            resp.Content = new StringContent(await res.TableStoragePolicyEnforcementResult.ToJSONStringAsync());
             return resp;
         }
 
         [HttpPost(Name = "GetDiagnosticsRetentionPolicyEnforcementResult")]
-        public async Task<TableStorageTableRetentionPolicyEnforcementResultEntity> GetDiagnosticsRetentionPolicyEnforcementResult(
+        public async Task<HttpResponseMessage> GetDiagnosticsRetentionPolicyEnforcementResult(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetDiagnosticsRetentionPolicyEnforcementResult"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
             HttpRequestMessage req,
@@ -333,7 +333,10 @@ namespace com.ataxlab.functions.table.retention.c2
 
             var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
             var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
-            return res.TableStoragePolicyEnforcementResult;
+
+            HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
+            resp.Content = new StringContent(await res.TableStorageEntityPolicyEnforcementResult.ToJSONStringAsync());
+            return resp;
         }
 
     }
