@@ -253,12 +253,12 @@ namespace com.ataxlab.functions.table.retention.c2
             return await Task.FromResult(new ApplianceSessionContext());
         }
 
-        [FunctionName("GetRetentionPolicyForStorageAccount")]
-        public async Task<TableStorageRetentionPolicy> GetRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                            [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
-        {
-            return await Task.FromResult(new TableStorageRetentionPolicy());
-        }
+        //[FunctionName("GetRetentionPolicyForStorageAccount")]
+        //public async Task<TableStorageRetentionPolicy> GetRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
+        //                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
+        //{
+        //    return await Task.FromResult(new TableStorageRetentionPolicy());
+        //}
 
         [FunctionName("SetRetentionPolicyForStorageAccount")]
         public async Task<TableStorageRetentionPolicy> SetRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
