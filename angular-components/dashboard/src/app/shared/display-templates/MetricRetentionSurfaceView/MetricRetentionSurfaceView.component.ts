@@ -45,7 +45,7 @@ export class MetricRetentionSurfaceViewComponent
   private currentJobOutputSource = new ReplaySubject<ApplianceJobOutput[]>();
   currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
 
-  metricsRetentionSurfaceEntities: MetricsRetentionSurfaceItemEntity[] | undefined;
+  metricsRetentionSurfaceEntities!: MetricsRetentionSurfaceItemEntity[];
   private metricsRetentionSurfaceEntitiesSource = new ReplaySubject<MetricsRetentionSurfaceItemEntity[]>();
   metricsRetentionSurfaceEntityChanges$ = this.metricsRetentionSurfaceEntitiesSource.asObservable();
   constructor(
@@ -98,20 +98,16 @@ export class MetricRetentionSurfaceViewComponent
 
                   var newEntities : MetricsRetentionSurfaceItemEntity[];
                   // emit metricsRetentionEntities
-                  this.currentJobOutput.forEach((entity) => {
-                    entity.retentionPolicyJobs?.forEach((job) =>{
-                      job.tableStorageRetentionPolicy?.
-                          tableStorageTableRetentionPolicy?.
-                            metricRetentionSurface?.
-                              metricsRetentionSurfaceItemEntities?.forEach((metricEntity) =>{
-                                console.log("metric retention entity : " + metricEntity.itemDescription);
-                                newEntities.push(metricEntity);
-                                this.metricsRetentionSurfaceEntitiesSource.next(newEntities);
-                              });
-                    });
-                  })
 
-                  this.entityEnforcementResultSource.next()
+                  this.applianceAPiSvc.entityService
+                    .getRetentionPolicyForStorageAccount(tenantId, oid,
+                      this.selectedStorageAccount.subscriptionId as string,
+                      this.selectedStorageAccount.id as string)
+                    .subscribe(policy => {
+                      this.metricsRetentionSurfaceEntitiesSource.next(policy.tableStorageTableRetentionPolicy?.metricRetentionSurface?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[]);
+});
+                      
+
               });
           });
         }

@@ -339,8 +339,8 @@ namespace com.ataxlab.functions.table.retention.c2
             return resp;
         }
 
-        [FunctionName("GetRetentionPolicyTuples")]
-        public async Task<HttpResponseMessage> GetCurrentJobOutput([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetRetentionPolicyTuples"
+        [FunctionName("GetRetentionPolicyForStorageAccount")]
+        public async Task<HttpResponseMessage> GetRetentionPolicyForStorageAccount([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetRetentionPolicyForStorageAccount"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
              HttpRequestMessage req,
             [DurableClient] IDurableClient durableClient,
@@ -372,7 +372,7 @@ namespace com.ataxlab.functions.table.retention.c2
         [FunctionName("GetCurrentJobOutput")]
         [Obsolete]
        
-        public async Task<HttpResponseMessage> RetentionPolicyTupleContainer([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetCurrentJobOutput"
+        public async Task<HttpResponseMessage> GetCurrentJobOutput([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetCurrentJobOutput"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
              HttpRequestMessage req,
             [DurableClient] IDurableClient durableClient,

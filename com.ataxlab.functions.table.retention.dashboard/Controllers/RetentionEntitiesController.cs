@@ -105,7 +105,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return await Task.FromResult(new TableStorageTableRetentionPolicyEnforcementResult());
         }
 
-        [HttpGet(Name = "GetRetentionPolicyTuples")]
+        [HttpGet(Name = "GetRetentionPolicyForStorageAccount")]
         public async Task<List<RetentionPolicyTupleContainer>> GetRetentionPolicyTuples([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
         [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
