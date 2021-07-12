@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 
 @Component({
@@ -7,10 +8,15 @@ import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDispla
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
   styleUrls: ['./DiagnosticsRetentionSurfaceView.component.css']
 })
-export class DiagnosticsRetentionSurfaceViewComponent implements OnInit, ICanBeHiddenFromDisplay {
+
+@AutoUnsubscribe()
+export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnInit, ICanBeHiddenFromDisplay {
 
   constructor( private route: ActivatedRoute) {
     this.isShow = false;
+  }
+  ngOnDestroy(): void {
+
   }
   isShow: boolean;
   toggleDisplay(): void {

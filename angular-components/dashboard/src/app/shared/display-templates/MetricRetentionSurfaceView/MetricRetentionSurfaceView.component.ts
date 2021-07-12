@@ -12,26 +12,48 @@ import {
   TableStorageEntityRetentionPolicy,
   TableStorageEntityRetentionPolicyEnforcementResult,
 } from '@wizardcontroller/sac-appliance-lib';
-import { ReplaySubject } from 'rxjs';
+import { combineLatest, ReplaySubject } from 'rxjs';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { ApplianceJobOutput, MetricsRetentionSurfaceItemEntity } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
+import { map, withLatestFrom } from 'rxjs/operators';
 
 @Component({
   templateUrl: './MetricRetentionSurfaceView.component.html',
   styleUrls: ['./MetricRetentionSurfaceView.component.css'],
 })
+
 @AutoUnsubscribe()
 export class MetricRetentionSurfaceViewComponent
   implements OnInit, OnDestroy, ICanBeHiddenFromDisplay
 {
-  private acctSubject = new ReplaySubject<StorageAccountDTO>();
+  private acctSubject = new ReplaySubject<string>();
   selectedAccountChanges$ = this.acctSubject.asObservable();
 
-  private entityEnforcementResultSource =
-    new ReplaySubject<TableStorageEntityRetentionPolicyEnforcementResult>();
-  entityEnforcementResultChanges$ =
-    this.entityEnforcementResultSource.asObservable();
+  private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
+  pageModelChanges$ = this.pageModelSubuject.asObservable();
+
+metricsItemDependencies$ =   this.pageModelChanges$.pipe(
+      withLatestFrom(
+        this.applianceAPiSvc.selectedStorageAccountAction$
+        // this.selectedAccountChanges$
+     )
+  )
+
+
+metricEntities$ = this.metricsItemDependencies$.subscribe(
+  dependencyData => {
+    var pageModel = dependencyData[0];
+    var storageAccountId = dependencyData[0];
+
+    console.log("getting metric entities");
+    this.applianceAPiSvc.entityService.getRetentionPolicyForStorageAccount(pageModel.tenantid as string,
+                          pageModel.oid as string, pageModel.subscriptionId as string, storageAccountId as string)
+                          .subscribe(data => {
+                                console.log("retention policy id " + JSON.stringify(data.tableStorageEntityRetentionPolicy));
+                                this.metricsRetentionSurfaceEntitiesSource.next(data.tableStorageTableRetentionPolicy?.metricRetentionSurface?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[])
+                          });
+  })
 
   private entityRetentionPolicySource =
     new ReplaySubject<TableStorageEntityRetentionPolicy>();
@@ -48,6 +70,8 @@ export class MetricRetentionSurfaceViewComponent
   metricsRetentionSurfaceEntities!: MetricsRetentionSurfaceItemEntity[];
   private metricsRetentionSurfaceEntitiesSource = new ReplaySubject<MetricsRetentionSurfaceItemEntity[]>();
   metricsRetentionSurfaceEntityChanges$ = this.metricsRetentionSurfaceEntitiesSource.asObservable();
+
+
   constructor(
     private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService,
@@ -63,55 +87,22 @@ export class MetricRetentionSurfaceViewComponent
   toggleDisplay(): void {}
 
   ngOnInit() {
-    this.applianceAPiSvc.applianceSessionContextChanges$.subscribe(
-      (applianceContext) => {}
-    );
 
-    this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
-      this.operatorPageModel = data;
 
-      var tenantId = data.tenantid as string;
-      var oid = data.oid as string;
+    this.applianceAPiSvc.selectedStorageAccountAction$.subscribe(data => {
+      console.log("metrics retention surface has new selected storage account");
 
-      console.log('tenantid is ' + tenantId);
-      console.log('oid is ' + oid);
-
-      this.applianceAPiSvc.storageAccountChanges$.subscribe(
-        (storageAccounts) => {
-          this.applianceAPiSvc.selectedStorageAccount$.subscribe((data) => {
-            console.log('metric tool has selected storage account ');
-            var acct = data.pop();
-            this.selectedStorageAccount = acct as StorageAccountDTO;
-
-            // configure retention service with selected storage account
-            this.applianceAPiSvc.entityService.defaultHeaders.append(
-              GlobalOhNoConstants.HEADER_CURRENT_STORAGE_ACCOUNT,
-              this.selectedStorageAccount.id as string);
-
-              this.applianceAPiSvc.entityService.getCurrentJobOutput(tenantId,oid,
-                this.selectedStorageAccount.subscriptionId as string,
-                this.selectedStorageAccount.id as string).subscribe((jobOutput: ApplianceJobOutput[]) =>{
-
-                  console.log("current job output is available for storage account id " + this.selectedStorageAccount.id);
-                  this.currentJobOutput = jobOutput;
-                  this.currentJobOutputSource.next(jobOutput);
-
-                  var newEntities : MetricsRetentionSurfaceItemEntity[];
-                  // emit metricsRetentionEntities
-
-                  this.applianceAPiSvc.entityService
-                    .getRetentionPolicyForStorageAccount(tenantId, oid,
-                      this.selectedStorageAccount.subscriptionId as string,
-                      this.selectedStorageAccount.id as string)
-                    .subscribe(policy => {
-                      this.metricsRetentionSurfaceEntitiesSource.next(policy.tableStorageTableRetentionPolicy?.metricRetentionSurface?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[]);
-});
-                      
-
-              });
-          });
-        }
-      );
+      this.acctSubject.next(data);
     });
+
+    this.apiConfigSvc.operatorPageModelChanges$.subscribe(pageModel =>{
+
+     // metrics retention component has operator page model
+      this.pageModelSubuject.next(pageModel);
+    });
+
+
+
+
   }
 }

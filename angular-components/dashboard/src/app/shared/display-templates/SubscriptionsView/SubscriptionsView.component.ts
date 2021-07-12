@@ -56,7 +56,7 @@ private configAuth() : void {
     // push operator page model changes
     // push current subscriptions
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
-      console.log("subscriptionviewcomponent has current subscriptions");
+      console.log("subscriptionviewcomponent has current page model");
       var subscriptions = data.subscriptions as SubscriptionDTO[] | undefined;
 
       // if only one then is selected
@@ -77,6 +77,6 @@ private configAuth() : void {
       { field: 'tenantId', header: 'Tenant Id' },
     ];
 
-    console.log('SubscriptionsViewComponent is initializing page model');
+
   }
 }

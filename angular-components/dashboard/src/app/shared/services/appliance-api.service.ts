@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
+import { MAT_MENU_DEFAULT_OPTIONS_FACTORY } from '@angular/material/menu/menu';
 import {
   ApplianceJobOutput,
   ApplianceSessionContext,
   ConfigService,
+  MetricsRetentionSurfaceItemEntity,
   OperatorPageModel,
   RetentionEntitiesService,
   StorageAccountDTO,
@@ -12,7 +14,7 @@ import {
 
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { BehaviorSubject, combineLatest, config, ReplaySubject, Subject } from 'rxjs';
-import { map} from 'rxjs/operators';
+import { flatMap, map, tap} from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
 import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
@@ -20,7 +22,9 @@ import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
 @Injectable({
   providedIn: 'root',
 })
-export class ApplianceApiService {
+
+@AutoUnsubscribe()
+export class ApplianceApiService implements OnDestroy {
   operatorPageModel!: OperatorPageModel | null;
 
   // this is the ApplianceSessionContext source of truth
@@ -52,11 +56,16 @@ export class ApplianceApiService {
   )
   .pipe(
     map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
-      filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)));
+      filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
+      ));
 
 
-      private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();
-      entityRetentionPolicyChanges$ = this.entityRetentionPolicySource.asObservable();
+
+
+
+
+  private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();
+  entityRetentionPolicyChanges$ = this.entityRetentionPolicySource.asObservable();
 
   baseUri: string | undefined;
 
@@ -69,6 +78,10 @@ export class ApplianceApiService {
 
     this.ensurePageModelSubject();
     console.log('appliance api service done startup');
+  }
+
+  ngOnDestroy(): void {
+
   }
 
   public ensureApplianceSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void{
@@ -84,16 +97,16 @@ export class ApplianceApiService {
 
       // can listen selected storage account changes
       // required for calls to retention service that require storage account header
-      this.selectedStorageAccount$.subscribe(selectedAcct => {
-        var acct = selectedAcct.pop();
+      //this.selectedStorageAccount$.subscribe(selectedAcct => {
+        //var acct = selectedAcct.pop();
 
          // this is where this code would go if needed
-        console.log("using account name " + acct?.name);
+        //console.log("using account name " + acct?.name);
         // set the storage account header
 
-      });
-    }, error => {
-      console.log("error getting session context: " + (error as Error).message);
+//      });
+//    }, error => {
+//      console.log("error getting session context: " + (error as Error).message);
     });
 
   }
@@ -111,6 +124,7 @@ export class ApplianceApiService {
    * on pagemodel retrieval update dependent DTOs
    */
   public ensurePageModelSubject() : void{
+
 
     this.apiConfigService.operatorPageModelChanges$.subscribe((data) => {
       console.log('appliance api service has operator page model');
@@ -138,6 +152,7 @@ export class ApplianceApiService {
 
       return (this.operatorPageModel = data);
     });
+
   }
 
   private ensureServiceUrls(data: OperatorPageModel) {
