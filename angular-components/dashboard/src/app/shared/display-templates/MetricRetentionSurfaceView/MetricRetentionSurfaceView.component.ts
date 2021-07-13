@@ -15,8 +15,8 @@ import {
 import { combineLatest, ReplaySubject } from 'rxjs';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { ApplianceJobOutput, MetricsRetentionSurfaceItemEntity } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { ApplianceJobOutput, MetricsRetentionSurfaceItemEntity, TableStorageRetentionPolicy } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
+import { concatMap, map, withLatestFrom } from 'rxjs/operators';
 
 @Component({
   templateUrl: './MetricRetentionSurfaceView.component.html',
@@ -40,20 +40,24 @@ metricsItemDependencies$ =   this.pageModelChanges$.pipe(
      )
   )
 
-
-metricEntities$ = this.metricsItemDependencies$.subscribe(
+// metricEntities$ = this.metricsItemDependencies$.subscribe(
+metricEntities$ = this.pageModelChanges$.pipe(
+  concatMap(dependencyData => this.metricsItemDependencies$
+)).subscribe(
   dependencyData => {
     var pageModel = dependencyData[0];
-    var storageAccountId = dependencyData[0];
+    var storageAccountId = dependencyData[1];
 
     console.log("getting metric entities");
     this.applianceAPiSvc.entityService.getRetentionPolicyForStorageAccount(pageModel.tenantid as string,
-                          pageModel.oid as string, pageModel.subscriptionId as string, storageAccountId as string)
-                          .subscribe(data => {
-                                console.log("retention policy id " + JSON.stringify(data.tableStorageEntityRetentionPolicy));
-                                this.metricsRetentionSurfaceEntitiesSource.next(data.tableStorageTableRetentionPolicy?.metricRetentionSurface?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[])
-                          });
-  })
+                          pageModel.oid as string, pageModel.selectedSubscriptionId as string, storageAccountId as string)
+                          .subscribe( (data : TableStorageRetentionPolicy) => {
+                                console.log("retention policy " + JSON.stringify(data?.tableStorageTableRetentionPolicy?.id));
+                                this.metricsRetentionSurfaceEntitiesSource
+                                    .next(data?.tableStorageTableRetentionPolicy?.
+                                            metricRetentionSurface?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[])});
+
+                              })
 
   private entityRetentionPolicySource =
     new ReplaySubject<TableStorageEntityRetentionPolicy>();

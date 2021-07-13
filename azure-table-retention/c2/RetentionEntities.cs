@@ -349,14 +349,37 @@ namespace com.ataxlab.functions.table.retention.c2
             string oid,
             ClaimsPrincipal claimsPrincipal)
         {
-            var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+            try
+            {
+                var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
 
-            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
-            var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
+                var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
+                var res = currentState.
+                            EntityState.
+                            CurrentJobOutput.
+                            retentionPolicyJobs.
+                            Where(w => w.StorageAccount.Id.
+                            Contains(storageAccountId)).
+                            FirstOrDefault()?.
+                            TableStorageRetentionPolicy;
 
-            HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
-            resp.Content = new StringContent(await res.ToJSONStringAsync());
-            return resp;
+                if (res != null)
+                {
+                    HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
+                    resp.Content = new StringContent(await res.ToJSONStringAsync());
+                    return resp;
+                }
+                else
+                {
+                    HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.NotFound);
+                    return resp;
+                }
+            }
+            catch(Exception e)
+            {
+                HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.NotFound);
+                return resp;
+            }
         }
 
         /// <summary>
