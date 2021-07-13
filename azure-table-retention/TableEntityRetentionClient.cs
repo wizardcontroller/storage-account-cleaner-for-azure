@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
+using Azure.Core;
 using Azure.Data.Tables;
 using Azure.Data.Tables.Models;
 using Azure.Identity;
 using com.ataxlab.azure.table.retention.models;
+using com.ataxlab.azure.table.retention.models.models;
 using com.ataxlab.azure.table.retention.state.entities;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -24,7 +27,10 @@ using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using Microsoft.Azure.Management.Storage.Fluent;
 using Microsoft.Azure.Management.Storage.Fluent.Models;
 using Microsoft.Azure.Management.Storage.Fluent.StorageAccount.Definition;
+using Microsoft.Azure.Storage.Auth;
 using Microsoft.IdentityModel.Protocols;
+using Microsoft.OData.UriParser;
+using Microsoft.Rest;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -60,6 +66,7 @@ namespace com.ataxlab.functions.table.retention
         Task<List<StorageAccountModel>> GetAllV2StorageAccounts();
         Task<List<Tuple<TableStorageRetentionPolicy, StorageAccountModel>>> GetRetentionPolicyTuples(List<StorageAccountModel> v2StorageAccounts);
         Task<Tuple<TableStorageRetentionPolicy, StorageAccountModel>> GetDefaultTableStorageRetentionPolicy(StorageAccountModel storageAccount);
+        Task<List<DiagnosticsRetentionSurfaceItemEntity>> GetMetricEntitiesForTableNames(StorageAccountModel account, List<string> tableNames);
     }
 
     /// <summary>
@@ -279,18 +286,92 @@ namespace com.ataxlab.functions.table.retention
 
         /// <summary>
         /// as per https://github.com/Azure/azure-sdk-for-net/blob/Azure.Data.Tables_3.0.0-beta.5/sdk/tables/Azure.Data.Tables/README.md
+        /// do not remove - this is on the test code path
         /// </summary>
         /// <param name="account"></param>
         /// <returns></returns>
+        [Obsolete]
         public async Task<List<string>> GetTableNamesInStorageAccount(StorageAccountModel account)
         {
-            TableServiceClient tableClient = GetTableServiceClient(account);
+            List<string> existingTableNames = new List<string>();
 
-            List<string> existingTableNames = await GetTableNames(tableClient);
+            try
+            {
+
+
+                TableServiceClient tableClient = GetTableServiceClient(account);
+                //var tokenCredentials = new DefaultAzureCredential(includeInteractiveCredentials: true);
+                //var impersonate = await tokenCredentials.GetTokenAsync(new TokenRequestContext(new string[] { "https://management.azure.com/user_impersonation" })).ConfigureAwait(false);
+                //var impersonate2 = await tokenCredentials.GetTokenAsync(new TokenRequestContext(new string[] { account.EndPoints.Primary.Table + ".default" })).ConfigureAwait(false);
+
+                //var token = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(impersonate2.Token);
+                //// get a cloud table client for this storage account
+                //var cloudTableClient = new CloudTableClient(new Uri(account.EndPoints.Primary.Table.), token);
+
+
+                var names= await GetTableNames(tableClient);
+
+                existingTableNames = names;
+            }
+            catch(Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine(e.Message);
+            }
 
             return existingTableNames;
         }
 
+        /// <summary>
+        /// testing codepath
+        /// proof of concept - read low watermark and high watermark
+        /// entity timestamp in storage account table
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="tableNames"></param>
+        /// <returns></returns>
+        public async Task<List<DiagnosticsRetentionSurfaceItemEntity>> GetMetricEntitiesForTableNames(StorageAccountModel account, List<string> tableNames)
+        {
+            var existingTableNames = new List<DiagnosticsRetentionSurfaceItemEntity>();
+
+            var ticks = "0" + DateTime.UtcNow.AddYears(-5).Ticks;
+            try
+            {
+                TableContinuationToken token = null;
+                foreach (var tableName in tableNames)
+                {
+
+                    TableServiceClient tableClient = GetTableServiceClient(account);
+                    TableClient table = tableClient.GetTableClient(tableName);
+                    TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
+                        .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.LessThanOrEqual, ticks))
+                        .Select(new List<string>() { "PartitionKey", "RowKey" });
+
+                    var resultSegment = table.QueryAsync<Azure.Data.Tables.TableEntity>(q => 
+
+                                                                                        (q.Timestamp < DateTime.UtcNow.AddMinutes(-25))
+                                                                                        
+                                                                                        );
+                    var res = resultSegment.AsPages();
+                    var enumerator = resultSegment.GetAsyncEnumerator();
+                    var r = await enumerator.MoveNextAsync();
+                    do
+                    {
+                        var a = enumerator.Current;
+                        r = false;
+                    }
+                    while (r == true);
+
+                    var rx = 'x';
+                }
+
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine(e.Message);
+            }
+
+            return existingTableNames;
+        }
         /// <summary>
         /// 
         /// </summary>

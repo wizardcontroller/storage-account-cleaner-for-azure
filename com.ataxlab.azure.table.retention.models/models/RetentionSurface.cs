@@ -155,6 +155,26 @@ namespace com.ataxlab.azure.table.retention.models.models
         public string SuscriptionId { get; set; }
         public string TableName { get; set; }
         public Uri DocumentationLink { get; set; }
+
+        /// <summary>
+        /// delete no entity more recent than this
+        /// </summary>
+        public DateTime MostRecentEntityTimestamp { get; set; }
+
+        /// <summary>
+        /// delete no entity less recent than this
+        /// </summary>
+        public DateTime LeastRecentEntityTimestamp { get; set; }
+
+        /// <summary>
+        /// entity with timestamp closest to UTC.now - 100 years
+        /// </summary>
+        public DateTime EntityTimestampLowWatermark { get; set; }
+
+        /// <summary>
+        /// entity with timestamp closest to UTC.now
+        /// </summary>
+        public DateTime EntityTimestampHighWatermark { get; set; }
     }
 
     #region the union of the retention surface is on the climb

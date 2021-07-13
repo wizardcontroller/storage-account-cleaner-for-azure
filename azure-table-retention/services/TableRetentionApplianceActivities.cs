@@ -723,6 +723,7 @@ namespace com.ataxlab.functions.table.retention.services
             return ret;
         }
 
+        [Obsolete]
         public async Task<MetricRetentionSurfaceEntity> DeprecatedAuditMetricsRetentionSurface(string authToken, StorageAccountEntity storageAccount, TableStorageTableRetentionPolicyEntity policy)
         {
             // as per https://mysharepointlearnings.wordpress.com/2019/08/20/managing-azure-vm-diagnostics-data-in-table-storage/
@@ -891,7 +892,11 @@ namespace com.ataxlab.functions.table.retention.services
                 return new DiagnosticsRetentionSurfaceEntity();
             }
 
-            var storageCreds = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(storageAccount.Name, storageAccount.Key);
+            // TODO - validate use the token here and remove need to use storage account key
+            // var storageCreds = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(storageAccount.Name, storageAccount.Key);
+            var storageCreds = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(authToken);
+
+
             var cloudTableClient = new CloudTableClient(storageAccount.PrimaryTableStorageEndpoint, storageCreds);
 
             var ret = policy.DiagnosticsRetentionSurface;
@@ -908,6 +913,8 @@ namespace com.ataxlab.functions.table.retention.services
                             if (allTablesResult != null && allTablesResult.Count() > 0)
                             {
                                 ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).ItemExists = true;
+                            
+                                
                             }
                             else
                             {

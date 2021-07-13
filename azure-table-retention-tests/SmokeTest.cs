@@ -167,6 +167,8 @@ namespace com.ataxlab.functions.table.retention
                 var v2StorageAccounts = await client.GetAllV2StorageAccounts();
 
                 Assert.IsTrue(v2StorageAccounts.Count > 0, "failed to retrieve storage accounts");
+
+
                 // we need only work with StorageV2
                 // because those have Table storage
                 // CloudTable cloudTable = cloudTableClient.GetTableReference("WADPerformanceCountersTable"); //do this for all other logs table too
@@ -205,7 +207,10 @@ namespace com.ataxlab.functions.table.retention
                     tableNames = await client.GetTableNamesInStorageAccount(act);
 
                     List<string> matchedDiagnosticsTables = client.GetCandidateMatches(tableNames, defaultRetentionConfiguration.WADDIagnosticsTableNameMatchPatterns);
-                    List<string> matchedMetricsTables = client.GetCandidateMatches(tableNames, defaultRetentionConfiguration.WADMetricsTableNameMatchPatterns);
+                    // List<string> matchedMetricsTables = client.GetCandidateMatches(tableNames, defaultRetentionConfiguration.WADMetricsTableNameMatchPatterns);
+                    List<string> matchedMetricsTables = tableNames.Where(w => w.StartsWith("WADMetrics")).ToList();
+                    // audit metric entities
+                    var entities = await client.GetMetricEntitiesForTableNames(act, matchedMetricsTables);
 
                     var tableRetentionPolicy = client.BuildTableStorageTableRetentionPolicy(tableDeletionAgeInMonths, matchedMetricsTables);
                     var entityRetentionPolicy = client.BuildTableStorageEntityRetentionPolicy(entityDeletionAgeInDays, matchedDiagnosticsTables);
