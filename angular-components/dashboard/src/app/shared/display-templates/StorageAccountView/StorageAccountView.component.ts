@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
-
+import {ButtonModule} from 'primeng/button';
 @Component({
   selector: 'lib-StorageAccountView',
   templateUrl: './StorageAccountView.component.html',

@@ -25,8 +25,7 @@ selectionMode="single" [(selection)]="selectedStorageAccount"
       {{ storageAccount[col.field] }}
     </td>
     <td>
-      <button mat-button  title="select" type="button" pButton pRipple icon="pi pi-search" (click)="selectStorageAccount(storageAccount)">
-        select
+      <button class="p-button-raised" label="select" type="button" pButton pRipple icon="pi" (click)="selectStorageAccount(storageAccount)">
       </button>
   </td>
   </tr>

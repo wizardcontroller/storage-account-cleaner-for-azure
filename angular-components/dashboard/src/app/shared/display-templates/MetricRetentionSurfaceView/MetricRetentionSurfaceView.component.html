@@ -1,29 +1,54 @@
-<p>MetricRetentionSurfaceView works!</p>
+<ng-container
+  *ngIf="metricsRetentionSurfaceEntityChanges$ | async as jobs; else noAccount"
+>
+  <div clas="card metricscard">
+    <p-dataView [value]="jobs" layout="grid">
+      <ng-template pTemplate="header">
+        <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
+          <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+          <div>Retention Surface</div>
+        </div>
+      </ng-template>
 
-<ng-container *ngIf="metricsRetentionSurfaceEntityChanges$ | async as jobs; else noAccount">
-  <p-dataView [value]="jobs">
+      <ng-template let-job pTemplate="listItem">
+        <div>
+          {{ job.tableName }}
+        </div>
+      </ng-template>
 
-    <ng-template pTemplate="header">
-      <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
-    </ng-template>
+      <ng-template let-job pTemplate="gridItem">
+        <p-card class="p-col-12 p-md-6">
+          <ng-template pTemplate="subtitle">{{job.tableName}}</ng-template>
+          <ng-template pTemplate="content">
+            <table>
+              <tr>
+                <td>Item Exists?</td>
+                <td>{{job.itemExists}}</td>
+              </tr>
 
-    <ng-template let-job pTemplate="listItem">
-      <div>
-        {{ job.id }}
-      </div>
-    </ng-template>
+              <tr>
+                <td><span>description: </span></td>
+                <td>{{job.itemDescription}}</td>
+              </tr>
 
-    <ng-template let-job pTemplate="gridItem">
-      <div class="p-col-12 p-md-3">
-        {{ job.retentionPolicyJobs }}
-      </div>
-    </ng-template>
+              <tr>
+                <td><span>will be deleted?: </span></td>
+                <td>{{job.itemWillBeDeleted}}</td>
+              </tr>
 
-    <ng-template pTemplate="footer">
-      <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
-  </ng-template>
+            </table>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <a href="{{job.documentationLink}}">documentation</a>
+          </ng-template>
+        </p-card>
+      </ng-template>
 
-  </p-dataView>
+      <ng-template pTemplate="footer">
+        <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+      </ng-template>
+    </p-dataView>
+  </div>
 </ng-container>
 
 <ng-template #noAccount>

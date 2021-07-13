@@ -52,7 +52,7 @@ metricEntities$ = this.pageModelChanges$.pipe(
     this.applianceAPiSvc.entityService.getRetentionPolicyForStorageAccount(pageModel.tenantid as string,
                           pageModel.oid as string, pageModel.selectedSubscriptionId as string, storageAccountId as string)
                           .subscribe( (data : TableStorageRetentionPolicy) => {
-                                console.log("retention policy " + JSON.stringify(data?.tableStorageTableRetentionPolicy?.id));
+                                console.log("retention policy " + JSON.stringify(data));
                                 this.metricsRetentionSurfaceEntitiesSource
                                     .next(data?.tableStorageTableRetentionPolicy?.
                                             metricRetentionSurface?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[])});
