@@ -140,12 +140,14 @@
 
                             //});
 
-                            $(document).ready(async function  () {
+                            $(document).ready(function  () {
+                                // getAngularAppRoot();
 
+                            });
 
+                            function getAngularAppRoot() {
 
-                                await $.ajax({
-                                    async: true,
+                                $.ajax({
                                     url: '/angular/app-root.html?format=html',
                                     data: {
                                         format: 'html'
@@ -164,10 +166,26 @@
                                     },
                                     type: 'GET'
                                 });
-                            });
+                            }
                             
                         </script>
                         <div id="angular">
+                            <script src="/angular/runtime.js" defer></script>
+                            <script src="/angular/polyfills.js" defer></script>
+                            <script src="/angular/main.js" defer></script>
+
+                            <script src="/angular/scripts.js" defer></script>
+
+                            @*<script src="/angular/color.png" defer></script>
+        <script src="/angular/hue.png" defer></script>
+
+        <script src="/angular/primeicons.eot" defer></script>
+        <script src="/angular/primeicons.svg" defer></script>
+        <script src="/angular/primeicons.ttf" defer></script>
+        <script src="/angular/primeicons.woff" defer></script>*@
+
+
+                            <app-root></app-root>
 
                         </div>
                     </div>
