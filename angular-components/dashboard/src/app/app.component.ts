@@ -7,7 +7,7 @@ import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { BehaviorSubject, Operator, ReplaySubject, Subject } from 'rxjs';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { SubscriptionsViewComponent } from './shared/display-templates/SubscriptionsView/SubscriptionsView.component';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ICanBeHiddenFromDisplay } from './shared/interfaces/ICanBeHiddenFromDisplay';
 @Component({
   selector: 'app-root',
@@ -20,13 +20,13 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
 
 
   operatorPageModel!: OperatorPageModel;
-    // operator page model change notification support
-    private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
-    operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
+  // operator page model change notification support
+  private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
+  operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
 
   baseUri: String | undefined;
   title = 'dashboard';
-  constructor(private apiConfigSvc : ApiConfigService, private applianceSvc : ApplianceApiService) {
+  constructor(private apiConfigSvc: ApiConfigService, private applianceSvc: ApplianceApiService) {
 
     this.isShow = false;
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
@@ -46,14 +46,14 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
 
   ngOnDestroy(): void {
 
+    // do nothing.
+
   }
 
-   ngOnInit(): void {
-     console.log("app component is initializing page model");
-     this.apiConfigSvc.initPageModelSubject();
+  ngOnInit(): void {
+    console.log("app component is initializing page model");
+    this.apiConfigSvc.initPageModelSubject();
 
-    // this.operatorPageModel = this.apiConfigSvc.operatorPageModel;
-    // this.baseUri = this.operatorPageModel?.applianceUrl?.toString();
 
   }
 

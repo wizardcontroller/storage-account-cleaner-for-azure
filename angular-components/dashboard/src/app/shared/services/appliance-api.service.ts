@@ -14,7 +14,7 @@ import {
 
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { BehaviorSubject, combineLatest, config, ReplaySubject, Subject } from 'rxjs';
-import { flatMap, map, tap} from 'rxjs/operators';
+import { flatMap, map, tap } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
 import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
@@ -32,7 +32,7 @@ export class ApplianceApiService implements OnDestroy {
   private currentApplianceSessionContextSource = new ReplaySubject<ApplianceSessionContext>();
   applianceSessionContextChanges$ = this.currentApplianceSessionContextSource.asObservable();
 
-  currentJobOutput! : ApplianceJobOutput | null;
+  currentJobOutput!: ApplianceJobOutput | null;
   private currentJobOutputSource = new ReplaySubject<ApplianceJobOutput>();
   currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
 
@@ -41,7 +41,7 @@ export class ApplianceApiService implements OnDestroy {
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
 
   storageAccounts: StorageAccountDTO[] = [];
-  private storageAccountsSource = new ReplaySubject<StorageAccountDTO[]  | undefined | null>();
+  private storageAccountsSource = new ReplaySubject<StorageAccountDTO[] | undefined | null>();
   storageAccountChanges$ = this.storageAccountsSource.asObservable();
 
   // support action stream of storage accounts selections
@@ -54,9 +54,9 @@ export class ApplianceApiService implements OnDestroy {
       this.selectedStorageAccountAction$
     ]
   )
-  .pipe(
-    map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
-      filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
+    .pipe(
+      map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
+        filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
       ));
 
 
@@ -81,11 +81,11 @@ export class ApplianceApiService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-
+    // nothing yet
   }
 
-  public ensureApplianceSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void{
-    this.entityService.getApplianceSessionContext(tenantId,oid,subscriptionId).subscribe(data =>{
+  public ensureApplianceSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void {
+    this.entityService.getApplianceSessionContext(tenantId, oid, subscriptionId).subscribe(data => {
       console.log("apliance session context updated");
       this.currentApplianceSessionContextSource.next(data);
       this.currentJobOutputSource.next(data.currentJobOutput);
@@ -98,24 +98,24 @@ export class ApplianceApiService implements OnDestroy {
       // can listen selected storage account changes
       // required for calls to retention service that require storage account header
       //this.selectedStorageAccount$.subscribe(selectedAcct => {
-        //var acct = selectedAcct.pop();
+      //var acct = selectedAcct.pop();
 
-         // this is where this code would go if needed
-        //console.log("using account name " + acct?.name);
-        // set the storage account header
+      // this is where this code would go if needed
+      //console.log("using account name " + acct?.name);
+      // set the storage account header
 
-//      });
-//    }, error => {
-//      console.log("error getting session context: " + (error as Error).message);
+      //      });
+      //    }, error => {
+      //      console.log("error getting session context: " + (error as Error).message);
     });
 
   }
 
-  public ensureWorkflowSessionContextSubject(tenantId: string, subscriptionId: string, oid: string) : void{
-    this.entityService.getWorkflowCheckpoint(tenantId,oid).subscribe(data =>{
+  public ensureWorkflowSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void {
+    this.entityService.getWorkflowCheckpoint(tenantId, oid).subscribe(data => {
       console.log("workflow context updated");
       this.currentWorkflowCheckpointSource.next(data);
-    }, error =>{
+    }, error => {
       console.log("error getting workflow context: " + (error as Error).message);
     });
   }
@@ -123,7 +123,7 @@ export class ApplianceApiService implements OnDestroy {
   /**
    * on pagemodel retrieval update dependent DTOs
    */
-  public ensurePageModelSubject() : void{
+  public ensurePageModelSubject(): void {
 
 
     this.apiConfigService.operatorPageModelChanges$.subscribe((data) => {
@@ -141,10 +141,10 @@ export class ApplianceApiService implements OnDestroy {
         console.log("ensurePageModelSubject(): oid: " + oid);
 
         console.log("getting workflow checkpoint");
-        this.ensureWorkflowSessionContextSubject(tenantid,subscriptionId,oid);
+        this.ensureWorkflowSessionContextSubject(tenantid, subscriptionId, oid);
 
         console.log("getting appliance context");
-        this.ensureApplianceSessionContextSubject(tenantid,subscriptionId,oid);
+        this.ensureApplianceSessionContextSubject(tenantid, subscriptionId, oid);
       } catch (ex) {
         console.log('error starting ApplianceApiSvc ' + (ex as Error).message);
 
@@ -156,12 +156,12 @@ export class ApplianceApiService implements OnDestroy {
   }
 
   private ensureServiceUrls(data: OperatorPageModel) {
-    var baseUrl = data?.applianceUrl?.toString().replace("/api/","");
+    var baseUrl = data?.applianceUrl?.toString().replace("/api/", "");
     this.baseUri = baseUrl;
     console.log('appliance api service is configuring baseUri' + this.baseUri);
 
     this.entityService.configuration.basePath =
-    baseUrl;
+      baseUrl;
     console.log(
       'configured appliance base path ' +
       baseUrl

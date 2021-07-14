@@ -4,13 +4,13 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { ReplaySubject } from 'rxjs';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { Router, ActivatedRoute, ParamMap, Routes } from '@angular/router';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatAccordion } from '@angular/material/expansion';
-import { MatMenuModule} from '@angular/material/menu';
-import {MatToolbarModule} from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { SubscriptionsViewComponent } from '../SubscriptionsView/SubscriptionsView.component';
 import { StorageAccountViewComponent } from '../StorageAccountView/StorageAccountView.component';
 @Component({
@@ -22,29 +22,29 @@ import { StorageAccountViewComponent } from '../StorageAccountView/StorageAccoun
 
 @AutoUnsubscribe()
 export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
-  @ViewChild(MatAccordion) accordion! : MatAccordion;
+  @ViewChild(MatAccordion) accordion!: MatAccordion;
 
-  private baseUri : string = '';
+  private baseUri: string = '';
 
   applianceSessionContext!: ApplianceSessionContext;
   private currentApplianceContextSource = new ReplaySubject<ApplianceSessionContext>();
   applianceContextChanges$ = this.currentApplianceContextSource.asObservable();
   id: any;
-  constructor(private apiConfigSvc : ApiConfigService,
-              private retentionEntitiesSvc: RetentionEntitiesService,
-              private router : Router,
-              private route: ActivatedRoute) {
+  constructor(private apiConfigSvc: ApiConfigService,
+    private retentionEntitiesSvc: RetentionEntitiesService,
+    private router: Router,
+    private route: ActivatedRoute) {
 
-   }
+  }
 
 
-    operatorPageModel!: OperatorPageModel;
-    // operator page model change notification support
-    private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
-    operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
+  operatorPageModel!: OperatorPageModel;
+  // operator page model change notification support
+  private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
+  operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
 
   ngOnDestroy(): void {
-
+    // nothing yet
   }
 
   ngOnInit() {
@@ -58,13 +58,13 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
 
   isShow = false;
 
-  ensureApplianceContext(tenantid: string, oid: string){
+  ensureApplianceContext(tenantid: string, oid: string) {
     this.retentionEntitiesSvc.getApplianceSessionContext(tenantid, oid).subscribe(data => {
       this.currentApplianceContextSource.next(data);
     });
   }
 
-  ensureOperatorPageModel(){
+  ensureOperatorPageModel() {
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
       console.log("app component has operator page model");
       this.baseUri = data.applianceUrl?.toString() as string;

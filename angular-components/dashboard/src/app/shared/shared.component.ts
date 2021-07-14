@@ -2,16 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 
 @Component({
-  selector: 'lib-shared',
+  selector: 'app-shared',
   templateUrl: './shared.component.html',
   styleUrls: ['./shared.component.css']
 })
 
 export class SharedComponent implements OnInit {
 
-  constructor() { }
-
-  ngOnInit() {
+  constructor() {
+    // nothing yet
   }
+  ngOnInit(): void {
+    // nothing yet
+  }
+
+
 
 }

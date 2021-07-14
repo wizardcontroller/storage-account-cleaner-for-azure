@@ -8,57 +8,57 @@ import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
   providedIn: 'root'
 })
 
-export class ApiConfigService implements OnInit {
+export class ApiConfigService {
   operatorPageModel!: OperatorPageModel;
-    // operator page model change notification support
-    private currentPageModelSource =  new ReplaySubject<OperatorPageModel>();
-    operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
+  // operator page model change notification support
+  private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
+  operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
 
 
-constructor(private configService : ConfigService, private router: Router) {
-  console.log("ApiConfigService service starting");
+  constructor(private configService: ConfigService, private router: Router) {
+    console.log("ApiConfigService service starting");
 
-  configService.configuration.basePath = window.location.origin;
-  this.ngOnInit();
- }
+    configService.configuration.basePath = window.location.origin;
+    this.initService();
+  }
 
   /*
     currently angular injectables do not participate in all lifecycle hooks
   */
-  ngOnInit(): void {
+  initService(): void {
 
   }
 
-   /*
-                call the dashboard and get the operator page model
-                including base url for discovery appliance
-                and user appliances
-            */
-                initPageModelSubject() {
-                  console.log("apiconfigsvc is getting operator page model");
-                  this.configService.configuration.basePath = window.location.origin;
-                  console.log('calling config service');
-                  this.configService.getOperatorPageModel().subscribe(
-                    (data: OperatorPageModel) => {
-                      return this.cacheOperatorPageModelSignalSubscribers(data);
-                    },
-                    (err: any) => console.log(err),
-                    () => {
-                      console.log(
-                        'done getting operator page model: applianceUrl is ' +
-                          this.operatorPageModel?.applianceUrl
-                      );
-                    }
-                  );
-                }
+  /*
+               call the dashboard and get the operator page model
+               including base url for discovery appliance
+               and user appliances
+           */
+  initPageModelSubject() {
+    console.log("apiconfigsvc is getting operator page model");
+    this.configService.configuration.basePath = window.location.origin;
+    console.log('calling config service');
+    this.configService.getOperatorPageModel().subscribe(
+      (data: OperatorPageModel) => {
+        return this.cacheOperatorPageModelSignalSubscribers(data);
+      },
+      (err: any) => console.log(err),
+      () => {
+        console.log(
+          'done getting operator page model: applianceUrl is ' +
+          this.operatorPageModel?.applianceUrl
+        );
+      }
+    );
+  }
 
-                /**
-                 * @description signal the new pagemodel subject listeners
-                 * @param data
-                 */
-                private cacheOperatorPageModelSignalSubscribers(data: OperatorPageModel): void {
-                  this.operatorPageModel = data;
-                  this.currentPageModelSource.next(data);
-                }
+  /**
+   * @description signal the new pagemodel subject listeners
+   * @param data
+   */
+  private cacheOperatorPageModelSignalSubscribers(data: OperatorPageModel): void {
+    this.operatorPageModel = data;
+    this.currentPageModelSource.next(data);
+  }
 
 }

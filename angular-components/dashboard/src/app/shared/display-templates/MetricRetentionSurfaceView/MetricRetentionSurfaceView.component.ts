@@ -25,39 +25,39 @@ import { concatMap, map, withLatestFrom } from 'rxjs/operators';
 
 @AutoUnsubscribe()
 export class MetricRetentionSurfaceViewComponent
-  implements OnInit, OnDestroy, ICanBeHiddenFromDisplay
-{
+  implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
   private acctSubject = new ReplaySubject<string>();
   selectedAccountChanges$ = this.acctSubject.asObservable();
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
 
-metricsItemDependencies$ =   this.pageModelChanges$.pipe(
-      withLatestFrom(
-        this.applianceAPiSvc.selectedStorageAccountAction$
-        // this.selectedAccountChanges$
-     )
+  metricsItemDependencies$ = this.pageModelChanges$.pipe(
+    withLatestFrom(
+      this.applianceAPiSvc.selectedStorageAccountAction$
+      // this.selectedAccountChanges$
+    )
   )
 
-// metricEntities$ = this.metricsItemDependencies$.subscribe(
-metricEntities$ = this.pageModelChanges$.pipe(
-  concatMap(dependencyData => this.metricsItemDependencies$
-)).subscribe(
-  dependencyData => {
-    var pageModel = dependencyData[0];
-    var storageAccountId = dependencyData[1];
+  // metricEntities$ = this.metricsItemDependencies$.subscribe(
+  metricEntities$ = this.pageModelChanges$.pipe(
+    concatMap(dependencyData => this.metricsItemDependencies$
+    )).subscribe(
+      dependencyData => {
+        var pageModel = dependencyData[0];
+        var storageAccountId = dependencyData[1];
 
-    console.log("getting metric entities");
-    this.applianceAPiSvc.entityService.getRetentionPolicyForStorageAccount(pageModel.tenantid as string,
-                          pageModel.oid as string, pageModel.selectedSubscriptionId as string, storageAccountId as string)
-                          .subscribe( (data : TableStorageRetentionPolicy) => {
-                                console.log("retention policy " + JSON.stringify(data));
-                                this.metricsRetentionSurfaceEntitiesSource
-                                    .next(data?.tableStorageTableRetentionPolicy?.
-                                            metricRetentionSurface?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[])});
+        console.log("getting metric entities");
+        this.applianceAPiSvc.entityService.getRetentionPolicyForStorageAccount(pageModel.tenantid as string,
+          pageModel.oid as string, pageModel.selectedSubscriptionId as string, storageAccountId as string)
+          .subscribe((data: TableStorageRetentionPolicy) => {
+            console.log("retention policy " + JSON.stringify(data));
+            this.metricsRetentionSurfaceEntitiesSource
+              .next(data?.tableStorageTableRetentionPolicy?.
+                metricRetentionSurface?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[])
+          });
 
-                              })
+      })
 
   private entityRetentionPolicySource =
     new ReplaySubject<TableStorageEntityRetentionPolicy>();
@@ -84,11 +84,11 @@ metricEntities$ = this.pageModelChanges$.pipe(
     this.isShow = false;
   }
   ngOnDestroy(): void {
-
+    // nothing yet
   }
 
   isShow: boolean;
-  toggleDisplay(): void {}
+  toggleDisplay(): void { }
 
   ngOnInit() {
 
@@ -99,9 +99,9 @@ metricEntities$ = this.pageModelChanges$.pipe(
       this.acctSubject.next(data);
     });
 
-    this.apiConfigSvc.operatorPageModelChanges$.subscribe(pageModel =>{
+    this.apiConfigSvc.operatorPageModelChanges$.subscribe(pageModel => {
 
-     // metrics retention component has operator page model
+      // metrics retention component has operator page model
       this.pageModelSubuject.next(pageModel);
     });
 

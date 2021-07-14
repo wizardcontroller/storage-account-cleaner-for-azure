@@ -1,15 +1,21 @@
 import { Component, OnInit } from '@angular/core';
+import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 
 @Component({
-  selector: 'lib-RetentionPolicyEditor',
+  selector: 'app-RetentionPolicyEditor',
   templateUrl: './RetentionPolicyEditor.component.html',
   styleUrls: ['./RetentionPolicyEditor.component.css']
 })
+
+@AutoUnsubscribe()
 export class RetentionPolicyEditorComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+    // nothing yet
+  }
 
   ngOnInit() {
+    // nothing yet
   }
 
 }

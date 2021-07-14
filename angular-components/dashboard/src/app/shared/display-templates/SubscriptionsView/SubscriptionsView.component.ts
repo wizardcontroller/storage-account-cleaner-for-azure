@@ -1,5 +1,5 @@
 import { ApplianceApiService } from './../../services/appliance-api.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/';
 import { Observable, ReplaySubject } from 'rxjs';
 import { ApiConfigService } from '../../../core/ApiConfig.service'
@@ -11,14 +11,16 @@ import {
 } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ActivatedRoute } from '@angular/router';
+import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 @Component({
   selector: 'app-SubscriptionsView',
   templateUrl: './SubscriptionsView.component.html',
   styleUrls: ['./SubscriptionsView.component.css']
 })
 
-export class SubscriptionsViewComponent implements OnInit, ICanBeHiddenFromDisplay {
-  operatorPageModel! : OperatorPageModel;
+@AutoUnsubscribe()
+export class SubscriptionsViewComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
+  operatorPageModel!: OperatorPageModel;
   cols!: any[];
 
   // operator page model change notification support
@@ -35,24 +37,27 @@ export class SubscriptionsViewComponent implements OnInit, ICanBeHiddenFromDispl
   ) {
     this.isShow = true;
 
-}
+  }
   isShow: boolean;
   toggleDisplay(): void {
     this.isShow = !this.isShow;
   }
 
 
-private configAuth() : void {
+  private configAuth(): void {
 
-}
-  ngOnDestroy(): void {}
+  }
+
+  ngOnDestroy(): void {
+    // nothing yet
+  }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       var parms = params['id'];
 
     });
-        // this.operatorPageModel$ = this.apiConfigSvc.operatorPageModelChanges$;
+    // this.operatorPageModel$ = this.apiConfigSvc.operatorPageModelChanges$;
     // push operator page model changes
     // push current subscriptions
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
@@ -60,8 +65,8 @@ private configAuth() : void {
       var subscriptions = data.subscriptions as SubscriptionDTO[] | undefined;
 
       // if only one then is selected
-      if(subscriptions?.length == 1){
-          subscriptions[0].isSelected = true;
+      if (subscriptions?.length == 1) {
+        subscriptions[0].isSelected = true;
       }
 
       this.subscriptionSource.next(subscriptions);
@@ -69,7 +74,7 @@ private configAuth() : void {
       this.configAuth();
       console.log("SubscriptionView has easyauth token: " + this.operatorPageModel.easyAuthAccessToken);
       this.currentPageModelSource.next(data);
-  });
+    });
 
     this.cols = [
       { field: 'isSelected', header: 'Is Selected' },

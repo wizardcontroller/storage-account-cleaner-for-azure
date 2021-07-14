@@ -4,7 +4,7 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 
 @Component({
-  selector: 'lib-DiagnosticsRetentionSurfaceView',
+  selector: 'app-DiagnosticsRetentionSurfaceView',
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
   styleUrls: ['./DiagnosticsRetentionSurfaceView.component.css']
 })
@@ -12,11 +12,11 @@ import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDispla
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnInit, ICanBeHiddenFromDisplay {
 
-  constructor( private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute) {
     this.isShow = false;
   }
   ngOnDestroy(): void {
-
+       // nothing yet
   }
   isShow: boolean;
   toggleDisplay(): void {
@@ -24,6 +24,7 @@ export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnIn
   }
 
   ngOnInit() {
+    // nothing yet
   }
 
 }
