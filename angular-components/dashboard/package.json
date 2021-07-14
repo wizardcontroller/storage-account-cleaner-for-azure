@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development && npm run-script postBuild",
     "postBuild": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./postBuild.ps1",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix"
   },
   "private": true,
   "dependencies": {
@@ -48,6 +49,7 @@
     "@typescript-eslint/eslint-plugin": "4.28.2",
     "@typescript-eslint/parser": "4.28.2",
     "eslint": "^7.26.0",
+    "husky": "^7.0.1",
     "jasmine-core": "~3.7.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
