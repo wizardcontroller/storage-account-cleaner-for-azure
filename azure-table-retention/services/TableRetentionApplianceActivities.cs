@@ -47,7 +47,7 @@ namespace com.ataxlab.functions.table.retention.services
         Task<ApplianceSessionContextEntity> InitializeCurrentJobOutput(EntityId entityId, IDurableEntityClient entityClient, List<Tuple<TableStorageRetentionPolicyEntity, StorageAccountEntity>> tuples);
         Task<Task<TSignal>> WhenAnySignalledTask<TSignal>(List<Task<TSignal>> tasks) where TSignal : class;
         Task<List<String>> DeleteOldTables(string authToken, StorageAccountEntity storageAccount, TableStorageTableRetentionPolicyEntity policy);
-        Task<int> AuditOldDiagnosticsEntitiesForTable(string ticks, CloudTable cloudTable);
+        Task<int> AuditEntitiesForTable(string ticks, CloudTable cloudTable);
     }
 
     public class TableRetentionApplianceActivities : ITableRetentionApplianceActivities
@@ -566,7 +566,7 @@ namespace com.ataxlab.functions.table.retention.services
                         else if (policy.PolicyEnforcementMode == entities.PolicyEnforcementMode.WhatIf)
                         {
                             log.LogInformation("running policy in WHATIF mode");
-                            ret.PolicyTriggerCount += await this.AuditOldDiagnosticsEntitiesForTable(policy.GetTicks(tickProvider), storageTable);
+                            ret.PolicyTriggerCount += await this.AuditEntitiesForTable(policy.GetTicks(tickProvider), storageTable);
                         }
                     }
                     catch (Exception e)
@@ -675,6 +675,35 @@ namespace com.ataxlab.functions.table.retention.services
                                     log.LogError($"problem deleting table: {tableName} - {e.Message}");
                                     newEntity.IsDeleted = false;
                                 }
+                            }
+                            else
+                            {
+                                // calculate low water mark and high watermark
+                                //
+                                TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
+                                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.LessThanOrEqual, "0" + DateTime.UtcNow.Ticks))
+                                .Select(new List<string>() { "PartitionKey", "RowKey" })
+                                .Take(1);
+
+                                var table = this.GetStorageTableReference(cloudTableClient, tableName);
+                                var res = await table
+                                            .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
+                                                (query, null);
+                                var highWatermark = res.Results[0].Timestamp.UtcDateTime;
+                                newEntity.EntityTimestampHighWatermark = highWatermark;
+
+                                var lowWatermarkQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
+                               .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "0" + DateTime.UtcNow.AddYears(-100).Ticks))
+                               .Select(new List<string>() { "PartitionKey", "RowKey" })
+                               .Take(1);
+
+                                res = await table
+                                    .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
+                                        (lowWatermarkQuery, null);
+
+                                var lowWatermark = res.Results[0].Timestamp.UtcDateTime;
+                                newEntity.EntityTimestampLowWatermark = lowWatermark;
+
                             }
 
                             ret.MetricsRetentionSurfaceItemEntities.Add(newEntity);
@@ -1127,7 +1156,7 @@ namespace com.ataxlab.functions.table.retention.services
 
             return await Task.FromResult<int>(ret);
         }
-        public async Task<int> AuditOldDiagnosticsEntitiesForTable(String ticks, CloudTable cloudTable)
+        public async Task<int> AuditEntitiesForTable(String ticks, CloudTable cloudTable)
         {
 
             // this query may take a while
