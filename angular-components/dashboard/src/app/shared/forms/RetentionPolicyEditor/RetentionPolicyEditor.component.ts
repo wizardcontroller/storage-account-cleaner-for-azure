@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 
 @Component({
@@ -8,9 +8,13 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 })
 
 @AutoUnsubscribe()
-export class RetentionPolicyEditorComponent implements OnInit {
+export class RetentionPolicyEditorComponent implements OnInit, OnDestroy {
 
   constructor() {
+    // nothing yet
+  }
+
+  ngOnDestroy(): void {
     // nothing yet
   }
 
