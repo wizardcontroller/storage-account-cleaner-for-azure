@@ -8,8 +8,7 @@
     "watch": "ng build --watch --configuration development && npm run-script postBuild",
     "postBuild": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./postBuild.ps1",
     "test": "ng test",
-    "lint": "ng lint",
-    "lint:fix": "ng lint --fix"
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
