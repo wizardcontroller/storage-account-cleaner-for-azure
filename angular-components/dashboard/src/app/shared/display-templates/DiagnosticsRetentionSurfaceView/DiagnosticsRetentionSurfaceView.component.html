@@ -1,5 +1,8 @@
 <ng-container *ngIf="diagnosticsRetentionSurfaceEntityChanges$ | async as jobs; else noAccount">
+
+
   <div clas="card metricscard">
+
     <p-dataView [value]="jobs" layout="grid">
       <ng-template pTemplate="header">
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
@@ -15,31 +18,44 @@
       </ng-template>
 
       <ng-template let-job pTemplate="gridItem">
-        <p-card class="p-col-12 p-md-6">
-          <ng-template pTemplate="subtitle">{{job.tableName}}</ng-template>
-          <ng-template pTemplate="content">
-            <table>
-              <tr>
-                <td>Item Exists?</td>
-                <td>{{job.itemExists}}</td>
-              </tr>
+        <div class="sidenav-container-parent">
 
-              <tr>
-                <td><span>description: </span></td>
-                <td>{{job.itemDescription}}</td>
-              </tr>
 
-              <tr>
-                <td><span>will be deleted?: </span></td>
-                <td>{{job.itemWillBeDeleted}}</td>
-              </tr>
+          <p-card class="p-col-12 p-md-6">
+            <ng-template pTemplate="tilte">
 
-            </table>
-          </ng-template>
-          <ng-template pTemplate="footer">
-            <a href="{{job.documentationLink}}">documentation</a>
-          </ng-template>
-        </p-card>
+              {{job.tableName}}
+
+            </ng-template>
+            <ng-template pTemplate="subtitle">{{job.tableName}}</ng-template>
+            <ng-template pTemplate="content">
+              <table>
+                <tr>
+                  <td>Item Exists?</td>
+                  <td>{{job.itemExists}}</td>
+                </tr>
+
+                <tr>
+                  <td><span>description: </span></td>
+                  <td>{{job.itemDescription}}</td>
+                </tr>
+
+                <tr>
+                  <td><span>will be deleted?: </span></td>
+                  <td>{{job.itemWillBeDeleted}}</td>
+                </tr>
+
+              </table>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <a href="{{job.documentationLink}}">documentation</a>
+              <button mat-raised-button (click)="toggleSideNav()">Show More</button>
+            </ng-template>
+
+          </p-card>
+
+
+        </div>
       </ng-template>
 
       <ng-template pTemplate="footer">

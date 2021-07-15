@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+
 import { ActivatedRoute } from '@angular/router';
 import { DiagnosticsRetentionSurfaceItemEntity, OperatorPageModel, TableStorageRetentionPolicy } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
@@ -7,6 +8,8 @@ import { concatMap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from '../../../core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
+import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav'
+import { PrimeIcons } from 'primeng/api'
 
 @Component({
 
@@ -16,6 +19,9 @@ import { ApplianceApiService } from '../../services/appliance-api.service';
 
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnInit, ICanBeHiddenFromDisplay {
+
+  @ViewChild('drawer') drawer!: MatDrawer;
+  isSideNavOpen: boolean = false;
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
@@ -72,6 +78,11 @@ export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnIn
       // metrics retention component has operator page model
       this.pageModelSubuject.next(pageModel);
     });
+  }
+
+  toggleSideNav(): void {
+    console.log("toggling sidenav");
+    this.isSideNavOpen = !this.isSideNavOpen;
   }
 
 }

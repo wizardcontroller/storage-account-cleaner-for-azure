@@ -1,0 +1,13 @@
+.sidenav-container-parent {
+  overflow: hidden;
+  position: relative;
+  width: 100%
+}
+
+.sidenav-container {
+  height: 90%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: blue;
+}

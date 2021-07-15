@@ -15,6 +15,7 @@ import { LoggingConfigurationService } from './display-templates/services/Loggin
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CardModule, Card } from 'primeng/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSidenavModule } from '@angular/material/sidenav'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { RouterModule, Routes } from '@angular/router';
@@ -35,6 +36,7 @@ import { MetricRetentionSurfaceViewComponent } from './display-templates/MetricR
     DataViewModule,
     HttpClientModule,
     MatButtonToggleModule,
+    MatSidenavModule,
     BrowserAnimationsModule,
     ButtonModule,
     TableModule,
