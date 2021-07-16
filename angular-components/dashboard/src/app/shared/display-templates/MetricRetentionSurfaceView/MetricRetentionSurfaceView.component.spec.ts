@@ -2,7 +2,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
-
+import { TimelineModule, Timeline } from 'primeng/timeline';
 import { MetricRetentionSurfaceViewComponent } from './MetricRetentionSurfaceView.component';
 import { MatButtonToggle } from '@angular/material/button-toggle';
 import { CardModule, Card } from 'primeng/card';

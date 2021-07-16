@@ -3,7 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
-
+import {DatesToTimeLineEventsPipePipe} from '../../pipes/dates-to-time-line-events-pipe.pipe';
+import { PrimeIcons } from "primeng/api";
 import {
 
   OperatorPageModel,

@@ -14,6 +14,7 @@ import { HomeGrownLoggingService } from './display-templates/services/HomeGrownL
 import { LoggingConfigurationService } from './display-templates/services/LoggingConfiguration.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CardModule, Card } from 'primeng/card';
+import { TimelineModule } from 'primeng/timeline';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSidenavModule } from '@angular/material/sidenav'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -41,6 +42,7 @@ import { DatesToTimeLineEventsPipePipe } from './pipes/dates-to-time-line-events
     BrowserAnimationsModule,
     ButtonModule,
     TableModule,
+    TimelineModule,
     MatExpansionModule,
     RouterModule
   ],
@@ -68,7 +70,7 @@ import { DatesToTimeLineEventsPipePipe } from './pipes/dates-to-time-line-events
     LoggingConfigurationService,
     HomeGrownLoggingService,
     ApplianceContextService,
-    ApplianceApiService,
-  ],
+    ApplianceApiService
+  ]
 })
 export class SharedModule {}
