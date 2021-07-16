@@ -665,9 +665,9 @@ namespace com.ataxlab.functions.table.retention.services
                             // calculate low water mark and high watermark
                             //
                             TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.LessThanOrEqual, "0" + DateTime.UtcNow.Ticks))
+                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.NotEqual, "0" + DateTime.UtcNow.AddMinutes(-5).Ticks))
                             .Select(new List<string>() { "PartitionKey", "RowKey" })
-                            .Take(1);
+                            .Take(5);
 
                             var table = this.GetStorageTableReference(cloudTableClient, tableName);
 
@@ -678,6 +678,7 @@ namespace com.ataxlab.functions.table.retention.services
                                                 (query, null);
                                 var highWatermark = res.Results[0].Timestamp.UtcDateTime;
                                 newEntity.EntityTimestampHighWatermark = highWatermark;
+                                newEntity.MostRecentEntityTimestamp = highWatermark;
                             }
                             catch(Exception e) { }
 
@@ -694,6 +695,7 @@ namespace com.ataxlab.functions.table.retention.services
 
                                 var lowWatermark = res.Results[0].Timestamp.UtcDateTime;
                                 newEntity.EntityTimestampLowWatermark = lowWatermark;
+                                newEntity.LeastRecentEntityTimestamp = lowWatermark;
                             }
                             catch(Exception e) { }
 
@@ -745,19 +747,21 @@ namespace com.ataxlab.functions.table.retention.services
                             // calculate low water mark and high watermark
                             //
                             TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.LessThanOrEqual, "0" + DateTime.UtcNow.Ticks))
+                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.NotEqual, "0" + DateTime.UtcNow.AddMinutes(-5).Ticks))
                             .Select(new List<string>() { "PartitionKey", "RowKey" })
-                            .Take(1);
+                            .Take(5);
 
                             var table = this.GetStorageTableReference(cloudTableClient, excludedTableName);
 
                             try
                             {
+
                                 var res = await table
-                                            .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
+                                            .ExecuteQuerySegmentedAsync
                                                 (query, null);
                                 var highWatermark = res.Results[0].Timestamp.UtcDateTime;
                                 newEntity.EntityTimestampHighWatermark = highWatermark;
+                                newEntity.MostRecentEntityTimestamp = highWatermark;
                             }
                             catch(Exception e) { }
 
@@ -774,6 +778,7 @@ namespace com.ataxlab.functions.table.retention.services
 
                                 var lowWatermark = res.Results[0].Timestamp.UtcDateTime;
                                 newEntity.EntityTimestampLowWatermark = lowWatermark;
+                                newEntity.LeastRecentEntityTimestamp = lowWatermark;
                                 log.LogInformation(excludedTableName + " found");
 
 
@@ -996,9 +1001,9 @@ namespace com.ataxlab.functions.table.retention.services
                                 // calculate low water mark and high watermark
                                 //
                                 TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.LessThanOrEqual, "0" + DateTime.UtcNow.Ticks))
+                                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.NotEqual, "0" + DateTime.UtcNow.AddMinutes(-5).Ticks))
                                 .Select(new List<string>() { "PartitionKey", "RowKey" })
-                                .Take(1);
+                                .Take(5);
 
                                 var cloudTable = this.GetStorageTableReference(cloudTableClient, table.TableName);
                                 var res = await cloudTable
@@ -1006,6 +1011,7 @@ namespace com.ataxlab.functions.table.retention.services
                                                 (query, null);
                                 var highWatermark = res.Results[0].Timestamp.UtcDateTime;
                                 ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampHighWatermark = highWatermark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).MostRecentEntityTimestamp = highWatermark;
 
                                 var lowWatermarkQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
                                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "0" + DateTime.UtcNow.AddYears(-100).Ticks))
@@ -1018,6 +1024,8 @@ namespace com.ataxlab.functions.table.retention.services
 
                                 var lowWatermark = res.Results[0].Timestamp.UtcDateTime;
                                 ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampLowWatermark = lowWatermark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).LeastRecentEntityTimestamp = lowWatermark;
+
                             }
                             else
                             {
@@ -1235,7 +1243,7 @@ namespace com.ataxlab.functions.table.retention.services
 
             // this query may take a while
             TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1000 }
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.LessThanOrEqual, ticks))
+                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, ticks))
                 .Select(new List<string>() { "PartitionKey", "RowKey" });
 
             // Console.WriteLine("Deleting data from " + cloudTable.Name + " using query " + query.FilterString);

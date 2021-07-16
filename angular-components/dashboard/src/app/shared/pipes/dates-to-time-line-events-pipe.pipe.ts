@@ -15,13 +15,13 @@ export class DatesToTimeLineEventsPipePipe implements PipeTransform {
       Object.assign(instance, value);
 
       instance.itemDescription = "Least Recent Timestamp"
-      instance.timestamp = value.leastRecentEntityTimestamp;
+      instance.timestamp = value.entityTimestampLowWatermark;
       ret.push(instance);
 
       const instance2 = new TimelineEvent();
       Object.assign(instance2, value);
       instance2.itemDescription = "Most Recent Timestamp"
-      instance2.timestamp = value.mostRecentEntityTimestamp;
+      instance2.timestamp = value.entityTimestampHighWatermark;
       ret.push(instance2);
 
       return ret;

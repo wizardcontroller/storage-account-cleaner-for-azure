@@ -2,9 +2,9 @@
 <div  *ngIf=" applianceContextChanges$ | async as applianceContext else noApplianceContext">
 
   <ul  aria-label="modules">
-    <li><a [routerLink]="['./subscriptions']">subscriptions</a></li>
+    <li><a [routerLink]="['subscriptions']">subscriptions</a></li>
 
-    <li><a [routerLink]="['./storageaccounts']">storage accounts</a></li>
+    <li><a [routerLink]="['storageaccounts']">storage accounts</a></li>
   </ul>
 
   <p-card header="Appliance Context" >

@@ -31,7 +31,7 @@
             <div class="p-d-inline-flex">
               <p-timeline [value]="job | datesToTimeLineEventsPipe">
                 <ng-template pTemplate="content" let-event>
-                  {{ event.mostRecentEntityTimestamp }}
+                  {{ event.timestamp }}
                 </ng-template>
                 <ng-template pTemplate="opposite" let-event>
                   {{ event.itemDescription }}
