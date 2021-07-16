@@ -664,8 +664,8 @@ namespace com.ataxlab.functions.table.retention.services
 
                             // calculate low water mark and high watermark
                             //
-                            TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.NotEqual, "0" + DateTime.UtcNow.AddMinutes(-5).Ticks))
+                            TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { }
+                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThanOrEqual, "0" + DateTime.UtcNow.AddDays(-665).Ticks).ToString())
                             .Select(new List<string>() { "PartitionKey", "RowKey" })
                             .Take(5);
 
@@ -746,8 +746,8 @@ namespace com.ataxlab.functions.table.retention.services
 
                             // calculate low water mark and high watermark
                             //
-                            TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.NotEqual, "0" + DateTime.UtcNow.AddMinutes(-5).Ticks))
+                            TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() {  }
+                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThanOrEqual, "0" + DateTime.UtcNow.AddDays(-665).Ticks).ToString())
                             .Select(new List<string>() { "PartitionKey", "RowKey" })
                             .Take(5);
 
@@ -1001,7 +1001,7 @@ namespace com.ataxlab.functions.table.retention.services
                                 // calculate low water mark and high watermark
                                 //
                                 TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.NotEqual, "0" + DateTime.UtcNow.AddMinutes(-5).Ticks))
+                                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThanOrEqual, "0" + DateTime.UtcNow.AddDays(-365).Ticks))
                                 .Select(new List<string>() { "PartitionKey", "RowKey" })
                                 .Take(5);
 
