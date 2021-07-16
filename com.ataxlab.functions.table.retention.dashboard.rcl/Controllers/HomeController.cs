@@ -197,7 +197,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet(Name = "GetCofigureAppliance")]
-        [Route("/ConfigureAppliance")]
+        [Route("/Operator/ConfigureAppliance")]
         public async Task<IActionResult> GetCofigureAppliance()
         {
             OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();

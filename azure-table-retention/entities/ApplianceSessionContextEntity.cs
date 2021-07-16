@@ -162,10 +162,11 @@ namespace com.ataxlab.azure.table.retention.state.entities
         /// <param name="tuples"></param>
         public void InitializeCurrentJobOutput(List<Tuple<TableStorageRetentionPolicyEntity, StorageAccountEntity>> tuples)
         {
-            CurrentJobOutput.retentionPolicyJobs.Clear();
+
 
             if (tuples == null) return;
 
+            CurrentJobOutput.retentionPolicyJobs.Clear();
             try
             {
                 foreach (var tuple in tuples)
