@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
@@ -8,14 +8,11 @@ import {
 import { Observable } from 'rxjs';
 import { ApiConfigService } from '../core/ApiConfig.service';
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/';
-
+import { ApplianceApiService } from '../shared/services/appliance-api.service';
 import { RouterTestingModule } from '@angular/router/testing';
-
-import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-
+import { CoreModule } from '../core/core.module';
 @Injectable()
-@AutoUnsubscribe()
-export class AuthHeaderInterceptor implements OnDestroy, HttpInterceptor {
+export class AuthHeaderInterceptor implements HttpInterceptor {
   private pageModel!: OperatorPageModel;
   private applianceUrl!: string;
   private HEADER_IMPERSONATION_TOKEN = 'x-table-retention-mgmt-impersonation';
@@ -27,16 +24,10 @@ export class AuthHeaderInterceptor implements OnDestroy, HttpInterceptor {
 
   constructor(private apiConfigSvc: ApiConfigService) {
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
-
-      console.log("auth header interceptor has operator page model");
       this.pageModel = data;
       this.applianceUrl = this.pageModel?.applianceUrl?.toString() as string;
       this.interceptorIsReady = true;
     });
-
-  }
-  ngOnDestroy(): void {
-
   }
 
   intercept(
@@ -66,9 +57,6 @@ export class AuthHeaderInterceptor implements OnDestroy, HttpInterceptor {
           );
         }
       }
-    }
-    else{
-      console.log("auth interceptor does not have pagemodel");
     }
     return next.handle(requestClone);
   }

@@ -1,16 +1,14 @@
 
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigService, OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { BehaviorSubject, of, ReplaySubject, Subject } from 'rxjs';
-
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
 
-@AutoUnsubscribe()
-export class ApiConfigService implements OnDestroy{
+export class ApiConfigService {
   operatorPageModel!: OperatorPageModel;
   // operator page model change notification support
   private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
@@ -23,15 +21,12 @@ export class ApiConfigService implements OnDestroy{
     configService.configuration.basePath = window.location.origin;
     this.initService();
   }
-  ngOnDestroy(): void {
-
-  }
 
   /*
     currently angular injectables do not participate in all lifecycle hooks
   */
   initService(): void {
-    this.initPageModelSubject();
+
   }
 
   /*
@@ -39,15 +34,13 @@ export class ApiConfigService implements OnDestroy{
                including base url for discovery appliance
                and user appliances
            */
-  private initPageModelSubject() {
+  initPageModelSubject() {
     console.log("apiconfigsvc is getting operator page model");
     this.configService.configuration.basePath = window.location.origin;
     console.log('calling config service');
     this.configService.getOperatorPageModel().subscribe(
       (data: OperatorPageModel) => {
-        this.operatorPageModel = data;
-        this.currentPageModelSource.next(data);
-        // return this.cacheOperatorPageModelSignalSubscribers(data);
+        return this.cacheOperatorPageModelSignalSubscribers(data);
       },
       (err: any) => console.log(err),
       () => {
