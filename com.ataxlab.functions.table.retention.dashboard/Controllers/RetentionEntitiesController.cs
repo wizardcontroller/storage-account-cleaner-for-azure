@@ -120,12 +120,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         }
 
         [HttpPost(Name = "WorkflowOperator")]
-        public async Task<WorkflowOperationCommand> WorkflowOperator(
-        [FromBody] AvailableCommand command,
+        public async Task<WorkflowCheckpointDTO> WorkflowOperator(
+        [FromBody] WorkflowOperationCommand command,
         [FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
         [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
-            return await Task.FromResult(new WorkflowOperationCommand());
+            return await Task.FromResult(new WorkflowCheckpointDTO());
         }
     }
 }
