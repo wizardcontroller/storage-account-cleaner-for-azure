@@ -28,6 +28,7 @@ import {MatToolbarModule, MatToolbar} from '@angular/material/toolbar';
 import {RetentionEntitiesService} from '@wizardcontroller/sac-appliance-lib'
 import { MetricRetentionSurfaceViewComponent } from './display-templates/MetricRetentionSurfaceView/MetricRetentionSurfaceView.component';
 import { DatesToTimeLineEventsPipePipe } from './pipes/dates-to-time-line-events-pipe.pipe';
+import { CommandPaletteComponent } from './display-templates/command-palette/command-palette.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -54,7 +55,8 @@ import { DatesToTimeLineEventsPipePipe } from './pipes/dates-to-time-line-events
     RetentionPolicyEditorComponent,
     DiagnosticsRetentionSurfaceViewComponent,
     MetricRetentionSurfaceViewComponent,
-    DatesToTimeLineEventsPipePipe
+    DatesToTimeLineEventsPipePipe,
+    CommandPaletteComponent
   ],
   declarations: [
     SharedComponent,
@@ -64,7 +66,8 @@ import { DatesToTimeLineEventsPipePipe } from './pipes/dates-to-time-line-events
     RetentionPolicyEditorComponent,
     DiagnosticsRetentionSurfaceViewComponent,
     MetricRetentionSurfaceViewComponent,
-    DatesToTimeLineEventsPipePipe
+    DatesToTimeLineEventsPipePipe,
+    CommandPaletteComponent
   ],
   providers: [
     LoggingConfigurationService,

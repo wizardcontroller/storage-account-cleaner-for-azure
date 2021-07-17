@@ -21,3 +21,20 @@ li a {
 li a:hover {
   background-color: #111111;
 }
+
+.drawer {
+  position: fixed;
+  height: 100vh;
+  min-width: 25%;
+  border-right: 1px solid #ccc;
+}
+
+  .drawer .header {
+    position: absolute;
+    right: 0;
+    justify-content: space-between;
+  }
+
+  .drawer .contents {
+    padding: 16px;
+  }

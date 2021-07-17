@@ -1,9 +1,46 @@
 
-<ul>
-  <li><a routerLink="workbench">workbench</a></li>
-  <li><a routerLink="report">report</a></li>
+<mat-drawer-container [class.drawer-opened]="drawer.opened"
+                      class="">
+  <mat-drawer #drawer
+              class="drawer"
+              mode="side"
+              opened="true">
 
-</ul>
-<div>
-  <router-outlet></router-outlet>
-</div>
+    <mat-toolbar class="header">
+      <div>Available Commands</div>
+      <mat-icon class="close"
+                (click)="drawer.close()">close</mat-icon>
+    </mat-toolbar>
+    <div class="contents">
+      Drawer
+    </div>
+  </mat-drawer>
+
+  <mat-toolbar class="main header">
+    <mat-icon *ngIf="!drawer.opened"
+              (click)="drawer.toggle()">
+      menu
+    </mat-icon>
+    <div style="width:100%;">
+
+      <ul>
+        <li><a routerLink="workbench">workbench</a></li>
+        <li><a routerLink="report">report</a></li>
+
+      </ul>
+    </div>
+  </mat-toolbar>
+
+  <div class="main contents">
+
+    <div>
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
+
+
+  <mat-toolbar class="main footer">
+    Footer
+  </mat-toolbar>
+</mat-drawer-container>

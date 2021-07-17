@@ -375,7 +375,7 @@ namespace com.ataxlab.functions.table.retention.c2
                     return resp;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.NotFound);
                 return resp;
@@ -394,7 +394,7 @@ namespace com.ataxlab.functions.table.retention.c2
         /// <returns></returns>
         [FunctionName("GetCurrentJobOutput")]
         [Obsolete]
-       
+
         public async Task<HttpResponseMessage> GetCurrentJobOutput([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/GetCurrentJobOutput"
                                                                      + ControlChannelConstants.QueryWorkflowCheckpointStatusRouteTemplate)]
              HttpRequestMessage req,
@@ -413,6 +413,31 @@ namespace com.ataxlab.functions.table.retention.c2
             resp.Content = new StringContent(await res.ToJSONStringAsync());
             return resp;
         }
+
+        [FunctionName("ControlChannelEndpoint")]
+        public async Task<HttpResponseMessage> WorkflowOperator(
+     [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "RetentionEntities/" + ControlChannelConstants.ApplicationControlChannelEndpoint
+                                                                     + ControlChannelConstants.ApplianceContextRouteTemplate)] HttpRequestMessage req,
+    [DurableClient] IDurableOrchestrationClient starter,
+     Microsoft.Azure.WebJobs.ExecutionContext context,
+    [DurableClient] IDurableClient durableClient,
+    [DurableClient] IDurableEntityClient durableEntityClient,
+     ClaimsPrincipal claimsPrincipal,
+     string tenantId,
+     string oid,
+     ILogger log)
+        {
+            log.LogInformation("ApplicationControlChannelEndpoint HttpRequest {0}", req.RequestUri.AbsoluteUri);
+            var commandJson = await req.Content.ReadAsStringAsync();
+
+            bool isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
+            var impersonate = await this.TableRetentionApplianceEngine.GetImpersonationTokenFromHeaders(req.Headers);
+            log.LogInformation("WorkflowOperator Operation Authorized? {0}", isAuthorized);
+            var response = await this.TableRetentionApplianceEngine.GetResponseForWorkflowOperator(starter, durableClient, durableEntityClient, tenantId, oid, commandJson, impersonate);
+            log.LogInformation("returning workflow operator endpoint response");
+            return response;
+        }
+
     }
 }
 

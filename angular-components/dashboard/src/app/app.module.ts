@@ -20,7 +20,10 @@ import { ApiConfigService } from './core/ApiConfig.service';
 import { MockOperatorPageModelInterceptor } from './interceptors/mock-operator-page-model.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon'
 import { CommonModule } from '@angular/common';
+import { MatToolbarModule } from '@angular/material/toolbar';
 @NgModule({
   declarations: [
     AppComponent
@@ -37,7 +40,10 @@ import { CommonModule } from '@angular/common';
     TableModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule
   ],
   providers: [
   {

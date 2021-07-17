@@ -9,6 +9,7 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { SubscriptionsViewComponent } from './shared/display-templates/SubscriptionsView/SubscriptionsView.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ICanBeHiddenFromDisplay } from './shared/interfaces/ICanBeHiddenFromDisplay';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
