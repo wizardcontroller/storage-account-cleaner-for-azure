@@ -82,6 +82,7 @@ export class ApplianceApiService implements OnDestroy {
 
   ngOnDestroy(): void {
     // nothing yet
+
   }
 
   public ensureApplianceSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void {

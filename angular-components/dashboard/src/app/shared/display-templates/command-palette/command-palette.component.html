@@ -1,1 +1,37 @@
-<p>command-palette works!</p>
+
+<ng-container *ngIf="availableCommandChanges$ | async as commands; else noCommands">
+
+
+  <div class="card">
+
+    <p-dataView [value]="commands"
+                layout="list"
+                [paginator]="true"
+                [rows]="10">
+
+      <ng-template pTemplate="header">
+        <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
+          <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+
+        </div>
+      </ng-template>
+
+      <ng-template let-command pTemplate="listItem">
+        <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
+          {{ command.menuLabel }}
+        </div>
+      </ng-template>
+
+
+
+      <ng-template pTemplate="footer">
+        <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+      </ng-template>
+    </p-dataView>
+  </div>
+</ng-container>
+
+<ng-template #noCommands>
+  <div>no commands available</div>
+</ng-template>
+

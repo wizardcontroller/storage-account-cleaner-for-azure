@@ -10,21 +10,20 @@ li {
   float: left;
 }
 
-li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 12px;
-  text-decoration: none;
-}
+  li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 12px;
+    text-decoration: none;
+  }
 
-li a:hover {
-  background-color: #111111;
-}
+    li a:hover {
+      background-color: #111111;
+    }
 
 .drawer {
-  position: fixed;
-  height: 100vh;
+  position:absolute;
   min-width: 25%;
   border-right: 1px solid #ccc;
 }
@@ -36,5 +35,45 @@ li a:hover {
   }
 
   .drawer .contents {
+    margin-top: 50px;
+    padding: 16px;
+    min-width: 25%;
+  }
+
+
+main {
+  position: absolute;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
+  top: 0px;
+}
+
+  .main.header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 2;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .main.contents {
+    min-height: 100vh;
+    margin-top: 64px; /* height of header */
     padding: 16px;
   }
+
+  .main.footer {
+    position: absolute;
+    border-top: 1px solid #ccc;
+    bottom: 0;
+    width: 100%;
+  }
+
+
+
+.example-container {
+
+  margin: 10px;
+  border: 1px solid #555;
+}

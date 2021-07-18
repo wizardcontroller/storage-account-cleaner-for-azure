@@ -20,7 +20,6 @@ import { PrimeIcons } from 'primeng/api'
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnInit, ICanBeHiddenFromDisplay {
 
-  @ViewChild('drawer') drawer!: MatDrawer;
   isSideNavOpen = false;
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
