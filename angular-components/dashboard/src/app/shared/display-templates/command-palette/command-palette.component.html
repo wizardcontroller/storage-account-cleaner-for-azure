@@ -1,4 +1,5 @@
-<ng-container
+
+  <ng-container
   *ngIf="availableCommandChanges$ | async as commands; else noCommands"
 >
   <div class="">
@@ -73,6 +74,7 @@
     </p-dataView>
   </div>
 </ng-container>
+
 
 <ng-template #noCommands>
   <div>no commands available</div>
