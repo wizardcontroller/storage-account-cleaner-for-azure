@@ -64,6 +64,7 @@ export class ApplianceApiService implements OnDestroy {
 
 
 
+
   private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();
   entityRetentionPolicyChanges$ = this.entityRetentionPolicySource.asObservable();
 
@@ -91,10 +92,13 @@ export class ApplianceApiService implements OnDestroy {
       this.currentApplianceSessionContextSource.next(data);
       this.currentJobOutputSource.next(data.currentJobOutput);
 
-      var accounts = data.selectedStorageAccounts as StorageAccountDTO[];
+      var accounts = data.selectedStorageAccounts as Array<StorageAccountDTO>;
 
       this.storageAccounts = accounts;
       this.storageAccountsSource.next(accounts);
+
+      // 'select' a newly available storage account
+      this.selectedStorageAccountSource.next(accounts[0].id as string);
 
       // can listen selected storage account changes
       // required for calls to retention service that require storage account header

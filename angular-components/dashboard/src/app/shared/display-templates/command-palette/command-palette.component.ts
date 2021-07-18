@@ -26,7 +26,8 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
                           .pipe(
                             withLatestFrom(
                               this.pageModelChanges$
-                            ));
+                            ))
+                          ;
 /*
   commandSet$ = this.pageModelChanges$
                   .pipe(
@@ -68,7 +69,10 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   .pipe
   (mergeMap(workflowCheckpoint =>
     of(workflowCheckpoint.availableCommands)
-  ));
+  ))
+  .subscribe(d => {
+    console.log("");
+  });
 
   constructor(
     private apiConfigSvc: ApiConfigService,
