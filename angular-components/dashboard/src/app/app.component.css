@@ -24,6 +24,8 @@ li {
 
 .drawer {
   position:absolute;
+  display: flex;
+  flex-direction: column;
   min-width: 315px;
   border-right: 1px solid #ccc;
 }
@@ -43,10 +45,7 @@ li {
 
 main {
   position: absolute;
-  right: 0px;
-  left: 0px;
-  bottom: 0px;
-  top: 0px;
+
 }
 
   .main.header {
@@ -58,7 +57,7 @@ main {
   }
 
   .main.contents {
-    min-height: 100vh;
+
     margin-top: 64px; /* height of header */
     padding: 16px;
   }

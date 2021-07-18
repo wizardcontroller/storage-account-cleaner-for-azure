@@ -64,23 +64,23 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
     public class WorkflowCheckpoint : IWorkflowCheckpoint, IWorkflowCheckpointProperties
     {
-        [JsonProperty("TimeStamp")]
+        [JsonProperty("timeStamp")]
         public DateTime TimeStamp { get; set; }
 
-        [JsonProperty("CurrentCheckpoint")]
+        [JsonProperty("currentCheckpoint")]
         public WorkflowCheckpointIdentifier CurrentCheckpoint { get; set; }
 
 
-        [JsonProperty("Messsage")]
+        [JsonProperty("messsage")]
         public string Message { get;  set; }
 
-        [JsonProperty("AvailableCommands")]
+        [JsonProperty("availableCommands")]
         public List<AvailableCommandEntity> AvailableCommands { get; set; }
 
-        [JsonProperty("SubscriptionId")]
+        [JsonProperty("subscriptionId")]
         public string SubscriptionId { get; set; }
 
-        [JsonProperty("SubscriptionName")]
+        [JsonProperty("subscriptionName")]
         public string SubscriptionName { get; set; }
 
         public void SetCurrentCheckpoint(WorkflowCheckpointIdentifier checkpoint) => CurrentCheckpoint = checkpoint;

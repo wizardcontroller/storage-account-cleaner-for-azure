@@ -30,7 +30,7 @@ namespace com.ataxlab.functions.table.retention.entities
 
         [ScaffoldColumn(false)]
         [NotMapped]
-        [JsonProperty("RetentionPolicyTuples")]
+        [JsonProperty("retentionPolicyTuples")]
 
         /*
          * wraps storage accounts and policy wrappers
