@@ -29,6 +29,7 @@ import {RetentionEntitiesService} from '@wizardcontroller/sac-appliance-lib'
 import { MetricRetentionSurfaceViewComponent } from './display-templates/MetricRetentionSurfaceView/MetricRetentionSurfaceView.component';
 import { DatesToTimeLineEventsPipePipe } from './pipes/dates-to-time-line-events-pipe.pipe';
 import { CommandPaletteComponent } from './display-templates/command-palette/command-palette.component';
+import { WorkflowOperationCommandImpl } from './models/WorkflowOperationCommandImpl';
 @NgModule({
   imports: [
     CommonModule,

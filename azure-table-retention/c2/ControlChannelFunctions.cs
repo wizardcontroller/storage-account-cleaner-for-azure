@@ -138,7 +138,7 @@ namespace com.ataxlab.functions.table.retention.c2
            [DurableClient] IDurableEntityClient durableEntityClient,
             ClaimsPrincipal claimsPrincipal,
             string tenantId,
-            string oid,
+            string oid, 
             ILogger log)
         {
             log.LogInformation("ApplicationControlChannelEndpoint HttpRequest {0}", req.RequestUri.AbsoluteUri);

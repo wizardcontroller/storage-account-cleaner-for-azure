@@ -1289,11 +1289,14 @@ namespace com.ataxlab.functions.table.retention.services
             if (candidateCommand != null && availableCommands != null)
             {
                 // match commands that have been 'posted back' with their properties matching
-                var matches = availableCommands
+                var matchesStricter = availableCommands
                                     .Where(x => x.WorkflowOperation == candidateCommand.CommandCode &&
                                            x.AvailableCommandId.Equals(candidateCommand.CandidateCommand.AvailableCommandId))
                                     .ToList<AvailableCommandEntity>();
 
+                var matches = availableCommands
+                    .Where(x => x.AvailableCommandId.Equals(candidateCommand.CandidateCommand.AvailableCommandId))
+                    .ToList<AvailableCommandEntity>();
                 if (matches.Count > 0)
                 {
                     ret = true;

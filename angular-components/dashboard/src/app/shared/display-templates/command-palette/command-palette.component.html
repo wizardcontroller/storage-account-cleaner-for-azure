@@ -1,47 +1,79 @@
-
-<ng-container *ngIf="availableCommandChanges$ | async as commands; else noCommands">
-
+<ng-container
+  *ngIf="availableCommandChanges$ | async as commands; else noCommands"
+>
   <div class="">
-
-    <p-dataView [value]="commands"
-                layout="list"
-                [paginator]="true"
-                [rows]="10"
-                >
-
+    <p-dataView
+      [value]="commands"
+      layout="list"
+      [paginator]="true"
+      [rows]="10"
+      rowHover="true"
+    >
       <ng-template pTemplate="header">
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
-
         </div>
       </ng-template>
 
       <ng-template let-command pTemplate="listItem">
-
-        <div class="uniform-button" (click)="onSelect(command)">{{ command.menuLabel}} </div>
-
-
-
+        <div
+          class="uniform-button hovered focussed"
+          (click)="onSelect(command)"
+        >
+          {{ command.menuLabel }}
+        </div>
       </ng-template>
-
-
 
       <ng-template pTemplate="footer">
         <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
 
-        <p-card>
-          <div id="commandDetailContainer">
-            {{selectedCommand.menuLabel}}
-          </div>
+        <p-card *ngIf="hasSelectedCommand">
+          <ng-template pTemplate="header">
+            <div align="right">
+              <p-button (onClick)="submitCommand(selectedCommand)"
+                >Submit Command</p-button
+              >
+            </div>
+          </ng-template>
 
+          <ng-template pTemplate="subheader">
+            <div>
+              <span style="font-weight: bold">{{selectedCommand.menuLabel}}</span>
+
+            </div>
+          </ng-template>
+
+          <div id="commandDetailContainer">
+            <div>
+              <span style="font-weight: bold">Purpose</span>
+              <div>
+                {{ selectedCommand.worklowOperationDisplayMessage }}
+              </div>
+              <hr />
+            </div>
+
+            <div *ngIf="selectedCommand.subscriptionName">
+              <span style="font-weight: bold">Affected Subscription</span>
+              <div>
+                {{ selectedCommand.subscriptionName }}
+              </div>
+              <hr />
+            </div>
+
+            <div *ngIf="selectedCommand.subscriptionId">
+              <span style="font-weight: bold">Affected Subscription</span>
+              <div>
+                {{ selectedCommand.subscriptionId }}
+              </div>
+              <hr />
+            </div>
+          </div>
         </p-card>
       </ng-template>
     </p-dataView>
   </div>
-
 </ng-container>
 
 <ng-template #noCommands>
   <div>no commands available</div>
 </ng-template>
-

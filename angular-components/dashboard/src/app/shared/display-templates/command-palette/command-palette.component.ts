@@ -1,11 +1,11 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { AvailableCommand, OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
+import { AvailableCommand, OperatorPageModel, WorkflowOperationCommand } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { from, of, ReplaySubject } from 'rxjs';
+import { from, of, Operator, ReplaySubject } from 'rxjs';
 import { concatMap, map, merge, mergeMap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
-
+import {WorkflowOperationCommandImpl} from '../../models/WorkflowOperationCommandImpl'
 @Component({
   selector: 'app-command-palette',
   templateUrl: './command-palette.component.html',
@@ -16,10 +16,15 @@ import { ApplianceApiService } from '../../services/appliance-api.service';
 @AutoUnsubscribe()
 export class CommandPaletteComponent implements OnInit, OnDestroy {
   availableCommands!: Array<AvailableCommand> | null | undefined;
-  availableCommandSubject = new ReplaySubject<Array<AvailableCommand>>();
+  availableCommandSubject = new ReplaySubject<Array<AvailableCommand> >();
   availableCommandChanges$ = this.availableCommandSubject.asObservable();
+  hasSelectedCommand  = false;
 
   selectedCommand!: AvailableCommand;
+
+  currentPageModel!: OperatorPageModel;
+
+  selectedStorageAccountId!: string;
 
   pageModelSubject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubject.asObservable();
@@ -28,14 +33,17 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
                           .pipe(
                             withLatestFrom(
                               this.pageModelChanges$
-                            ))
-                          ;
-/*
-  commandSet$ = this.pageModelChanges$
-                  .pipe(
-                    concatMap(dependencyData => this.commandDependencies$)
-                  )
-*/
+                            ));
+
+  workflowOperationDependencies$ = this.applianceAPiSvc.workflowCheckpointChanges$
+    .pipe(
+      map(workflowOperationCommand => {
+        this.availableCommandSubject.next(workflowOperationCommand.availableCommands as
+          Array<AvailableCommand>);
+      })
+  ).subscribe(d => {
+    console.log("");
+    });
 
   dataSet$ = this.commandDependencies$
 
@@ -44,37 +52,21 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
                       console.log("command palette dependencies available");
                       const pageModel = dependencyData[1];
-                      const storageAccountId = dependencyData[0];
+                      const storageAccountId = dependencyData[0] as string;
                       const tenantId = pageModel.tenantid as string;
                       const oid = pageModel.oid as string;
 
                       // this is not quite right - should come from appliance context
                       const subscriptionId = pageModel.selectedSubscriptionId as string;
 
-                      this.applianceAPiSvc.entityService
-                        .getWorkflowCheckpoint(tenantId, oid, subscriptionId)
-                        .subscribe(data => {
-                          console.log("command palette has workflow checkpoint");
-                          console.log("command palette: command timestamp is " + data.message);
-                              this.availableCommandSubject.next(data.availableCommands as Array<AvailableCommand>  | undefined);
-                          })
-                          ;
+                      this.applianceAPiSvc.ensureApplianceSessionContextSubject
+                        (tenantId, subscriptionId, oid);
 
                     })
                   )
                   .subscribe(x =>{
                     console.log("dependencies data available");
                   });
-
-  // get the available commands from the workflow checkpoint
-  availableCommands$ = this.applianceAPiSvc.workflowCheckpointChanges$
-  .pipe
-  (mergeMap(workflowCheckpoint =>
-    of(workflowCheckpoint.availableCommands)
-  ))
-  .subscribe(d => {
-    console.log("");
-  });
 
   constructor(
     private apiConfigSvc: ApiConfigService,
@@ -84,11 +76,58 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
     }
 
+    submitCommand(command: AvailableCommand): void{
+      console.log("submitting command: " + command.menuLabel);
+      const oid = this.currentPageModel.oid as string;
+      const tenantId = this.currentPageModel.tenantid  as string;
+      const subscriptionId = this.currentPageModel.selectedSubscriptionId  as string;
+      const storageAccountId = this.selectedStorageAccountId  as string;
+      const workflowOperationCommand = new WorkflowOperationCommandImpl();
+      workflowOperationCommand.candidateCommand = this.selectedCommand;
+      // workflowOperationCommand.timeStamp = Date.UTC.toString();
+      // workflowOperationCommand.displayMessage = this.selectedCommand.worklowOperationDisplayMessage;
+      workflowOperationCommand.commandCode = this.selectedCommand.workflowOperation;
+      /*
+      {
+        "candidateCommand": this.selectedCommand,
+        "timeStamp": Date.UTC.toString(),
+        "displayMessage": this.selectedCommand.worklowOperationDisplayMessage,
+        "commandCode": this.selectedCommand.workflowOperation
+      };
+      */
 
+      this.applianceAPiSvc.entityService.workflowOperator(
+        tenantId,
+        oid,
+        subscriptionId,
+        storageAccountId,
+        workflowOperationCommand
+      )
+      .pipe(
+          map(result =>{
+            console.log("workflow operator results available");
+            this.availableCommandSubject.next(result.availableCommands as Array<AvailableCommand>);
+
+
+            this.applianceAPiSvc.ensurePageModelSubject();
+
+            // update dependencies
+            this.applianceAPiSvc.ensureApplianceSessionContextSubject(tenantId, subscriptionId, oid);
+
+          })
+      )
+      .subscribe(placeholder =>{
+        console.log("");
+      },
+        errors => {
+          console.log(JSON.stringify(errors));
+        });
+    }
 
     onSelect(command: AvailableCommand): void{
       // nothing yet
       this.selectedCommand = command;
+      this.hasSelectedCommand = true;
       console.log("command selected: " + command.menuLabel);
       }
 
@@ -105,11 +144,13 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       console.log("command palette view has page model");
       // metrics retention component has operator page model
       this.pageModelSubject.next(pageModel);
+      this.currentPageModel = pageModel;
+
     });
 
     this.commandDependencies$.subscribe(dependencies => {
       console.log("command dependencies available: storage account Id " + dependencies[1] );
-
+      this.selectedStorageAccountId = dependencies[0];
     })
     ;
 

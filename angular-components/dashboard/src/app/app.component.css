@@ -27,8 +27,10 @@ li {
   align-content: center;
   overflow: visible;
   display: flex;
+  overflow-y: scroll;
   flex-direction: column;
-  min-width: 315px;
+  min-width:400px;
+  max-width: 100%; overflow-x: hidden;
 
 }
 
@@ -47,6 +49,8 @@ li {
 
 main {
   position: absolute;
+  min-width: 315px;
+  min-height: 100%;
 
 }
 
