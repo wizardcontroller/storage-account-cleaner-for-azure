@@ -24,7 +24,7 @@ li {
 
 .drawer {
   position:absolute;
-  min-width: 25%;
+  min-width: 315px;
   border-right: 1px solid #ccc;
 }
 
