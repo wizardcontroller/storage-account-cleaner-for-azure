@@ -19,6 +19,8 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   availableCommandSubject = new ReplaySubject<Array<AvailableCommand>>();
   availableCommandChanges$ = this.availableCommandSubject.asObservable();
 
+  selectedCommand!: AvailableCommand;
+
   pageModelSubject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubject.asObservable();
 
@@ -76,8 +78,21 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiConfigSvc: ApiConfigService,
-    private applianceAPiSvc: ApplianceApiService) { }
-  ngOnDestroy(): void {
+    private applianceAPiSvc: ApplianceApiService) {
+      this.selectedCommand = {menuLabel: "select a command"};
+
+
+    }
+
+
+
+    onSelect(command: AvailableCommand): void{
+      // nothing yet
+      this.selectedCommand = command;
+      console.log("command selected: " + command.menuLabel);
+      }
+
+    ngOnDestroy(): void {
     // nothing yet
 
   }

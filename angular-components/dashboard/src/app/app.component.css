@@ -24,10 +24,12 @@ li {
 
 .drawer {
   position:absolute;
+  align-content: center;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   min-width: 315px;
-  border-right: 1px solid #ccc;
+
 }
 
   .drawer .header {
@@ -39,8 +41,7 @@ li {
   .drawer .contents {
     margin-top: 50px;
     padding: 16px;
-    min-width: 25%;
-
+    overflow: visible;
   }
 
 
@@ -53,8 +54,8 @@ main {
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 2;
-    border-bottom: 1px solid #ccc;
+    /* z-index: 2;
+    border-bottom: 1px solid #ccc; */
   }
 
   .main.contents {
@@ -74,6 +75,6 @@ main {
 
 .example-container {
 
-  margin: 10px;
-  border: 1px solid #555;
+  margin: 1px;
+
 }
