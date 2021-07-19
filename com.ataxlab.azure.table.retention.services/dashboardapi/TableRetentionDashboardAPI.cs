@@ -304,6 +304,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         // cache the available commands in session
                         if (result != null)
                         {
+                            var timestamp = result.TimeStamp;
                             this.CurrentHttpContext.Session.SetString(DashboardConstants.SESSIONKEY_AVAILABLECOMMANDS, JsonConvert.SerializeObject(result.AvailableCommands));
                             log.LogInformation("applying aailable commands to operator page model");
                             operatorPageModel.AvailableCommands = result.AvailableCommands;

@@ -22,6 +22,7 @@ import {
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
 import { WorkflowOperationCommandImpl } from '../../models/WorkflowOperationCommandImpl';
+import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-command-palette',
   templateUrl: './command-palette.component.html',
@@ -60,13 +61,17 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       .selectedSubscriptionId as string;
     const storageAccountId = this.selectedStorageAccountId as string;
     const workflowOperationCommand = new WorkflowOperationCommandImpl();
+    const datepipe: DatePipe = new DatePipe('en-US')
+    let formattedDate = datepipe.transform(new Date(), 'YYYY-mm-dd HH:mm:ss')
+
     workflowOperationCommand.candidateCommand = this.selectedCommand;
     // workflowOperationCommand.timeStamp = Date.UTC.toString();
     // workflowOperationCommand.displayMessage = this.selectedCommand.worklowOperationDisplayMessage;
     workflowOperationCommand.commandCode =
       this.selectedCommand.workflowOperation;
 
-      workflowOperationCommand.timeStamp = Date.UTC.toString();
+    // a copout cos we need a c# compatible formatted date
+    workflowOperationCommand.timeStamp = this.workflowCheckpoint.timeStamp;
 
     this.applianceAPiSvc.entityService
       .workflowOperator( 
