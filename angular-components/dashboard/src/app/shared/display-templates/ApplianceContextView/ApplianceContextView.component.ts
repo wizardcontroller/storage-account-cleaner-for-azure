@@ -13,6 +13,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { SubscriptionsViewComponent } from '../SubscriptionsView/SubscriptionsView.component';
 import { StorageAccountViewComponent } from '../StorageAccountView/StorageAccountView.component';
+import { ApplianceApiService } from '../../services/appliance-api.service';
+
+
 @Component({
 
   templateUrl: './ApplianceContextView.component.html',
@@ -26,15 +29,18 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
 
   private baseUri: string = '';
 
+  isWorkflowCheckpointPollingEnabled!: boolean;
+
   applianceSessionContext!: ApplianceSessionContext;
   private currentApplianceContextSource = new ReplaySubject<ApplianceSessionContext>();
   applianceContextChanges$ = this.currentApplianceContextSource.asObservable();
   id: any;
   constructor(private apiConfigSvc: ApiConfigService,
     private retentionEntitiesSvc: RetentionEntitiesService,
+    private applianceApiSvc: ApplianceApiService,
     private router: Router,
     private route: ActivatedRoute) {
-
+    this.isWorkflowCheckpointPollingEnabled = this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint;
   }
 
 
@@ -42,6 +48,11 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
   // operator page model change notification support
   private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
   operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
+
+
+  handleAutoRefreshSelectionChange(e: { checked: any; }) {
+    this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint = e.checked;
+  }
 
   ngOnDestroy(): void {
     // nothing yet

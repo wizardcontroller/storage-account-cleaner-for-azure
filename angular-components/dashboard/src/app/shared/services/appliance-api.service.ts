@@ -39,10 +39,9 @@ export class ApplianceApiService implements OnDestroy {
   workflowCheckPoint!: WorkflowCheckpointDTO | null;
   private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
-  isAutoRefreshWorkflowCheckpoint = true;
+  isAutoRefreshWorkflowCheckpoint = false;
   workflowCheckpointPollingStartDelay = 1500; //1.5 seconds
-  workflowCheckpointPollingInterval = 1000 * 30; // 30 seconds
-
+  workflowCheckpointPollingInterval = (1000 * 1) * ( 1 * 60); // seconds * minutes
   storageAccounts: StorageAccountDTO[] = [];
   private storageAccountsSource = new ReplaySubject<StorageAccountDTO[] | undefined | null>();
   storageAccountChanges$ = this.storageAccountsSource.asObservable();
@@ -57,7 +56,7 @@ export class ApplianceApiService implements OnDestroy {
   )
     .pipe(
       tap(t => {
-        console.log("workflow poller firing");
+
       }),
       map(([elapsedEvent, pageModel])=> {
         var tenantid = pageModel.tenantid as string;
@@ -65,6 +64,8 @@ export class ApplianceApiService implements OnDestroy {
         var subscriptionId = pageModel.subscriptionId as string;
 
         var oid = pageModel.oid as string;
+
+        this.ensureWorkflowSessionContextSubject(tenantid, subscriptionId, oid);
 
       })
     ).subscribe();
@@ -135,13 +136,22 @@ export class ApplianceApiService implements OnDestroy {
   }
 
   public ensureWorkflowSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void {
-    this.entityService.getWorkflowCheckpoint(tenantId, oid).subscribe(data => {
-      console.log("workflow context updated");
-      this.currentWorkflowCheckpointSource.next(data);
-    }, error => {
-      console.log("error getting workflow context: " + (error as Error).message);
-    });
-  }
+
+    if (this.isAutoRefreshWorkflowCheckpoint) {
+      this.entityService.getWorkflowCheckpoint(tenantId, oid).subscribe(data => {
+        console.log("workflow context updated");
+
+
+        this.workflowCheckPoint = data;
+        this.currentWorkflowCheckpointSource.next(data);
+      }, error => {
+        console.log("error getting workflow context: " + (error as Error).message);
+      });
+    }
+    else {
+
+    }
+    }
 
   /**
    * on pagemodel retrieval update dependent DTOs
@@ -149,33 +159,35 @@ export class ApplianceApiService implements OnDestroy {
   public ensurePageModelSubject(): void {
 
 
-    this.apiConfigService.operatorPageModelChanges$.subscribe((data) => {
-      console.log('appliance api service has operator page model');
-      try {
-        this.operatorPageModel = data
-        this.ensureServiceUrls(data);
-        var tenantid = data.tenantid as string;
-        console.log("ensurePageModelSubject(): tenantId: " + tenantid);
+    this.apiConfigService.operatorPageModelChanges$
+      .pipe(
+        map(data => {
+          console.log('appliance api service has operator page model');
+          try {
+            this.operatorPageModel = data
+            this.ensureServiceUrls(data);
+            var tenantid = data.tenantid as string;
+            console.log("ensurePageModelSubject(): tenantId: " + tenantid);
 
-        var subscriptionId = data.subscriptionId as string;
-        console.log("ensurePageModelSubject(): subscriptionId: " + subscriptionId);
+            var subscriptionId = data.subscriptionId as string;
+            console.log("ensurePageModelSubject(): subscriptionId: " + subscriptionId);
 
-        var oid = data.oid as string;
-        console.log("ensurePageModelSubject(): oid: " + oid);
+            var oid = data.oid as string;
+            console.log("ensurePageModelSubject(): oid: " + oid);
 
-        console.log("getting workflow checkpoint");
-        this.ensureWorkflowSessionContextSubject(tenantid, subscriptionId, oid);
+            console.log("getting workflow checkpoint");
+            this.ensureWorkflowSessionContextSubject(tenantid, subscriptionId, oid);
 
-        console.log("getting appliance context");
-        this.ensureApplianceSessionContextSubject(tenantid, subscriptionId, oid);
-      } catch (ex) {
-        console.log('error starting ApplianceApiSvc ' + (ex as Error).message);
+            console.log("getting appliance context");
+            this.ensureApplianceSessionContextSubject(tenantid, subscriptionId, oid);
+          } catch (ex) {
+            console.log('error starting ApplianceApiSvc ' + (ex as Error).message);
 
-      }
+          }
 
-      return (this.operatorPageModel = data);
-    });
-
+          this.operatorPageModel = data;
+        })
+      ).subscribe();
   }
 
   private ensureServiceUrls(data: OperatorPageModel) {

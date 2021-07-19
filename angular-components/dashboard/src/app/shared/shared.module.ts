@@ -30,11 +30,14 @@ import { MetricRetentionSurfaceViewComponent } from './display-templates/MetricR
 import { DatesToTimeLineEventsPipePipe } from './pipes/dates-to-time-line-events-pipe.pipe';
 import { CommandPaletteComponent } from './display-templates/command-palette/command-palette.component';
 import { WorkflowOperationCommandImpl } from './models/WorkflowOperationCommandImpl';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { FormsModule } from '@angular/forms';
 @NgModule({
   imports: [
     CommonModule,
     TableModule,
     BrowserModule,
+    FormsModule,
     BrowserAnimationsModule,
     CardModule,
     DataViewModule,
@@ -46,6 +49,7 @@ import { WorkflowOperationCommandImpl } from './models/WorkflowOperationCommandI
     TableModule,
     TimelineModule,
     MatExpansionModule,
+    ToggleButtonModule,
     RouterModule
   ],
   exports: [
