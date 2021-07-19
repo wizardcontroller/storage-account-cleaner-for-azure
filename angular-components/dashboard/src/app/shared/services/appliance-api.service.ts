@@ -13,8 +13,8 @@ import {
 } from '@wizardcontroller/sac-appliance-lib';
 
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { BehaviorSubject, combineLatest, config, ReplaySubject, Subject } from 'rxjs';
-import { flatMap, map, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, config, from, of, ReplaySubject, Subject, timer } from 'rxjs';
+import { concatMap, flatMap, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
 import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
@@ -39,12 +39,35 @@ export class ApplianceApiService implements OnDestroy {
   workflowCheckPoint!: WorkflowCheckpointDTO | null;
   private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
+  isAutoRefreshWorkflowCheckpoint = true;
+  workflowCheckpointPollingStartDelay = 1500; //1.5 seconds
+  workflowCheckpointPollingInterval = 1000 * 30; // 30 seconds
 
   storageAccounts: StorageAccountDTO[] = [];
   private storageAccountsSource = new ReplaySubject<StorageAccountDTO[] | undefined | null>();
   storageAccountChanges$ = this.storageAccountsSource.asObservable();
 
   // support action stream of storage accounts selections
+  private stopPolling = new Subject();
+  workflowCheckpointTimer$ = timer(this.workflowCheckpointPollingStartDelay,
+    this.workflowCheckpointPollingInterval);
+  workflowCheckpoints$ = combineLatest(
+    this.workflowCheckpointTimer$,
+    this.apiConfigService.operatorPageModelChanges$
+  )
+    .pipe(
+      tap(t => {
+        console.log("workflow poller firing");
+      }),
+      map(([elapsedEvent, pageModel])=> {
+        var tenantid = pageModel.tenantid as string;
+
+        var subscriptionId = pageModel.subscriptionId as string;
+
+        var oid = pageModel.oid as string;
+
+      })
+    ).subscribe();
 
   public selectedStorageAccountSource = new BehaviorSubject<string>("");
   selectedStorageAccountAction$ = this.selectedStorageAccountSource.asObservable();
@@ -58,11 +81,6 @@ export class ApplianceApiService implements OnDestroy {
       map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
         filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
       ));
-
-
-
-
-
 
 
   private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();
