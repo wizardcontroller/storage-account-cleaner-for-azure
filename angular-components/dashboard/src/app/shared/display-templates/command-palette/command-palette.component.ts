@@ -7,6 +7,7 @@ import {
 import {
   AvailableCommand,
   OperatorPageModel,
+  WorkflowCheckpointDTO,
   WorkflowOperationCommand,
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
@@ -33,6 +34,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   availableCommandSubject = new ReplaySubject<Array<AvailableCommand>>();
   availableCommandChanges$ = this.availableCommandSubject.asObservable();
   hasSelectedCommand = false;
+  workflowCheckpoint!: WorkflowCheckpointDTO;
 
   selectedCommand!: AvailableCommand;
 
@@ -124,6 +126,8 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
     this.applianceAPiSvc.workflowCheckpointChanges$.subscribe(
       (workflowCheckpoint) => {
+
+        this.workflowCheckpoint = workflowCheckpoint;
         this.availableCommandSubject.next(
           workflowCheckpoint.availableCommands as Array<AvailableCommand>
         );

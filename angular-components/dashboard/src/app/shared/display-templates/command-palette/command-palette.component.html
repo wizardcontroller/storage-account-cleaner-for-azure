@@ -1,15 +1,14 @@
 
-  <ng-container
-  *ngIf="availableCommandChanges$ | async as commands; else noCommands"
->
+<ng-container *ngIf="availableCommandChanges$ | async as commands; else noCommands">
+  <div>
+    Workflow Timestamp: {{workflowCheckpoint.timeStamp}}
+  </div>
   <div class="">
-    <p-dataView
-      [value]="commands"
-      layout="list"
-      [paginator]="true"
-      [rows]="10"
-      rowHover="true"
-    >
+    <p-dataView [value]="commands"
+                layout="list"
+                [paginator]="true"
+                [rows]="10"
+                rowHover="true">
       <ng-template pTemplate="header">
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
@@ -17,10 +16,9 @@
       </ng-template>
 
       <ng-template let-command pTemplate="listItem">
-        <div
-          class="uniform-button hovered focussed"
-          (click)="onSelect(command)"
-        >
+
+        <div class="uniform-button hovered focussed"
+             (click)="onSelect(command)">
           {{ command.menuLabel }}
         </div>
       </ng-template>
@@ -31,9 +29,7 @@
         <p-card *ngIf="hasSelectedCommand">
           <ng-template pTemplate="header">
             <div align="right">
-              <p-button (onClick)="submitCommand(selectedCommand)"
-                >Submit Command</p-button
-              >
+              <p-button (onClick)="submitCommand(selectedCommand)">Submit Command</p-button>
             </div>
           </ng-template>
 
