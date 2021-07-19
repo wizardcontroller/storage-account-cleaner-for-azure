@@ -1266,10 +1266,12 @@ namespace com.ataxlab.functions.table.retention.services
                 log.LogInformation("edit mode available commands count {0}", availableCommands.Count());
             }
 
+            var availableCommandsJson = await availableCommands.ToJSONStringAsync();
+            var candidateCommandJson = await command.ToJSONStringAsync();
             // get the list of available commands
             // = await this.GetAvailableCommands(durableClient);
-            log.LogInformation("current available commands {0}", await availableCommands.ToJSONStringAsync());
-            log.LogInformation("candidate command {0}", await command.ToJSONStringAsync());
+            log.LogInformation("current available commands {0}", availableCommandsJson);
+            log.LogInformation("candidate command {0}", candidateCommandJson);
             var isValidTransition = this.IsValidTransition(command, availableCommands);
             log.LogInformation("isValidTransition {0}", isValidTransition);
             return isValidTransition;

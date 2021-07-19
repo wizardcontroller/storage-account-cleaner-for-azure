@@ -64,6 +64,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     workflowOperationCommand.commandCode =
       this.selectedCommand.workflowOperation;
 
+      workflowOperationCommand.timeStamp = Date.UTC.toString();
 
     this.applianceAPiSvc.entityService
       .workflowOperator(
