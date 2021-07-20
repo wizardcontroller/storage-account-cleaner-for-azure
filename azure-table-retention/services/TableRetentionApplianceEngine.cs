@@ -150,7 +150,16 @@ namespace com.ataxlab.functions.table.retention.services
             try
             {
 
-                var impersonate = headers.Where(w => w.Key.Equals(ControlChannelConstants.HEADER_IMPERSONATION_TOKEN)).Select(s => s.Value)?.FirstOrDefault();
+                IEnumerable<string> listValues; 
+                var r = headers.TryGetValues(ControlChannelConstants.HEADER_IMPERSONATION_TOKEN, out listValues);
+
+                var keysList = new List<string>();
+                foreach(var h in headers)
+                {
+                    keysList.Add(h.Key);
+                }
+                    
+                var impersonate = headers.Where(w => w.Key.ToLower().Equals(ControlChannelConstants.HEADER_IMPERSONATION_TOKEN.ToLower())).Select(s => s.Value)?.FirstOrDefault();
                 impersonationToken = impersonate?.FirstOrDefault()?.TrimStart(',')?.Trim();
 
             }

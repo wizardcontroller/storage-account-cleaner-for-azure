@@ -59,9 +59,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     const tenantId = this.currentPageModel.tenantid as string;
     const subscriptionId = this.currentPageModel
       .selectedSubscriptionId as string;
-    console.log('submitting command with subscriptionid ' + subscriptionId);
     const storageAccountId = this.selectedStorageAccountId as string;
-    console.log('submitting command with storageAccountId ' + storageAccountId);
     const workflowOperationCommand = new WorkflowOperationCommandImpl();
     const datepipe: DatePipe = new DatePipe('en-US')
     let formattedDate = datepipe.transform(new Date(), 'YYYY-mm-dd HH:mm:ss')
@@ -126,7 +124,6 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((pageModel) => {
       console.log('command palette view has page model');
-
       // metrics retention component has operator page model
       this.pageModelSubject.next(pageModel);
       this.currentPageModel = pageModel;

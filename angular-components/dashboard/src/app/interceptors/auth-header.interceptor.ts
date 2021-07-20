@@ -49,39 +49,21 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
      */
     if (this.interceptorIsReady) {
 
-      if (requestClone.url.startsWith(this.applianceUrl)) {
-        console.log('http interceptor is adding location' + this.apiConfigSvc.configService.configuration.basePath);
-        if (!requestClone.headers.has("Location")) {
-          requestClone.headers.append(
-            "Location",
-            this.apiConfigSvc.configService.configuration.basePath as string
-          );
-        }
-      }
-
-      if (requestClone.url.startsWith(this.applianceUrl)) {
         console.log('http interceptor is adding xumo auth header' + this.pageModel?.easyAuthAccessToken?.toString());
         if (!requestClone.headers.has(this.HEADER_X_ZUMO_AUTH)) {
           requestClone.headers.append(
             this.HEADER_X_ZUMO_AUTH,
             this.pageModel?.easyAuthAccessToken?.toString() as string
           );
-        }
+        
 
-        console.log('http interceptor is adding impersonation token header' + this.pageModel?.impersonationToken?.toString() );
-        if (!requestClone.headers.has(this.HEADER_IMPERSONATION_TOKEN)) {
+          console.log('http interceptor is adding impersonation token header' + this.pageModel?.impersonationToken?.toString());
+
           requestClone.headers.append(
             this.HEADER_IMPERSONATION_TOKEN,
             this.pageModel?.impersonationToken?.toString() as string
           );
-        }
 
-        if (!requestClone.headers.has(this.HEADER_CURRENTSUBSCRIPTION)) {
-          requestClone.headers.append(
-            this.HEADER_CURRENTSUBSCRIPTION,
-            this.pageModel?.selectedSubscriptionId as string
-          );
-        }
       }
     }
     return next.handle(requestClone);

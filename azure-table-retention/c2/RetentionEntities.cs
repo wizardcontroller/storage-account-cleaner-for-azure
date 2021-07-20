@@ -427,6 +427,7 @@ namespace com.ataxlab.functions.table.retention.c2
      string oid,
      ILogger log)
         {
+
             log.LogInformation("ApplicationControlChannelEndpoint HttpRequest {0}", req.RequestUri.AbsoluteUri);
             var commandJson = await req.Content.ReadAsStringAsync();
 
