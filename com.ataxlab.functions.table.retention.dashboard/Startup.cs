@@ -128,13 +128,17 @@ namespace com.ataxlab.functions.table.retention.dashboard
                     options.AddPolicy(name: "CorsPolicy",
                                       builder =>
                                       {
-                                          builder.WithOrigins("https://localhost:44349", "https://localhost", "http://localhost",
+                                          builder.WithOrigins
+                                          ("https://localhost:44349", "https://localhost", "http://localhost",
+                                          "https://localhost:5001",
                                                               "https://logon.microsoft.com", "http://192.168.10.138:4200",
+                                                              "https://login.microsoftonline.com",
+                                                              "https://localhost:7071",
                                                               applianceBaseUrl)
                                           .AllowAnyHeader()
                                           .AllowAnyMethod()
                                           .SetIsOriginAllowed(origin => true)
-                                          //.AllowAnyOrigin();
+                                          //.AllowAnyOrigin(); is incompatible with .allowCredentials() 
                                           .AllowCredentials();
                                       });
                 });

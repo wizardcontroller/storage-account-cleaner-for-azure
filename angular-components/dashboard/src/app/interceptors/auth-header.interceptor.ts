@@ -11,6 +11,7 @@ import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib/';
 import { ApplianceApiService } from '../shared/services/appliance-api.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CoreModule } from '../core/core.module';
+import { map } from 'rxjs/operators';
 @Injectable()
 export class AuthHeaderInterceptor implements HttpInterceptor {
   private pageModel!: OperatorPageModel;
@@ -21,9 +22,14 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
   private HEADER_CURRENT_STORAGE_ACCOUNT =
     'x-table-retention-current-storage-account';
   private interceptorIsReady: boolean = false;
+  private selectedStorageAccount!: string;
+  
+  constructor(private apiConfigSvc: ApiConfigService, private applianceSvc: ApplianceApiService) {
+    
 
-  constructor(private apiConfigSvc: ApiConfigService) {
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
+      console.log("auth interceptor has easyauth token: " + data.easyAuthAccessToken);
+      console.log("auth interceptor has impersonation token: " + data.impersonationToken);
       this.pageModel = data;
       this.applianceUrl = this.pageModel?.applianceUrl?.toString() as string;
       this.interceptorIsReady = true;
@@ -34,14 +40,27 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const requestClone = request.clone();
+    const requestClone = request.clone({
+      withCredentials: false
+    });
 
     /**
      * this interceptor depends on the current pagemodel context
      */
     if (this.interceptorIsReady) {
-      if (requestClone.url.includes(this.applianceUrl)) {
-        console.log('http interceptor is adding xumo auth header');
+
+      if (requestClone.url.startsWith(this.applianceUrl)) {
+        console.log('http interceptor is adding location' + this.apiConfigSvc.configService.configuration.basePath);
+        if (!requestClone.headers.has("Location")) {
+          requestClone.headers.append(
+            "Location",
+            this.apiConfigSvc.configService.configuration.basePath as string
+          );
+        }
+      }
+
+      if (requestClone.url.startsWith(this.applianceUrl)) {
+        console.log('http interceptor is adding xumo auth header' + this.pageModel?.easyAuthAccessToken?.toString());
         if (!requestClone.headers.has(this.HEADER_X_ZUMO_AUTH)) {
           requestClone.headers.append(
             this.HEADER_X_ZUMO_AUTH,
@@ -49,11 +68,18 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
           );
         }
 
-        console.log('http interceptor is adding impersonation token header');
+        console.log('http interceptor is adding impersonation token header' + this.pageModel?.impersonationToken?.toString() );
         if (!requestClone.headers.has(this.HEADER_IMPERSONATION_TOKEN)) {
           requestClone.headers.append(
             this.HEADER_IMPERSONATION_TOKEN,
             this.pageModel?.impersonationToken?.toString() as string
+          );
+        }
+
+        if (!requestClone.headers.has(this.HEADER_CURRENTSUBSCRIPTION)) {
+          requestClone.headers.append(
+            this.HEADER_CURRENTSUBSCRIPTION,
+            this.pageModel?.selectedSubscriptionId as string
           );
         }
       }

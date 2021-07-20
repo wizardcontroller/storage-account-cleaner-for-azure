@@ -18,6 +18,7 @@ import { concatMap, flatMap, map, mergeMap, switchMap, tap } from 'rxjs/operator
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
 import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
+import { OperationStatus } from '../models/OperationStatus';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,9 @@ import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
 @AutoUnsubscribe()
 export class ApplianceApiService implements OnDestroy {
   operatorPageModel!: OperatorPageModel | null;
+
+  statusFeedSource = new ReplaySubject<OperationStatus>();
+  statusFeedChanges$ = this.statusFeedSource.asObservable();
 
   // this is the ApplianceSessionContext source of truth
   applianceContext!: ApplianceSessionContext | null;
@@ -106,7 +110,26 @@ export class ApplianceApiService implements OnDestroy {
   }
 
   public ensureApplianceSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void {
-    this.entityService.getApplianceSessionContext(tenantId, oid, subscriptionId).subscribe(data => {
+
+    this.entityService.getApplianceSessionContext(tenantId, oid)
+      .pipe(
+        map(data => {
+          console.log("apliance session context updated");
+          this.currentApplianceSessionContextSource.next(data);
+          this.currentJobOutputSource.next(data.currentJobOutput);
+
+          var accounts = data.selectedStorageAccounts as Array<StorageAccountDTO>;
+
+          this.storageAccounts = accounts;
+          this.storageAccountsSource.next(accounts);
+
+          // 'select' a newly available storage account
+          this.selectedStorageAccountSource.next(accounts[0].id as string);
+        })
+      ).subscribe();
+
+    /**
+    this.entityService.getApplianceSessionContext(tenantId, oid).subscribe(data => {
       console.log("apliance session context updated");
       this.currentApplianceSessionContextSource.next(data);
       this.currentJobOutputSource.next(data.currentJobOutput);
@@ -132,12 +155,25 @@ export class ApplianceApiService implements OnDestroy {
       //    }, error => {
       //      console.log("error getting session context: " + (error as Error).message);
     });
-
+    */
   }
 
   public ensureWorkflowSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void {
 
     if (this.isAutoRefreshWorkflowCheckpoint) {
+
+      this.entityService.getWorkflowCheckpoint(tenantId, oid)
+        .pipe(
+          map(data => {
+            console.log("workflow context updated");
+
+
+            this.workflowCheckPoint = data;
+            this.currentWorkflowCheckpointSource.next(data);
+          })
+      ).subscribe();
+
+      /*
       this.entityService.getWorkflowCheckpoint(tenantId, oid).subscribe(data => {
         console.log("workflow context updated");
 
@@ -147,6 +183,7 @@ export class ApplianceApiService implements OnDestroy {
       }, error => {
         console.log("error getting workflow context: " + (error as Error).message);
       });
+      */
     }
     else {
 
@@ -194,7 +231,7 @@ export class ApplianceApiService implements OnDestroy {
     var baseUrl = data?.applianceUrl?.toString().replace("/api/", "");
     this.baseUri = baseUrl;
     console.log('appliance api service is configuring baseUri' + this.baseUri);
-
+   
     this.entityService.configuration.basePath =
       baseUrl;
     console.log(

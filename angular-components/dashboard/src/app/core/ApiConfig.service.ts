@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ConfigService, OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
@@ -13,12 +14,13 @@ export class ApiConfigService {
   // operator page model change notification support
   private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
   operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
+  configService!: ConfigService;
 
 
-  constructor(private configService: ConfigService, private router: Router) {
+  constructor(cfgSvc: ConfigService, private router: Router) {
     console.log("ApiConfigService service starting");
-
-    configService.configuration.basePath = window.location.origin;
+    this.configService = cfgSvc;
+    this.configService.configuration.basePath = window.location.origin;
     this.initService();
   }
 
@@ -26,7 +28,7 @@ export class ApiConfigService {
     currently angular injectables do not participate in all lifecycle hooks
   */
   initService(): void {
-
+  
   }
 
   /*
@@ -38,7 +40,16 @@ export class ApiConfigService {
     console.log("apiconfigsvc is getting operator page model");
     this.configService.configuration.basePath = window.location.origin;
     console.log('calling config service');
-    this.configService.getOperatorPageModel().subscribe(
+    this.configService.getOperatorPageModel()
+      .pipe(
+        map(data => {
+          this.currentPageModelSource.next(data);
+        })
+      ).subscribe();
+
+
+      /*
+      .subscribe(
       (data: OperatorPageModel) => {
         return this.cacheOperatorPageModelSignalSubscribers(data);
       },
@@ -49,7 +60,7 @@ export class ApiConfigService {
           this.operatorPageModel?.applianceUrl
         );
       }
-    );
+    ); */
   }
 
   /**

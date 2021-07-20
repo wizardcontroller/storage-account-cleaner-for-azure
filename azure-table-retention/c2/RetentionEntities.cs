@@ -196,7 +196,7 @@ namespace com.ataxlab.functions.table.retention.c2
             isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             if (isAuthorized)
             {
-                var response = await this.TableRetentionApplianceEngine.GetWorkflowEditModeCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
                 return response;
             }
             else
@@ -358,8 +358,8 @@ namespace com.ataxlab.functions.table.retention.c2
                             EntityState.
                             CurrentJobOutput.
                             retentionPolicyJobs.
-                            Where(w => w.StorageAccount.Id.
-                            Contains(storageAccountId)).
+                            Where(w => w.StorageAccount != null && w.StorageAccount.Id != null &&
+                            w.StorageAccount.Id.Contains(storageAccountId)).
                             FirstOrDefault()?.
                             TableStorageRetentionPolicy;
 

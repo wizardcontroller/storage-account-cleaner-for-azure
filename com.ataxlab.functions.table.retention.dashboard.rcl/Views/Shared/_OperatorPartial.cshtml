@@ -77,7 +77,7 @@
                 //$("#DIV").html('');
 
                 $(element).html('');
-                $(element).append(data.TimeStamp);
+                $(element).append(data.timeStamp);
 
                 console.log(JSON.stringify(data));
             }, //End of AJAX Success function
@@ -194,10 +194,10 @@
 
                         @await Html.PartialAsync("_SubscriptionsPartial", Model.Subscriptions)
                     </div>
-                    <h3>Appliance @Model.ApplianceUrl.FirstOrDefault()</h3>
+                    <h3  onclick="UpdateWorkflowTimestamp('#AccordionTimestamp');">Appliance @Model.ApplianceUrl.FirstOrDefault()</h3>
                     <div>
                         <div>
-                            <span onclick="UpdateWorkflowTimestamp('#AccordionTimestamp');">Checkpoint Timestamp</span><span>&nbsp;</span><span id="AccordionTimestamp"> </span>
+                            <span>Checkpoint Timestamp</span><span>&nbsp;</span><span id="AccordionTimestamp"> </span>
                             <input type="button" id="ResetState" title="Reset State" value="Reset State" />
                         </div>
 
