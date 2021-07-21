@@ -21,11 +21,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { RouterModule, Routes } from '@angular/router';
 import { MatExpansionModule } from '@angular/material/expansion';
-import {DataViewModule } from 'primeng/dataview'
+import { DataViewModule } from 'primeng/dataview'
 import { MatAccordion } from '@angular/material/expansion';
-import {MatMenuModule, MatMenu} from '@angular/material/menu';
-import {MatToolbarModule, MatToolbar} from '@angular/material/toolbar';
-import {RetentionEntitiesService} from '@wizardcontroller/sac-appliance-lib'
+import { MatMenuModule, MatMenu } from '@angular/material/menu';
+import { MatToolbarModule, MatToolbar } from '@angular/material/toolbar';
+import { RetentionEntitiesService } from '@wizardcontroller/sac-appliance-lib'
 import { MetricRetentionSurfaceViewComponent } from './display-templates/MetricRetentionSurfaceView/MetricRetentionSurfaceView.component';
 import { DatesToTimeLineEventsPipePipe } from './pipes/dates-to-time-line-events-pipe.pipe';
 import { CommandPaletteComponent } from './display-templates/command-palette/command-palette.component';
@@ -33,6 +33,7 @@ import { WorkflowOperationCommandImpl } from './models/WorkflowOperationCommandI
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 @NgModule({
   imports: [
     CommonModule,
@@ -83,4 +84,4 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
     ApplianceApiService
   ]
 })
-export class SharedModule {}
+export class SharedModule { }

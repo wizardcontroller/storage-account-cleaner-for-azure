@@ -46,6 +46,7 @@ export class ApplianceApiService implements OnDestroy {
   workflowCheckPoint!: WorkflowCheckpointDTO | null;
   private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
+
   isAutoRefreshWorkflowCheckpoint = true;
   workflowCheckpointPollingStartDelay = 1500; //1.5 seconds
   workflowCheckpointPollingInterval = (1000 * 1) * ( 1 * 60); // seconds * minutes

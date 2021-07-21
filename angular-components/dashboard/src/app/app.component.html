@@ -30,8 +30,14 @@
         <ul>
           <li><a routerLink="workbench">workbench</a></li>
           <li><a routerLink="report">report</a></li>
-
+          <li style="margin-top:15px;background-color: white; display: flex;">
+            <mat-slide-toggle 
+              [color]="color" [checked]="isAutoRefreshWorkflowCheckpoint">
+              Auto Refresh
+            </mat-slide-toggle>
+          </li>
         </ul>
+
       </div>
     </mat-toolbar>
 

@@ -9,7 +9,9 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { SubscriptionsViewComponent } from './shared/display-templates/SubscriptionsView/SubscriptionsView.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ICanBeHiddenFromDisplay } from './shared/interfaces/ICanBeHiddenFromDisplay';
-
+import { map, tap } from 'rxjs/operators';
+import { ThemePalette } from '@angular/material/core'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -18,7 +20,17 @@ import { ICanBeHiddenFromDisplay } from './shared/interfaces/ICanBeHiddenFromDis
 
 @AutoUnsubscribe()
 export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
+  isAutoRefreshWorkflowCheckpoint = this.applianceSvc.isAutoRefreshWorkflowCheckpoint;
+  color: ThemePalette = 'accent';
 
+  isRefreshing!: boolean;
+
+  isRefreshingPipe = this.applianceSvc.isRefreshingChanges$
+    .pipe(
+      map(isRefreshing => {
+        isRefreshing = isRefreshing;
+      })
+  ).subscribe();
 
   operatorPageModel!: OperatorPageModel;
   // operator page model change notification support
