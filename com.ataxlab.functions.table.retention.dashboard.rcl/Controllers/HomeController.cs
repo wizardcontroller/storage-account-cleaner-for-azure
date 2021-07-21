@@ -69,11 +69,11 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
 
 
-            // OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
+            OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
 
-            // log.LogInformation("home controller has easy auth token = " + OperatorPageModel.EasyAuthAccessToken);
+            log.LogInformation("home controller has easy auth token = " + OperatorPageModel.EasyAuthAccessToken);
 
-            return RedirectToAction("Operator", "Home"); // View("Operator", OperatorPageModel);
+            return View(OperatorPageModel);
         }
 
         private async Task<OperatorPageModel> InitializeOperatorPageModel()

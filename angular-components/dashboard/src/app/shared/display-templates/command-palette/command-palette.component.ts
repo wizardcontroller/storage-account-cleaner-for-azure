@@ -11,12 +11,13 @@ import {
   WorkflowOperationCommand,
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { from, of, Operator, ReplaySubject } from 'rxjs';
+import { from, of, Operator, ReplaySubject, Subject } from 'rxjs';
 import {
   concatMap,
   map,
   merge,
   mergeMap,
+  tap,
   withLatestFrom,
 } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
@@ -35,6 +36,23 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   availableCommandSubject = new ReplaySubject<Array<AvailableCommand>>();
   availableCommandChanges$ = this.availableCommandSubject.asObservable();
   hasSelectedCommand = false;
+
+  isRefreshing: boolean = false;
+  isRefreshingSource = new ReplaySubject<boolean>();
+  isRefreshingChanges$ = this.isRefreshingSource.asObservable();
+  isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$
+    .pipe
+    (
+      tap(tapped => {
+        console.log("is refreshing = " + tapped);
+      }),
+      map(isRefreshing => {
+        this.isRefreshing = isRefreshing;
+        this.isRefreshingSource.next(isRefreshing);
+
+      })
+  ).subscribe(data => { }, error => { this.isRefreshing = false; this.isRefreshingSource.next(false); });
+
   workflowCheckpoint!: WorkflowCheckpointDTO;
 
   selectedCommand!: AvailableCommand;
@@ -55,6 +73,8 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
   submitCommand(command: AvailableCommand): void {
     console.log('submitting command: ' + command.menuLabel);
+    this.applianceAPiSvc.isRefreshingSource.next(true);
+    this.isRefreshing = true;
     const oid = this.currentPageModel.oid as string;
     const tenantId = this.currentPageModel.tenantid as string;
     const subscriptionId = this.currentPageModel
@@ -83,6 +103,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       )
       .pipe(
         map((result) => {
+;
           console.log('workflow operator results available');
           this.availableCommandSubject.next(
             result.availableCommands as Array<AvailableCommand>
@@ -96,16 +117,23 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
             subscriptionId,
             oid
           );
+          this.applianceAPiSvc.isRefreshingSource.next(false);
+          this.isRefreshing = false;
         })
       )
       .subscribe(
         (placeholder) => {
           console.log('');
+
         },
         (errors) => {
           console.log(JSON.stringify(errors));
+          console.log("error submitting");
+          this.applianceAPiSvc.isRefreshingSource.next(false);
+          this.isRefreshing = false;
         }
-      );
+    );
+
   }
 
   onSelect(command: AvailableCommand): void {

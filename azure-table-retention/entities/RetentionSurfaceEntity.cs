@@ -99,14 +99,6 @@ namespace com.ataxlab.functions.table.retention.entities
                 new DiagnosticsRetentionSurfaceItemEntity()
                 {
                     Id = Guid.NewGuid(),
-                    TableName = "WADDiagnosticInfrastructureLogsTable",
-                    ItemDescriptor = DiagnosticsRetentionSurfaceItemDescriptor.WADDiagnosticInfrastructureLogsTable,
-                    ItemDescription = "Diagnostic monitor and configuration changes.",
-                    DocumentationLink = new Uri("https://docs.microsoft.com/en-us/azure/cloud-services/diagnostics-extension-to-storage#tools-to-view-diagnostic-data")
-                },
-                new DiagnosticsRetentionSurfaceItemEntity()
-                {
-                    Id = Guid.NewGuid(),
                     TableName = "WADPerformanceCountersTable",
                     ItemDescriptor = DiagnosticsRetentionSurfaceItemDescriptor.WADPerformanceCountersTable,
                     ItemDescription = "Performance counters.",

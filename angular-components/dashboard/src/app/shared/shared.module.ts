@@ -32,6 +32,7 @@ import { CommandPaletteComponent } from './display-templates/command-palette/com
 import { WorkflowOperationCommandImpl } from './models/WorkflowOperationCommandImpl';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { FormsModule } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 @NgModule({
   imports: [
     CommonModule,
@@ -49,6 +50,7 @@ import { FormsModule } from '@angular/forms';
     TableModule,
     TimelineModule,
     MatExpansionModule,
+    MatProgressSpinnerModule,
     ToggleButtonModule,
     RouterModule
   ],

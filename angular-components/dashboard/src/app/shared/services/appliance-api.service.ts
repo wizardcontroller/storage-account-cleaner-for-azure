@@ -28,6 +28,9 @@ import { OperationStatus } from '../models/OperationStatus';
 export class ApplianceApiService implements OnDestroy {
   operatorPageModel!: OperatorPageModel | null;
 
+  isRefreshingSource = new ReplaySubject<boolean>();
+  isRefreshingChanges$ = this.isRefreshingSource.asObservable();
+
   statusFeedSource = new ReplaySubject<OperationStatus>();
   statusFeedChanges$ = this.statusFeedSource.asObservable();
 
@@ -62,7 +65,10 @@ export class ApplianceApiService implements OnDestroy {
       tap(t => {
 
       }),
-      map(([elapsedEvent, pageModel])=> {
+      map(([elapsedEvent, pageModel]) => {
+
+        this.isRefreshingSource.next(true);
+
         var tenantid = pageModel.tenantid as string;
 
         var subscriptionId = pageModel.subscriptionId as string;
@@ -70,6 +76,8 @@ export class ApplianceApiService implements OnDestroy {
         var oid = pageModel.oid as string;
 
         this.ensureWorkflowSessionContextSubject(tenantid, subscriptionId, oid);
+
+        this.isRefreshingSource.next(false);
 
       })
     ).subscribe();
@@ -99,8 +107,11 @@ export class ApplianceApiService implements OnDestroy {
     public entityService: RetentionEntitiesService
   ) {
     console.log('ApplianceApiService is starting');
+    this.isRefreshingSource.next(true);
 
     this.ensurePageModelSubject();
+    this.isRefreshingSource.next(false);
+
     console.log('appliance api service done startup');
   }
 
@@ -114,6 +125,8 @@ export class ApplianceApiService implements OnDestroy {
     this.entityService.getApplianceSessionContext(tenantId, oid)
       .pipe(
         map(data => {
+          this.isRefreshingSource.next(true);
+
           console.log("apliance session context updated");
           this.currentApplianceSessionContextSource.next(data);
           this.currentJobOutputSource.next(data.currentJobOutput);
@@ -125,6 +138,8 @@ export class ApplianceApiService implements OnDestroy {
 
           // 'select' a newly available storage account
           this.selectedStorageAccountSource.next(accounts[0].id as string);
+          this.isRefreshingSource.next(false);
+
         })
       ).subscribe();
 
@@ -165,11 +180,15 @@ export class ApplianceApiService implements OnDestroy {
       this.entityService.getWorkflowCheckpoint(tenantId, oid)
         .pipe(
           map(data => {
+            this.isRefreshingSource.next(true);
+
             console.log("workflow context updated");
 
 
             this.workflowCheckPoint = data;
             this.currentWorkflowCheckpointSource.next(data);
+            this.isRefreshingSource.next(false);
+
           })
       ).subscribe();
 
@@ -199,6 +218,8 @@ export class ApplianceApiService implements OnDestroy {
     this.apiConfigService.operatorPageModelChanges$
       .pipe(
         map(data => {
+          this.isRefreshingSource.next(true);
+
           console.log('appliance api service has operator page model');
           try {
             this.operatorPageModel = data
@@ -217,12 +238,16 @@ export class ApplianceApiService implements OnDestroy {
 
             console.log("getting appliance context");
             this.ensureApplianceSessionContextSubject(tenantid, subscriptionId, oid);
+
           } catch (ex) {
             console.log('error starting ApplianceApiSvc ' + (ex as Error).message);
+            this.isRefreshingSource.next(false);
 
           }
 
           this.operatorPageModel = data;
+          this.isRefreshingSource.next(false);
+
         })
       ).subscribe();
   }

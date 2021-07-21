@@ -212,7 +212,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
                 opts.DefaultScheme = OpenIdConnectDefaults.AuthenticationScheme;
                 opts.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
                 opts.DefaultSignInScheme = OpenIdConnectDefaults.AuthenticationScheme;
-
+                
 
             })
 
@@ -223,7 +223,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
                 //Require tokens be saved in the AuthenticationProperties on the request
                 //We need the token later to get another token
                 o.SaveToken = true;
-
+                o.Events.OnChallenge = OnChallenge;
                 o.Audience = Configuration.GetValue<string>("AzureAD:Audience");
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -265,11 +265,12 @@ namespace com.ataxlab.functions.table.retention.dashboard
                     .AddPolicyHandler(GetRetryPolicy());
 
 
-            //services.AddDistributedMemoryCache();
+            services.AddDistributedMemoryCache();
             services.AddSession(opts =>
             {
-                opts.IdleTimeout = TimeSpan.FromHours(24);
-                opts.Cookie.HttpOnly = true;
+                
+                opts.IdleTimeout = TimeSpan.FromMinutes(24);
+                opts.Cookie.HttpOnly = false;
                 opts.Cookie.IsEssential = true;
 
             });
@@ -292,6 +293,12 @@ namespace com.ataxlab.functions.table.retention.dashboard
 
             services.AddDbContext<ScaffoldingContext>(options =>
         options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=azuretableretentionapplaince"));
+        }
+
+        private Task OnChallenge(JwtBearerChallengeContext arg)
+        {
+            int i = 0;
+            return Task.CompletedTask;
         }
 
         private Task OnMessageReceived(Microsoft.AspNetCore.Authentication.JwtBearer.MessageReceivedContext arg)

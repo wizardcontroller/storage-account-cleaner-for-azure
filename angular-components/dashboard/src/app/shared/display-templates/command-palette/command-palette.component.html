@@ -1,5 +1,6 @@
 
 <ng-container *ngIf="availableCommandChanges$ | async as commands; else noCommands">
+
   <div>
     Workflow Timestamp: {{workflowCheckpoint.timeStamp}}
   </div>
@@ -13,6 +14,7 @@
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
         </div>
+
       </ng-template>
 
       <ng-template let-command pTemplate="listItem">
@@ -26,12 +28,23 @@
       <ng-template pTemplate="footer">
         <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
 
+
         <p-card *ngIf="hasSelectedCommand">
           <ng-template pTemplate="header">
-            <div align="right">
-              <p-button (onClick)="submitCommand(selectedCommand)">Submit Command</p-button>
-            </div>
+            <ng-container >
+              <mat-spinner style="margin:0 auto;" *ngIf="isRefreshingChanges$ | async"></mat-spinner>
+              <ng-container *ngIf="!isRefreshing">
+                <div align="right">
+                  <p-button (onClick)="submitCommand(selectedCommand);">Submit Command</p-button>
+                </div>
+              </ng-container>
+
+            </ng-container>
+
+
+
           </ng-template>
+
 
           <ng-template pTemplate="subheader">
             <div>

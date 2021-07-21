@@ -984,12 +984,33 @@ namespace com.ataxlab.functions.table.retention.services
             var ret = policy.DiagnosticsRetentionSurface;
             try
             {
+                try
+                {
+                    var sometables = await cloudTableClient.ListTablesSegmentedAsync("", token);
+                    var someCount = sometables.Count();
+                }
+                catch(Exception e) { }
+
                 foreach (var table in policy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities)
                 {
                     try
                     {
-                        var tableReference = cloudTableClient.GetTableReference(table.TableName);
-                        var tableExists = await tableReference.ExistsAsync();
+                        bool tableExists = false;
+                        try
+                        {
+                            // var tableReference = cloudTableClient.GetTableReference(table.TableName);
+                            // tableExists = await tableReference.ExistsAsync();
+                            /// var allTablesResult = await cloudTableClient.ListTablesSegmentedAsync(table.TableName.Substring(0, 6), token);
+
+                            var allTablesResult = await cloudTableClient.ListTablesSegmentedAsync(table.TableName.Substring(0,6), token);
+                            tableExists = allTablesResult.Count() > 0;
+                        }
+                        catch(Exception e) { }
+
+
+
+                        // var tableReference = cloudTableClient.GetTableReference(table.TableName);
+                        // var tableExists = await tableReference.ExistsAsync();
  //                       var allTablesResult = await cloudTableClient.ListTablesSegmentedAsync(table.TableName, token);
                         try
                         {
@@ -1069,8 +1090,10 @@ namespace com.ataxlab.functions.table.retention.services
             var wadMetricsTables = new List<string>();
             try
             {
-     
-                var allTablesResult = await cloudTableClient.ListTablesSegmentedAsync(policy.WADMetricsTableNamePrefix, token);
+
+                var allTablesResult = await cloudTableClient.ListTablesSegmentedAsync("WADMetrics", token);
+
+//                var allTablesResult = await cloudTableClient.ListTablesSegmentedAsync(policy.WADMetricsTableNamePrefix, token);
                 if (allTablesResult != null && allTablesResult.Count() > 0)
                 {
 
