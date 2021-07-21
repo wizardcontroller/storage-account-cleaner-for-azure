@@ -4,6 +4,7 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
+  HttpHeaders,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiConfigService } from '../core/ApiConfig.service';
@@ -23,9 +24,9 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
     'x-table-retention-current-storage-account';
   private interceptorIsReady: boolean = false;
   private selectedStorageAccount!: string;
-  
+
   constructor(private apiConfigSvc: ApiConfigService, private applianceSvc: ApplianceApiService) {
-    
+
 
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
       console.log("auth interceptor has easyauth token: " + data.easyAuthAccessToken);
@@ -40,32 +41,24 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const requestClone = request.clone({
-      withCredentials: false
-    });
 
+    var headers = new HttpHeaders();
     /**
      * this interceptor depends on the current pagemodel context
      */
     if (this.interceptorIsReady) {
 
-        console.log('http interceptor is adding xumo auth header' + this.pageModel?.easyAuthAccessToken?.toString());
-        if (!requestClone.headers.has(this.HEADER_X_ZUMO_AUTH)) {
-          requestClone.headers.append(
-            this.HEADER_X_ZUMO_AUTH,
-            this.pageModel?.easyAuthAccessToken?.toString() as string
-          );
-        
+      const requestClone = request.clone({
+        headers: request.
+          headers.set(this.HEADER_X_ZUMO_AUTH,
+            this.pageModel?.easyAuthAccessToken?.toString() as string).
+          set(this.HEADER_IMPERSONATION_TOKEN,
+            this.pageModel?.impersonationToken?.toString() as string)
+      });
 
-          console.log('http interceptor is adding impersonation token header' + this.pageModel?.impersonationToken?.toString());
-
-          requestClone.headers.append(
-            this.HEADER_IMPERSONATION_TOKEN,
-            this.pageModel?.impersonationToken?.toString() as string
-          );
-
-      }
+      return next.handle(requestClone);
     }
-    return next.handle(requestClone);
+
+    return next.handle(request.clone());
   }
 }

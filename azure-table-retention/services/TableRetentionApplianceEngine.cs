@@ -1329,58 +1329,58 @@ namespace com.ataxlab.functions.table.retention.services
                                 SubscriptionId = subscriptionId,
                                 TenantId = tenantid,
                                 UserOid = oid,
-                                WorklowOperationDisplayMessage = "Please Initialize The Appliance" },
+                                WorklowOperationDisplayMessage = "Initializes the Appliance" },
                   new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.CancelWorkflow, AvailableCommandId = Guid.NewGuid().ToString(),
                                 MenuLabel = "Cancel Workflow",
                                 SubscriptionId = subscriptionId,
                                 TenantId = tenantid,
                                 UserOid = oid,
-                                WorklowOperationDisplayMessage = "Delete's The Appliance Configuration" }
+                                WorklowOperationDisplayMessage = "Ends The Workflow" }
             };
 
             // return the default set;
             var provisionApplianceSet = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.BeginWorkflow, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Permissions",
+                               MenuLabel = "Begin Workflow",
                                 SubscriptionId = subscriptionId,
                                 TenantId = tenantid,
                                 UserOid = oid,
-                                WorklowOperationDisplayMessage = "The appliance needs to enumerate the storage accounts in your available subscriptions" } };
+                                WorklowOperationDisplayMessage = "This will start the workflow on the appliance" } };
 
             var beginEnvironmentDiscoverySet = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.GetV2StorageAccounts, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Accounts",
+                               MenuLabel = "Get Storage Accounts",
                                 SubscriptionId = subscriptionId,
                                 TenantId = tenantid,
                                 UserOid = oid,
-                                WorklowOperationDisplayMessage = "The appliance needs to enumerate the storage accounts in your available subscriptions" } };
+                                WorklowOperationDisplayMessage = "The appliance will use your authentication token to retrieve storage accounts in your subscription." } };
 
             var GetV2StorageAccountsSet = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.BuildEnvironmentRetentionPolicy, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Account Entities",
+                               MenuLabel = "Build Retention Policy",
                                 SubscriptionId = subscriptionId,
                                 TenantId = tenantid,
                                 UserOid = oid,
-                                WorklowOperationDisplayMessage = "The appliance needs to enumerate the storage accounts in your available subscriptions that have azure diagnostics entities" } };
+                                WorklowOperationDisplayMessage = "TThe appliance will prepare metadata based on your selected storage accounts" } };
 
 
             var BuildEnvironmentRetentionPolicySet = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.ApplyEnvironmentRetentionPolicy, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Account Entities Usage Over Time",
+                               MenuLabel = "Apply Retention Policy",
                                 SubscriptionId = subscriptionId,
                                 TenantId = tenantid,
                                 UserOid = oid,
-                                WorklowOperationDisplayMessage = "The appliance needs to calculate storage consumption by azure diagnostics over time" } };
+                                WorklowOperationDisplayMessage = "The appliance will calculate the retention surface" } };
 
 
             var ApplyEnvironmentRetentionPolicy = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.CommitRetentionPolicyConfiguration, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Account Entities Usage Over Time",
+                               MenuLabel = "Commit Retention Policy",
                                 SubscriptionId = subscriptionId,
                                 TenantId = tenantid,
                                 UserOid = oid,
-                                WorklowOperationDisplayMessage = "The appliance needs to prune storage consumption by azure diagnostics over time" } };
+                                WorklowOperationDisplayMessage = "The appliance will apply the retention policy to the retention surface" } };
 
 
 
@@ -1475,8 +1475,8 @@ namespace com.ataxlab.functions.table.retention.services
             // return the default set;
             var provisionApplianceSet = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.BeginWorkflow, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Permissions",
-                                WorklowOperationDisplayMessage = "The appliance needs to enumerate the storage accounts in your available subscriptions" } };
+                               MenuLabel = "Initialize Workflow",
+                                WorklowOperationDisplayMessage = "This command will reset the workflow." } };
 
             var beginEnvironmentDiscoverySet = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.GetV2StorageAccounts, AvailableCommandId = Guid.NewGuid().ToString(),
@@ -1485,20 +1485,20 @@ namespace com.ataxlab.functions.table.retention.services
 
             var GetV2StorageAccountsSet = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.BuildEnvironmentRetentionPolicy, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Account Entities",
-                                WorklowOperationDisplayMessage = "The appliance needs to enumerate the storage accounts in your available subscriptions that have azure diagnostics entities" } };
+                               MenuLabel = "Build Policy",
+                                WorklowOperationDisplayMessage = "The appliance needs to examine your selected storage accounts to calculate the applicable policy" } };
 
 
             var BuildEnvironmentRetentionPolicySet = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.ApplyEnvironmentRetentionPolicy, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Account Entities Usage Over Time",
-                                WorklowOperationDisplayMessage = "The appliance needs to calculate storage consumption by azure diagnostics over time" } };
+                               MenuLabel = "Apply Policy",
+                                WorklowOperationDisplayMessage = "The appliance will verify it can apply the calculated policy" } };
 
 
             var ApplyEnvironmentRetentionPolicy = new List<AvailableCommandEntity>() { new AvailableCommandEntity()
                             { WorkflowOperation = WorkflowOperation.CommitRetentionPolicyConfiguration, AvailableCommandId = Guid.NewGuid().ToString(),
-                               MenuLabel = "Inventory Storage Account Entities Usage Over Time",
-                                WorklowOperationDisplayMessage = "The appliance needs to prune storage consumption by azure diagnostics over time" } };
+                               MenuLabel = "Commit Policy Enforcement",
+                                WorklowOperationDisplayMessage = "The appliance will delete data as necessary" } };
 
 
 
