@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using System.Linq;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using com.ataxlab.azure.table.retention.state.entities;
+using Microsoft.Azure.WebJobs;
 
 namespace com.ataxlab.functions.table.retention.entities
 {
@@ -19,6 +22,12 @@ namespace com.ataxlab.functions.table.retention.entities
 
     public class JobOutputLogEntity : JobOutputLogEntityBase, IJobOutputLogEntity
     {
+
+        [FunctionName(nameof(JobOutputLogEntity))]
+        public static Task Run([EntityTrigger] IDurableEntityContext ctx)
+        {
+            return ctx.DispatchAsync<JobOutputLogEntity>();
+        }
 
         public JobOutputLogEntity() : base()
         {

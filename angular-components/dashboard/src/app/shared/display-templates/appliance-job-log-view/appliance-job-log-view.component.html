@@ -1,1 +1,19 @@
-<p>appliance-job-log-view works!</p>
+<ng-container *ngIf="jobOutputLogChanges$ | async as logEntities">
+  <p-dataView [value]="logEntities"
+              [paginator]="true"
+              [rows]="applianceLogRowCount"
+              [lazy]="true"
+              (onLazyLoad)="ensureLogEntries($event)">
+              [totalRecords]="totalLogEntries"
+
+              <ng-template pTemplate="header">
+                <div>appliance log</div>
+              </ng-template>
+    <ng-template let-logentry pTemplate="listItem">
+      <div>
+        {{logentry.summary}}
+      </div>
+    </ng-template>
+
+  </p-dataView>
+</ng-container>

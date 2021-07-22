@@ -1,4 +1,5 @@
 ﻿using com.ataxlab.azure.table.retention.state.entities;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -27,8 +28,10 @@ namespace com.ataxlab.functions.table.retention.entities
 
     [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
 
+
     public class ApplianceJobOutputEntity
     {
+
         public ApplianceJobOutputEntity()
         {
             // one per storage account
