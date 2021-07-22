@@ -17,6 +17,9 @@ import {
   map,
   merge,
   mergeMap,
+  publishReplay,
+  share,
+  shareReplay,
   tap,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -45,6 +48,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$
     .pipe
     (
+
       tap(tapped => {
         console.log("is refreshing = " + tapped);
       }),
@@ -59,9 +63,13 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           toast.sticky = false;
           toast.life = 1000 * 8;
           toast.severity = "info";
+          toast.key = "commandpalette";
           this.showToast(toast);
+
         }
-      })
+  
+      }),
+      shareReplay()
   ).subscribe(data => { }, error => { this.isRefreshing = false; this.isRefreshingSource.next(false); });
 
   workflowCheckpoint!: WorkflowCheckpointDTO;

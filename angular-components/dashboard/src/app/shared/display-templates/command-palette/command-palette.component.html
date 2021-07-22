@@ -1,4 +1,4 @@
-<p-toast position="top-right"></p-toast>
+<p-toast key="commandpalette" position="top-right"></p-toast>
 <ng-container *ngIf="availableCommandChanges$ | async as commands; else noCommands">
 
   <div>
@@ -32,7 +32,7 @@
 
         <p-card *ngIf="hasSelectedCommand">
           <ng-template pTemplate="header">
-            <ng-container >
+            <ng-container>
               <mat-spinner style="margin:0 auto;" *ngIf="isRefreshingChanges$ | async"></mat-spinner>
               <ng-container *ngIf="!isRefreshing">
                 <div align="right">

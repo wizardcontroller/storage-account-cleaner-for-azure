@@ -14,7 +14,7 @@ import {
 
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { BehaviorSubject, combineLatest, config, from, of, ReplaySubject, Subject, timer } from 'rxjs';
-import { concatMap, flatMap, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { concatMap, flatMap, map, mergeMap, share, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
 import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
@@ -68,7 +68,7 @@ export class ApplianceApiService implements OnDestroy {
       }),
       map(([elapsedEvent, pageModel]) => {
 
-        this.isRefreshingSource.next(true);
+        // this.isRefreshingSource.next(true);
 
         var tenantid = pageModel.tenantid as string;
 
@@ -78,9 +78,10 @@ export class ApplianceApiService implements OnDestroy {
 
         this.ensureWorkflowSessionContextSubject(tenantid, subscriptionId, oid);
 
-        this.isRefreshingSource.next(false);
+        // this.isRefreshingSource.next(false);
 
-      })
+      }),
+
     ).subscribe();
 
   public selectedStorageAccountSource = new BehaviorSubject<string>("");
@@ -94,7 +95,8 @@ export class ApplianceApiService implements OnDestroy {
     .pipe(
       map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
         filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
-      ));
+      )
+    );
 
 
   private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();
@@ -108,10 +110,10 @@ export class ApplianceApiService implements OnDestroy {
     public entityService: RetentionEntitiesService
   ) {
     console.log('ApplianceApiService is starting');
-    this.isRefreshingSource.next(true);
+    // this.isRefreshingSource.next(true);
 
     this.ensurePageModelSubject();
-    this.isRefreshingSource.next(false);
+    // this.isRefreshingSource.next(false);
 
     console.log('appliance api service done startup');
   }
