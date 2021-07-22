@@ -52,7 +52,7 @@ export class ApiConfigService {
           this.currentPageModelSource.next(data);
           const toast = new ToastMessage();
           toast.detail = "loaded operator page model";
-          toast.detail = "page model refreshed";
+          toast.summary = "page model refreshed";
           toast.severity = "info";
           this.showToast(toast);
         })

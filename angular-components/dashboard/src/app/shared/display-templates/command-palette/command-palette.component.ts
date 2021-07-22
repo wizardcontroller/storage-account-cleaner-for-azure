@@ -24,6 +24,8 @@ import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
 import { WorkflowOperationCommandImpl } from '../../models/WorkflowOperationCommandImpl';
 import { DatePipe } from '@angular/common';
+import { MessageService } from 'primeng/api';
+import { ToastMessage } from '../../../models/ToastMessage';
 @Component({
   selector: 'app-command-palette',
   templateUrl: './command-palette.component.html',
@@ -66,13 +68,24 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiConfigSvc: ApiConfigService,
-    private applianceAPiSvc: ApplianceApiService
+    private applianceAPiSvc: ApplianceApiService,
+    private messageService: MessageService
   ) {
     this.selectedCommand = { menuLabel: 'select a command' };
   }
 
+  showToast(message: ToastMessage): void {
+    this.messageService.add(message);
+  }
+
   submitCommand(command: AvailableCommand): void {
     console.log('submitting command: ' + command.menuLabel);
+    const toast = new ToastMessage();
+    toast.detail = command.worklowOperationDisplayMessage as string;
+    toast.summary = command.menuLabel as string;
+    toast.severity = "info";
+    this.showToast(toast);
+
     this.applianceAPiSvc.isRefreshingSource.next(true);
     this.isRefreshing = true;
     const oid = this.currentPageModel.oid as string;

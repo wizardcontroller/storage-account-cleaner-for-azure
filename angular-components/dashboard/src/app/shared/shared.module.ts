@@ -34,6 +34,8 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 @NgModule({
   imports: [
     CommonModule,
@@ -53,7 +55,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle'
     MatExpansionModule,
     MatProgressSpinnerModule,
     ToggleButtonModule,
-    RouterModule
+    RouterModule,
+    ToastModule
   ],
   exports: [
     SharedComponent,
@@ -81,7 +84,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle'
     LoggingConfigurationService,
     HomeGrownLoggingService,
     ApplianceContextService,
-    ApplianceApiService
+    ApplianceApiService,
+    MessageService
   ]
 })
 export class SharedModule { }

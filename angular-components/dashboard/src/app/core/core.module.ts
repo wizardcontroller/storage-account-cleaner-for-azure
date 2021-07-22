@@ -9,7 +9,8 @@ import { MessageService } from 'primeng/api';
   imports: [
     CommonModule,
     ToastModule,
-    RippleModule
+    RippleModule,
+    ToastModule
   ],
   exports : [CoreComponent],
   declarations: [CoreComponent],
