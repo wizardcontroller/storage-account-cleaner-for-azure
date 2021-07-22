@@ -52,6 +52,15 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         this.isRefreshing = isRefreshing;
         this.isRefreshingSource.next(isRefreshing);
 
+        if (isRefreshing) {
+          const toast = new ToastMessage();
+          toast.detail = "checking the appliance state";
+          toast.summary = "Updating";
+          toast.sticky = false;
+          toast.life = 1000 * 8;
+          toast.severity = "info";
+          this.showToast(toast);
+        }
       })
   ).subscribe(data => { }, error => { this.isRefreshing = false; this.isRefreshingSource.next(false); });
 
