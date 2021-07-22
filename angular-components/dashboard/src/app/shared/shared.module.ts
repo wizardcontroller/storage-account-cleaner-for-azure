@@ -36,6 +36,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ApplianceJobLogViewComponent } from './display-templates/appliance-job-log-view/appliance-job-log-view.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -67,7 +68,8 @@ import { ToastModule } from 'primeng/toast';
     DiagnosticsRetentionSurfaceViewComponent,
     MetricRetentionSurfaceViewComponent,
     DatesToTimeLineEventsPipePipe,
-    CommandPaletteComponent
+    CommandPaletteComponent,
+    ApplianceJobLogViewComponent
   ],
   declarations: [
     SharedComponent,
@@ -78,7 +80,8 @@ import { ToastModule } from 'primeng/toast';
     DiagnosticsRetentionSurfaceViewComponent,
     MetricRetentionSurfaceViewComponent,
     DatesToTimeLineEventsPipePipe,
-    CommandPaletteComponent
+    CommandPaletteComponent,
+    ApplianceJobLogViewComponent
   ],
   providers: [
     LoggingConfigurationService,

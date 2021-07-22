@@ -54,6 +54,7 @@ export class ApplianceApiService implements OnDestroy {
   private storageAccountsSource = new ReplaySubject<StorageAccountDTO[] | undefined | null>();
   storageAccountChanges$ = this.storageAccountsSource.asObservable();
 
+
   // support action stream of storage accounts selections
   private stopPolling = new Subject();
   workflowCheckpointTimer$ = timer(this.workflowCheckpointPollingStartDelay,
@@ -259,7 +260,7 @@ export class ApplianceApiService implements OnDestroy {
     var baseUrl = data?.applianceUrl?.toString().replace("/api/", "");
     this.baseUri = baseUrl;
     console.log('appliance api service is configuring baseUri' + this.baseUri);
-   
+
     this.entityService.configuration.basePath =
       baseUrl;
     console.log(
