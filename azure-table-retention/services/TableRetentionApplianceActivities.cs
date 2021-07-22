@@ -623,7 +623,7 @@ namespace com.ataxlab.functions.table.retention.services
             TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> dateRangeQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { }.
             Where(dateRangeFilter)
             .Select(new List<string>() { "PartitionKey", "RowKey" })
-            .Take(5);
+            .Take(500);
 
             var table = this.GetStorageTableReference(cloudTableClient, tableName);
             try
@@ -652,7 +652,7 @@ namespace com.ataxlab.functions.table.retention.services
             var dateRangeQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { }.
             Where(dateRangeFilter)
             .Select(new List<string>() { "PartitionKey", "RowKey" })
-            .Take(5);
+            .Take(500);
 
 
             var table = this.GetStorageTableReference(cloudTableClient, tableName);
@@ -661,7 +661,7 @@ namespace com.ataxlab.functions.table.retention.services
                 var res = await table
                             .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
                                 (dateRangeQuery, null);
-                var highWatermark = res.Results[0].Timestamp.UtcDateTime;
+                var highWatermark = res.Results[res.Count() - 1].Timestamp.UtcDateTime;
                 ret = highWatermark;
             }
             catch (Exception e) { }
