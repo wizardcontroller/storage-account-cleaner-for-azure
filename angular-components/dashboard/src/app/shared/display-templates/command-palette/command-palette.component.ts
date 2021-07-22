@@ -13,6 +13,7 @@ import {
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { from, of, Operator, ReplaySubject, Subject } from 'rxjs';
 import {
+    catchError,
   concatMap,
   map,
   merge,
@@ -42,13 +43,17 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   availableCommandChanges$ = this.availableCommandSubject.asObservable();
   hasSelectedCommand = false;
 
+  
   isRefreshing: boolean = false;
   isRefreshingSource = new ReplaySubject<boolean>();
   isRefreshingChanges$ = this.isRefreshingSource.asObservable();
+
+  isShowSpinnerSource = new ReplaySubject<boolean>();
+  isShowSpinnerChanges$ = this.isShowSpinnerSource.asObservable();
+
   isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$
     .pipe
     (
-
       tap(tapped => {
         console.log("is refreshing = " + tapped);
       }),
@@ -57,20 +62,28 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         this.isRefreshingSource.next(isRefreshing);
 
         if (isRefreshing) {
+          console.log("showing refresh toast");
           const toast = new ToastMessage();
           toast.detail = "checking the appliance state";
           toast.summary = "Updating";
           toast.sticky = false;
           toast.life = 1000 * 8;
           toast.severity = "info";
-          toast.key = "commandpalette";
           this.showToast(toast);
 
         }
-  
-      }),
-      shareReplay()
-  ).subscribe(data => { }, error => { this.isRefreshing = false; this.isRefreshingSource.next(false); });
+
+      })
+  ).subscribe(data => { }, error => {
+    const toast = new ToastMessage();
+    toast.detail = "checking the appliance state";
+    toast.summary = "Error";
+    toast.sticky = false;
+    toast.life = 1000 * 8;
+    toast.severity = "error";
+    this.showToast(toast);
+    this.isRefreshing = false; this.isRefreshingSource.next(false);
+  });
 
   workflowCheckpoint!: WorkflowCheckpointDTO;
 
@@ -100,10 +113,12 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     const toast = new ToastMessage();
     toast.detail = command.worklowOperationDisplayMessage as string;
     toast.summary = command.menuLabel as string;
+
     toast.severity = "info";
     this.showToast(toast);
 
-    this.applianceAPiSvc.isRefreshingSource.next(true);
+    // this.applianceAPiSvc.isRefreshingSource.next(true);
+    this.isShowSpinnerSource.next(true);
     this.isRefreshing = true;
     const oid = this.currentPageModel.oid as string;
     const tenantId = this.currentPageModel.tenantid as string;
@@ -133,7 +148,6 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       )
       .pipe(
         map((result) => {
-;
           console.log('workflow operator results available');
           this.availableCommandSubject.next(
             result.availableCommands as Array<AvailableCommand>
@@ -147,8 +161,23 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
             subscriptionId,
             oid
           );
-          this.applianceAPiSvc.isRefreshingSource.next(false);
+
+          // this.applianceAPiSvc.isRefreshingSource.next(false);
+          this.isShowSpinnerSource.next(false);
           this.isRefreshing = false;
+        }),
+        catchError(err => {
+          const toast = new ToastMessage();
+          toast.detail = "failed to submit command to the appliance";
+          toast.summary = "update failed";
+          toast.sticky = true;
+          toast.life = 1000 * 8;
+          toast.severity = "error";
+          // this.applianceAPiSvc.isRefreshingSource.next(false);
+          this.isShowSpinnerSource.next(false);
+          this.isRefreshing = false;
+          this.showToast(toast);
+          return of([]);
         })
       )
       .subscribe(
@@ -159,8 +188,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         (errors) => {
           console.log(JSON.stringify(errors));
           console.log("error submitting");
-          this.applianceAPiSvc.isRefreshingSource.next(false);
-          this.isRefreshing = false;
+
         }
     );
 
