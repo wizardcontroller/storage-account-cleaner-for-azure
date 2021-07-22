@@ -24,9 +24,13 @@ const routes: Routes = [
    }
 
   ]},
-  { path: 'report', component: JobOutputViewComponent },
-  { path: '', redirectTo: 'workbench', pathMatch: 'full'},
-  { path: '**', component: ApplianceContextViewComponent }
+  { path: 'report', component: JobOutputViewComponent }
+  /*
+
+  ,
+  { path: '', redirectTo: 'workbench', pathMatch: 'full' }
+  ,
+  { path: '**', component: ApplianceContextViewComponent }*/
 ];
 
 

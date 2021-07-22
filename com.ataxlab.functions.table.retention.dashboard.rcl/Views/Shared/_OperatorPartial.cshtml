@@ -128,8 +128,20 @@
 </script>
 }
 
+                <script>
+                    $(document).ready(function () {
+                        loadAngularComponentRoute();
+                    });
+
+                    function loadAngularComponentRoute() {
+                        if (!window.location.href.includes("workbench/storageaccounts"))
+                        window.location.href = window.location.href + "/workbench/storageaccounts/";
+                    }
+
+                </script>
+
                 <div id="accordion">
-                    <h3>Workbench</h3>
+                    <h3 onclick="loadAngularComponentRoute();">Workbench</h3>
                     <div>
                         <!--loaded by angular components -->
 

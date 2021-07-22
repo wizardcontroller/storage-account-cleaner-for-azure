@@ -5,6 +5,8 @@ import { ConfigService, OperatorPageModel } from '@wizardcontroller/sac-applianc
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { MessageService } from 'primeng/api';
+import { ToastMessage } from '../models/ToastMessage';
 @Injectable({
   providedIn: 'root'
 })
@@ -17,18 +19,22 @@ export class ApiConfigService {
   configService!: ConfigService;
 
 
-  constructor(cfgSvc: ConfigService, private router: Router) {
+  constructor(cfgSvc: ConfigService, private router: Router, private messageService: MessageService) {
     console.log("ApiConfigService service starting");
     this.configService = cfgSvc;
     this.configService.configuration.basePath = window.location.origin;
     this.initService();
   }
 
+  showToast(message: ToastMessage): void{
+    this.messageService.add(message);
+  }
+
   /*
     currently angular injectables do not participate in all lifecycle hooks
   */
   initService(): void {
-  
+
   }
 
   /*
@@ -44,23 +50,13 @@ export class ApiConfigService {
       .pipe(
         map(data => {
           this.currentPageModelSource.next(data);
+          const toast = new ToastMessage();
+          toast.detail = "loaded operator page model";
+          toast.detail = "page model refreshed";
+          toast.severity = "info";
+          this.showToast(toast);
         })
       ).subscribe();
-
-
-      /*
-      .subscribe(
-      (data: OperatorPageModel) => {
-        return this.cacheOperatorPageModelSignalSubscribers(data);
-      },
-      (err: any) => console.log(err),
-      () => {
-        console.log(
-          'done getting operator page model: applianceUrl is ' +
-          this.operatorPageModel?.applianceUrl
-        );
-      }
-    ); */
   }
 
   /**
