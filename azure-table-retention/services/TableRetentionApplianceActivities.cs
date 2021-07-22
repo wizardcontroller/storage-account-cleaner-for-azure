@@ -795,7 +795,7 @@ namespace com.ataxlab.functions.table.retention.services
             return ret;
         }
 
-        private static CloudTableClient GetCloudTableClientForAuthToken(string authToken, StorageAccountEntity storageAccount)
+        private CloudTableClient GetCloudTableClientForAuthToken(string authToken, StorageAccountEntity storageAccount)
         {
             var tokenCredentials = new TokenCredential(authToken);
             var cred = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(authToken);
@@ -976,20 +976,21 @@ namespace com.ataxlab.functions.table.retention.services
 
             // TODO - validate use the token here and remove need to use storage account key
             // var storageCreds = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(storageAccount.Name, storageAccount.Key);
-            var storageCreds = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(authToken);
+            // var storageCreds = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(authToken);
 
 
-            var cloudTableClient = new CloudTableClient(storageAccount.PrimaryTableStorageEndpoint, storageCreds);
+            var cloudTableClient = this.GetCloudTableClientForAuthToken(authToken, storageAccount); // new CloudTableClient(storageAccount.PrimaryTableStorageEndpoint, storageCreds);
 
             var ret = policy.DiagnosticsRetentionSurface;
             try
             {
-                try
-                {
-                    var sometables = await cloudTableClient.ListTablesSegmentedAsync("", token);
-                    var someCount = sometables.Count();
-                }
-                catch(Exception e) { }
+                //try
+                //{
+                //    var sometables = await cloudTableClient.ListTablesSegmentedAsync("", token);
+                //    var someCount = sometables.Count();
+
+                //}
+                //catch(Exception e) { }
 
                 foreach (var table in policy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities)
                 {
@@ -1017,35 +1018,38 @@ namespace com.ataxlab.functions.table.retention.services
                             if (tableExists)
                             // if (allTablesResult != null && allTablesResult.Count() > 0)
                             {
+                                var lowWaterMark = await this.GetLeastRecentTimestampForStorageTable(authToken, table.TableName, storageAccount);
+                                var highWaterMark = await this.GetMostRecentTimestampForStorageTable(authToken, table.TableName, storageAccount);
+
                                 ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).ItemExists = true;
 
-                                // calculate low water mark and high watermark
-                                //
-                                TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThanOrEqual, "0" + DateTime.UtcNow.AddDays(-365).Ticks))
-                                .Select(new List<string>() { "PartitionKey", "RowKey" })
-                                .Take(5);
+                                //// calculate low water mark and high watermark
+                                ////
+                                //TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> query = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
+                                //.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThanOrEqual, "0" + DateTime.UtcNow.AddDays(-365).Ticks))
+                                //.Select(new List<string>() { "PartitionKey", "RowKey" })
+                                //.Take(5);
 
-                                var cloudTable = this.GetStorageTableReference(cloudTableClient, table.TableName);
-                                var res = await cloudTable
-                                            .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
-                                                (query, null);
-                                var highWatermark = res.Results[0].Timestamp.UtcDateTime;
-                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampHighWatermark = highWatermark;
-                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).MostRecentEntityTimestamp = highWatermark;
+                                //var cloudTable = this.GetStorageTableReference(cloudTableClient, table.TableName);
+                                //var res = await cloudTable
+                                //            .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
+                                //                (query, null);
+                                //var highWatermark = res.Results[0].Timestamp.UtcDateTime;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampHighWatermark = highWaterMark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).MostRecentEntityTimestamp = highWaterMark;
 
-                                var lowWatermarkQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                               .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "0" + DateTime.UtcNow.AddYears(-100).Ticks))
-                               .Select(new List<string>() { "PartitionKey", "RowKey" })
-                               .Take(1);
+                               // var lowWatermarkQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
+                               //.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "0" + DateTime.UtcNow.AddYears(-100).Ticks))
+                               //.Select(new List<string>() { "PartitionKey", "RowKey" })
+                               //.Take(1);
 
-                                res = await cloudTable
-                                    .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
-                                        (lowWatermarkQuery, null);
+                               // res = await cloudTable
+                               //     .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
+                               //         (lowWatermarkQuery, null);
 
-                                var lowWatermark = res.Results[0].Timestamp.UtcDateTime;
-                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampLowWatermark = lowWatermark;
-                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).LeastRecentEntityTimestamp = lowWatermark;
+                               // var lowWatermark = res.Results[0].Timestamp.UtcDateTime;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampLowWatermark = lowWaterMark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).LeastRecentEntityTimestamp = lowWaterMark;
 
                             }
                             else

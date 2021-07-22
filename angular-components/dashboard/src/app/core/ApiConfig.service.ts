@@ -54,6 +54,7 @@ export class ApiConfigService {
           toast.detail = "loaded operator page model";
           toast.summary = "page model refreshed";
           toast.severity = "info";
+          toast.sticky = false;
           this.showToast(toast);
         })
       ).subscribe();

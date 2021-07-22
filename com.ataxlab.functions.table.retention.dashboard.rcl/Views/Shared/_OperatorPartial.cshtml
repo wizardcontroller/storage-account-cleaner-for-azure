@@ -135,173 +135,177 @@
 
                     function loadAngularComponentRoute() {
                         if (!window.location.href.includes("workbench/storageaccounts"))
-                        window.location.href = window.location.href + "/workbench/storageaccounts/";
+                            window.location.href = window.location.href + "/workbench/storageaccounts/";
                     }
 
                 </script>
 
-                <div id="accordion">
-                    <h3 onclick="loadAngularComponentRoute();">Workbench</h3>
-                    <div>
-                        <!--loaded by angular components -->
+                                <div id="angular">
+                                    <script src="/angular/runtime.js" defer></script>
+                                    <script src="/angular/polyfills.js" defer></script>
+                                    <script src="/angular/main.js" defer></script>
 
-                        <script>
-                            //$(document).ready(function () {
-                            //    $("#angular").load("angular/app-root.html");
-                            //    console.log("set up angular comopnents");
+                                    <script src="/angular/scripts.js" defer></script>
 
-                            //});
+                                    @*<script src="/angular/color.png" defer></script>
+                                        <script src="/angular/hue.png" defer></script>
 
-                            $(document).ready(function  () {
-                                // getAngularAppRoot();
-
-                            });
-
-                            function getAngularAppRoot() {
-
-                                $.ajax({
-                                    url: '/angular/app-root.html?format=html',
-                                    data: {
-                                        format: 'html'
-                                    },
-                                    error: function () {
-                                        /// $('#info').html('<p>An error has occurred</p>');
-                                    },
-                                    dataType: 'html',
-                                    success: function (data) {
-                                        console.log("deploying angular components");
-                                        $("#angular").append(data);
-                                        //var loader = $("#angularLoader").html();
-                                        //$("#angular").append(loader);
-                                        //var elem = document.querySelector('#angularLoader');
-                                        //elem.parentNode.removeChild(elem);
-                                    },
-                                    type: 'GET'
-                                });
-                            }
-                            
-                        </script>
-                        <div id="angular">
-                            <script src="/angular/runtime.js" defer></script>
-                            <script src="/angular/polyfills.js" defer></script>
-                            <script src="/angular/main.js" defer></script>
-
-                            <script src="/angular/scripts.js" defer></script>
-
-                            @*<script src="/angular/color.png" defer></script>
-        <script src="/angular/hue.png" defer></script>
-
-        <script src="/angular/primeicons.eot" defer></script>
-        <script src="/angular/primeicons.svg" defer></script>
-        <script src="/angular/primeicons.ttf" defer></script>
-        <script src="/angular/primeicons.woff" defer></script>*@
+                                        <script src="/angular/primeicons.eot" defer></script>
+                                        <script src="/angular/primeicons.svg" defer></script>
+                                        <script src="/angular/primeicons.ttf" defer></script>
+                                        <script src="/angular/primeicons.woff" defer></script>*@
 
 
-                            <app-root></app-root>
+                                    <app-root></app-root>
 
-                        </div>
-                    </div>
-                    <h3 id="SubscriptionTitle">Subscriptions</h3>
-                    <div>
+                                </div>
 
-                        @await Html.PartialAsync("_SubscriptionsPartial", Model.Subscriptions)
-                    </div>
-                    <h3  onclick="UpdateWorkflowTimestamp('#AccordionTimestamp');">Appliance @Model.ApplianceUrl.FirstOrDefault()</h3>
-                    <div>
-                        <div>
-                            <span>Checkpoint Timestamp</span><span>&nbsp;</span><span id="AccordionTimestamp"> </span>
-                            <input type="button" id="ResetState" title="Reset State" value="Reset State" />
-                        </div>
+                                                <div id="accordion">
+                                                    <h3 onclick="loadAngularComponentRoute();">Workbench</h3>
+                                                    <div>
+                                                        <!--loaded by angular components -->
 
-                    </div>
-                    @if (Model.AvailableCommands == null)
-                    {
-    <h3>Available Commands</h3>
-                        <div>
+                                                        <script>
+                                                            //$(document).ready(function () {
+                                                            //    $("#angular").load("angular/app-root.html");
+                                                            //    console.log("set up angular comopnents");
 
-                            <span>no data available</span>
-                        </div> }
-                    else
-                    {
-    <h3>Available Commands</h3>
-                        <div>
+                                                            //});
 
-                            @await Html.PartialAsync("_AvailableCommands", Model?.AvailableCommands)
-                        </div>}
-                    <h3>Appliance Context</h3>
-                    <div style="background-color: whitesmoke">
-                        <div>
+                                                            $(document).ready(function () {
+                                                                // getAngularAppRoot();
 
-                            <script>
+                                                            });
 
-                                var viewportWidth = window.innerWidth - 20;
-                                var viewportHeight = window.innerHeight - 20;
-                                if (viewportWidth > 1000) viewportWidth = 1000;
-                                if (viewportHeight > 500) viewportHeight = 500;
+                                                            function getAngularAppRoot() {
 
-                                $(document).ready(function () {
-                                    var dialogElement = "#RetentionPolicyEditorDialog";
-                                    var dialogButtonElement = "#RetentionPolicyEditorButton";
-                                    // initialize retention policy editor dialogs
-                                    $(dialogElement).dialog({
-                                        height: viewportHeight,
-                                        width: viewportWidth,
-                                        autoOpen: false,
-                                        modal: true,
-                                        title: "Retention Policy Editor",
-                                        position: {
+                                                                $.ajax({
+                                                                    url: '/angular/app-root.html?format=html',
+                                                                    data: {
+                                                                        format: 'html'
+                                                                    },
+                                                                    error: function () {
+                                                                        /// $('#info').html('<p>An error has occurred</p>');
+                                                                    },
+                                                                    dataType: 'html',
+                                                                    success: function (data) {
+                                                                        console.log("deploying angular components");
+                                                                        $("#angular").append(data);
+                                                                        //var loader = $("#angularLoader").html();
+                                                                        //$("#angular").append(loader);
+                                                                        //var elem = document.querySelector('#angularLoader');
+                                                                        //elem.parentNode.removeChild(elem);
+                                                                    },
+                                                                    type: 'GET'
+                                                                });
+                                                            }
 
-                                            my: "center",
-                                            at: "center",
-                                            of: window,
-                                            collision: "none",
-                                            create: function (event, ui) {
-                                                $(event.target).parent().css('position', 'fixed');
-                                            }
-                                        }
+                                                        </script>
+                                                        <div>
 
-                                    });
+                                                        </div>
+                                                    </div>
+                                                    <h3 id="SubscriptionTitle">Subscriptions</h3>
+                                                    <div>
 
-                                    // set up the dialog editor button
-                                    $(dialogButtonElement).click(function () {
-                                        $(dialogElement).dialog("open");
-                                    });
-                                });
+                                                        @await Html.PartialAsync("_SubscriptionsPartial", Model.Subscriptions)
+                                                    </div>
+                                                    <h3 onclick="UpdateWorkflowTimestamp('#AccordionTimestamp');">Appliance @Model.ApplianceUrl.FirstOrDefault()</h3>
+                                                    <div>
+                                                        <div>
+                                                            <span>Checkpoint Timestamp</span><span>&nbsp;</span><span id="AccordionTimestamp"> </span>
+                                                            <input type="button" id="ResetState" title="Reset State" value="Reset State" />
+                                                        </div>
 
-                            </script>
+                                                    </div>
+                                                    @if (Model.AvailableCommands == null)
+                                                    {
+                                    <h3>Available Commands</h3>
+                                                        <div>
 
-                            @if (Model.ApplianceSessionContext != null &&
-                          Model.ApplianceSessionContext.CurrentJobOutput != null &&
-                            Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs != null &&
-                          Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs.Count() > 0)
-                            {
-            <div>
-                <hr />
-                <a href="#" id="RetentionPolicyEditorButton">SHOW RETENTION POLICY EDITORS</a>
-                <hr />
-            </div>
+                                                            <span>no data available</span>
+                                                        </div> }
+                                                    else
+                                                    {
+                                    <h3>Available Commands</h3>
+                                                        <div>
 
-                                <div class="container border-warning" id="RetentionPolicyDialogContainer">
+                                                            @await Html.PartialAsync("_AvailableCommands", Model?.AvailableCommands)
+                                                        </div>}
+                                                    <h3>Appliance Context</h3>
+                                                    <div style="background-color: whitesmoke">
+                                                        <div>
 
-                                    <div id="RetentionPolicyEditorDialog" style="height:350px; overflow: scroll">
-                                        @Html.EditorFor(m => Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs)
-                                    </div>
+                                                            <script>
+
+                                                                var viewportWidth = window.innerWidth - 20;
+                                                                var viewportHeight = window.innerHeight - 20;
+                                                                if (viewportWidth > 1000) viewportWidth = 1000;
+                                                                if (viewportHeight > 500) viewportHeight = 500;
+
+                                                                $(document).ready(function () {
+                                                                    var dialogElement = "#RetentionPolicyEditorDialog";
+                                                                    var dialogButtonElement = "#RetentionPolicyEditorButton";
+                                                                    // initialize retention policy editor dialogs
+                                                                    $(dialogElement).dialog({
+                                                                        height: viewportHeight,
+                                                                        width: viewportWidth,
+                                                                        autoOpen: false,
+                                                                        modal: true,
+                                                                        title: "Retention Policy Editor",
+                                                                        position: {
+
+                                                                            my: "center",
+                                                                            at: "center",
+                                                                            of: window,
+                                                                            collision: "none",
+                                                                            create: function (event, ui) {
+                                                                                $(event.target).parent().css('position', 'fixed');
+                                                                            }
+                                                                        }
+
+                                                                    });
+
+                                                                    // set up the dialog editor button
+                                                                    $(dialogButtonElement).click(function () {
+                                                                        $(dialogElement).dialog("open");
+                                                                    });
+                                                                });
+
+                                                            </script>
+
+                                                            @if (Model.ApplianceSessionContext != null &&
+                                                        Model.ApplianceSessionContext.CurrentJobOutput != null &&
+                                                          Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs != null &&
+                                                        Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs.Count() > 0)
+                                                            {
+                                            <div>
+                                                <hr />
+                                                <a href="#" id="RetentionPolicyEditorButton">SHOW RETENTION POLICY EDITORS</a>
+                                                <hr />
+                                            </div>
+
+                                                                <div class="container border-warning" id="RetentionPolicyDialogContainer">
+
+                                                                    <div id="RetentionPolicyEditorDialog" style="height:350px; overflow: scroll">
+                                                                        @Html.EditorFor(m => Model.ApplianceSessionContext.CurrentJobOutput.RetentionPolicyJobs)
+                                                                    </div>
 
 
-                                </div>}
+                                                                </div>}
 
-                            <div class="border-dark">
-                                @await Html.PartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext)
-                            </div>
+                                                            <div class="border-dark">
+                                                                @await Html.PartialAsync("_ApplianceSessionContext", Model?.ApplianceSessionContext)
+                                                            </div>
 
-                        </div>
-                    </div>
+                                                        </div>
+                                                    </div>
 
-                    <h3>Orchestration Status</h3>
-                    <div>
-                        @await Html.PartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations)
-                    </div>
-                </div> }
-            else
-            {
-<span>no data is available. check your permissions and sign in again.</span>}
+                                                    <h3>Orchestration Status</h3>
+                                                    <div>
+                                                        @await Html.PartialAsync("_DurableOrchestrationStatePartial", Model?.Orchestrations)
+                                                    </div>
+                                                </div> }
+                                            else
+                                            {
+                                <span>no data is available. check your permissions and sign in again.</span>}
