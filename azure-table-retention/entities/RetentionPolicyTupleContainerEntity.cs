@@ -22,11 +22,13 @@ namespace com.ataxlab.functions.table.retention.entities
         public RetentionPolicyTupleContainerEntity()
         {
             Id = Guid.NewGuid();
+
         }
 
         [ScaffoldColumn(false)]
         [Key]
         public Guid Id { get; set; }
+
 
         [ScaffoldColumn(false)]
         [NotMapped]

@@ -127,5 +127,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         {
             return await Task.FromResult(new WorkflowCheckpointDTO());
         }
+
+        [Route("api/[controller]/[Action]/{tenantId}/{oid}/{offset}/{pageSize}/{pageCount}")]
+        [HttpGet(Name = "GetApplianceLogEntries")]
+        public async Task<JobOutputLogEntity> GetApplianceLogEntries(string tenantId, string oid, int offset, int pageSize, int pageCount)
+        {
+            return await Task.FromResult(new JobOutputLogEntity());
+        }
     }
 }

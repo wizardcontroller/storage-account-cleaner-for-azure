@@ -1,5 +1,7 @@
-﻿using com.ataxlab.azure.table.retention.models.models.azuremanagement;
+﻿using com.ataxlab.azure.table.retention.models.control;
+using com.ataxlab.azure.table.retention.models.models.azuremanagement;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -55,6 +57,41 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
 
         [JsonProperty("CurrentJobOutput")]
         public ApplianceJobOutput CurrentJobOutput { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+    public class JobOutputLogEntry
+    {
+        public DateTime timeStamp { get; set; }
+
+        public string summary { get; set; }
+
+        public string detail { get; set; }
+
+        public string severity { get; set; }
+
+        public string source { get; set; }
+
+        public AvailableCommand ExecutedCommand { get; set; }
+    }
+
+
+    [JsonObject(MemberSerialization.OptOut, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+
+    public class JobOutputLogEntity
+    {
+        public JobOutputLogEntity()
+        {
+            this.logEntries = new List<JobOutputLogEntry>();
+        }
+
+        public string userOid { get; set; }
+        public string userTenantId { get; set; }
+
+        public int rowCount { get; set; }
+
+        public List<JobOutputLogEntry> logEntries { get; set; }
+
     }
 
     public class ApplianceJobOutput
@@ -143,9 +180,11 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
 
         }
 
+
         [ScaffoldColumn(false)]
         [Key]
         public Guid Id { get; set; }
+
 
         /// <summary>
         /// tuples interfere with asp.net core mvc view scaffolding

@@ -439,6 +439,27 @@ namespace com.ataxlab.functions.table.retention.c2
             return response;
         }
 
+        [FunctionName("GetApplianceLogEntries")]
+        public async Task<HttpResponseMessage> GetApplianceLogEntries(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "RetentionEntities/" + "GetApplianceLogEntries"
+                                                                             + ControlChannelConstants.GetApplianceLogEntriesRouteTemplate)] HttpRequestMessage req,
+        [DurableClient] IDurableOrchestrationClient starter,
+        Microsoft.Azure.WebJobs.ExecutionContext context,
+        [DurableClient] IDurableClient durableClient,
+        [DurableClient] IDurableEntityClient durableEntityClient,
+        ClaimsPrincipal claimsPrincipal,
+        string tenantId,
+        string oid,
+        int offset, int pageSize, int pageCount,
+        ILogger log)
+                {
+
+            log.LogInformation("GetApplianceLogEntries HttpRequest {0}", req.RequestUri.AbsoluteUri);
+            var commandJson = await req.Content.ReadAsStringAsync();
+
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
     }
 }
 

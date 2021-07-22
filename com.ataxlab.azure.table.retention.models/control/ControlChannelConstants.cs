@@ -69,6 +69,8 @@ namespace com.ataxlab.azure.table.retention.models.control
         public const string ApplianceContextRouteFormatTemplate = "/{0}/{1}";
         public const string ApplianceContextRouteTemplate = "/{tenantId}/{oid}";
 
+        public const string GetApplianceLogEntriesRouteTemplate = "/{tenantId}/{oid}/{offset}/{pageSize}/{pageCount}";
+
         public const string QueryOrchestrationStatusEndpoint = "QueryWorkflowStatus";
         public const string QueryOrchestrationStatusRouteFormatTemplate = "/{0}/{1}/{2}";
         public const string QueryOrchestrationStatusRouteTemplate = "/{tenantId}/{oid}/{fromDays}";
