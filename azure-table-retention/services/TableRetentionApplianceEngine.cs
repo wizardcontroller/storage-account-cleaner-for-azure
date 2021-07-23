@@ -85,6 +85,7 @@ namespace com.ataxlab.functions.table.retention.services
         Task<HttpResponseMessage> GetResposeForPostedApplianceSessionContext(string impersonationToken, string tenantId, string oid, List<Claim> claims, IDurableClient durableClient, string commandJson);
         Task<HttpResponseMessage> GetResponseForWorkflowOperator(IDurableOrchestrationClient starter, IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string commandJson, string impersonationToken);
         Task<EntityStateResponse<WorkflowCheckpoint>> GetStateForUpdateWorkflowCheckpoints(IDurableEntityClient durableEntityClient, string tenantid, string subscriptionid, string userOid, WorkflowOperation operation);
+        Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient);
         #endregion durable entity operations
     }
 
