@@ -43,7 +43,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   availableCommandChanges$ = this.availableCommandSubject.asObservable();
   hasSelectedCommand = false;
 
-  
+
   isRefreshing: boolean = false;
   isRefreshingSource = new ReplaySubject<boolean>();
   isRefreshingChanges$ = this.isRefreshingSource.asObservable();
@@ -55,7 +55,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     .pipe
     (
       tap(tapped => {
-        console.log("is refreshing = " + tapped);
+        console.log("command palette is refreshing = " + tapped);
       }),
       map(isRefreshing => {
         this.isRefreshing = isRefreshing;
@@ -65,7 +65,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           console.log("showing refresh toast");
           const toast = new ToastMessage();
           toast.detail = "checking the appliance state";
-          toast.summary = "Updating";
+          toast.summary = "command palette Updating";
           toast.sticky = false;
           toast.life = 1000 * 8;
           toast.severity = "info";
@@ -76,7 +76,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       })
   ).subscribe(data => { }, error => {
     const toast = new ToastMessage();
-    toast.detail = "checking the appliance state";
+    toast.detail = JSON.stringify(error);
     toast.summary = "Error";
     toast.sticky = false;
     toast.life = 1000 * 8;
@@ -139,7 +139,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     workflowOperationCommand.timeStamp = this.workflowCheckpoint.timeStamp;
 
     this.applianceAPiSvc.entityService
-      .workflowOperator( 
+      .workflowOperator(
         tenantId,
         oid,
         subscriptionId,

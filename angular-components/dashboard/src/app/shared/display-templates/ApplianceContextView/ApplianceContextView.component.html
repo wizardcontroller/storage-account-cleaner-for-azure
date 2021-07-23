@@ -10,7 +10,10 @@
 
   <p-card>
     <ng-template pTemplate="header">
-      <app-appliance-job-log-view></app-appliance-job-log-view>
+      <div>appliance log</div>
+      <div style="height: 200px; overflow-y: scroll;">
+        <app-appliance-job-log-view></app-appliance-job-log-view>
+      </div>
     </ng-template>
     <ng-template #noPageModel>
       no operator data

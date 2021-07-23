@@ -126,14 +126,14 @@ namespace com.ataxlab.functions.table.retention
                 appcontext = applianceContext;
                 if (applianceContext != null)
                 {
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                    this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                     {
                         summary = "workflow started",
                         detail = "workflow has retrieved appliance session context.",
                         severity = "info",
                         timeStamp = context.CurrentUtcDateTime
                     },
-                    tenantId, oid, entityClient);
+                tenantId, oid, entityClient).GetAwaiter().GetResult();
 
                     tenantId = applianceContext.TenantId;
                     subscriptionId = applianceContext.SelectedSubscriptionId;
@@ -147,17 +147,17 @@ namespace com.ataxlab.functions.table.retention
                 // tolerate no exceptions
                 // await durableClient.TerminateAsync(context.InstanceId, "instance threw exception on validation check");
                 // var purgeResult = await durableClient.PurgeInstanceHistoryAsync(context.InstanceId);
-                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                 {
                     summary = "workflow started with exception",
                     detail = $"{e.Message}",
                     severity = "error",
                     timeStamp = context.CurrentUtcDateTime
                 },
-                tenantId, oid, entityClient);
+                tenantId, oid, entityClient).GetAwaiter().GetResult();
 
-                var abort = await this.TableRetentionApplianceEngine.GetStateForUpdateWorkflowCheckpoints(entityClient, tenantId, subscriptionId, oid, WorkflowOperation.CancelWorkflow);
-                log.LogWarning("excecution history purged");
+                // var abort = await this.TableRetentionApplianceEngine.GetStateForUpdateWorkflowCheckpoints(entityClient, tenantId, subscriptionId, oid, WorkflowOperation.CancelWorkflow);
+                // log.LogWarning("excecution history purged");
                 context.SetCustomStatus("exception starting");
                 return;
             }
@@ -185,7 +185,7 @@ namespace com.ataxlab.functions.table.retention
             if (currentActivityConfig.WorkflowOperation != null && (currentActivityConfig.WorkflowOperation.CommandCode == WorkflowOperation.GetV2StorageAccounts)) // && !context.IsReplaying)
             {
                 log.LogInformation("user sent device get v2 storage accounts");
-                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                 {
                     summary = "workflow running",
                     detail = "user sent device get v2 storage accounts",
@@ -193,7 +193,7 @@ namespace com.ataxlab.functions.table.retention
                     timeStamp = context.CurrentUtcDateTime,
                     ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
                 },
-                    tenantId, oid, entityClient);
+                tenantId, oid, entityClient).GetAwaiter().GetResult();
 
                 try
                 {
@@ -213,7 +213,7 @@ namespace com.ataxlab.functions.table.retention
 
                     // we want to continue as new with the latest
                     appcontext = storageAccountsResult;
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                    this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                     {
                         summary = "workflow running",
                         detail = "getting v2 storage accounts",
@@ -221,7 +221,7 @@ namespace com.ataxlab.functions.table.retention
                         timeStamp = context.CurrentUtcDateTime,
                         ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
                     },
-                    tenantId, oid, entityClient);
+                    tenantId, oid, entityClient).GetAwaiter().GetResult();
 
 
                     context.SetCustomStatus("GetAllV2StorageAccountsEndpoint");
@@ -253,7 +253,7 @@ namespace com.ataxlab.functions.table.retention
                     var policyTuplesResults = await context.CallActivityAsync<ApplianceSessionContextEntity>(ControlChannelConstants.BuildRetentionPolicyTuplesEndpoint, currentActivityConfig);
                     appcontext = policyTuplesResults;
 
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                    this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                     {
                         summary = "workflow running",
                         detail = "building retention policy",
@@ -261,7 +261,7 @@ namespace com.ataxlab.functions.table.retention
                         timeStamp = context.CurrentUtcDateTime,
                         ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
                     },
-                            tenantId, oid, entityClient);
+                tenantId, oid, entityClient).GetAwaiter().GetResult();
                     context.SetCustomStatus("BuildEnvironmentRetentionPolicy");
                     log.LogInformation("called building environment activity");
                 }
@@ -275,7 +275,7 @@ namespace com.ataxlab.functions.table.retention
                 try
                 {
                     log.LogInformation("user sent device apply retention policy");
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                    this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                     {
                         summary = "workflow running",
                         detail = "applying retention policy to calculate retention urface",
@@ -283,7 +283,7 @@ namespace com.ataxlab.functions.table.retention
                         timeStamp = context.CurrentUtcDateTime,
                         ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
                     },
-                    tenantId, oid, entityClient);
+                tenantId, oid, entityClient).GetAwaiter().GetResult();
                     var currentCtx = await context.CallActivityAsync<ApplianceSessionContextEntity>(ControlChannelConstants.ApplyTableEntityRetentionPolicyTuplesEndpoint, currentActivityConfig);
                     appcontext = currentCtx;
 
@@ -309,7 +309,7 @@ namespace com.ataxlab.functions.table.retention
                         != WorkflowOperation.CommitRetentionPolicyConfiguration)
             {
 
-                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                 {
                     summary = "workflow running",
                     detail = "workflow is waiting for new commands",
@@ -317,12 +317,13 @@ namespace com.ataxlab.functions.table.retention
                     timeStamp = context.CurrentUtcDateTime,
                     ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
                 },
-                    tenantId, oid, entityClient);
+                  tenantId, oid, entityClient).GetAwaiter().GetResult();
+
                 context.ContinueAsNew(appcontext);
             }
             else
             {
-                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                 {
                     summary = "workflow ended",
                     detail = "workflow has ended",
@@ -330,7 +331,7 @@ namespace com.ataxlab.functions.table.retention
                     timeStamp = context.CurrentUtcDateTime,
                     ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
                 },
-                    tenantId, oid, entityClient);
+                  tenantId, oid, entityClient).GetAwaiter().GetResult();
                 context.SetCustomStatus("finished");
 
             }
