@@ -326,7 +326,7 @@ namespace com.ataxlab.functions.table.retention.services
                         log.LogWarning("exception handling nonexistent workflow condition {0}", e.Message);
                     }
 
-                    var canGetStorage = CanGetStorageAccountsForUser(impersonationToken, applianceContext.EntityState);
+                    var canGetStorage = await CanGetStorageAccountsForUser(impersonationToken, applianceContext.EntityState);
                     // validate the syntax - the prefetch logic
                     isValidTransition = await this.ValidateTransition(durableClient, command, tenantId,
                     applianceContext.EntityState.SelectedSubscriptionId, oid);
