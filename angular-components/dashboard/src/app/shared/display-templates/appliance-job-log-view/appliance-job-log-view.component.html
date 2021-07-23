@@ -8,6 +8,7 @@
               [lazy]="true"
               [loading]="isRefreshing"
               [showCurrentPageReport]="true"
+              [style]="{ }"
               (onLazyLoad)="ensureLogEntries($event)">
               [totalRecords]="totalLogEntries"
 
@@ -20,7 +21,7 @@
         <div style="display: flex; align-items: left; width: 15%; ">{{logentry.source}}</div>
 
         <div style="display: flex; align-items: left; width: 20%; ">{{logentry.summary}}</div>
-        <div style="display: flex; align-items: left;  width: 30%; ">{{logentry.detail}}</div>
+        <div style="display: flex; align-items: left;  width: 30%; overflow-y: auto; ">{{logentry.detail}}</div>
 
       </div>
 

@@ -8,7 +8,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import {
   SubscriptionDTO,
   SubscriptionPoliciesDTO
-} from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
+} from '@wizardcontroller/sac-appliance-lib';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ActivatedRoute } from '@angular/router';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';

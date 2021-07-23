@@ -1,0 +1,4 @@
+::ng-deep .ui-datatable-scrollable-view .ui-datatable-scrollable-body {
+  height: fit-content;
+  margin-top: 10px;
+}

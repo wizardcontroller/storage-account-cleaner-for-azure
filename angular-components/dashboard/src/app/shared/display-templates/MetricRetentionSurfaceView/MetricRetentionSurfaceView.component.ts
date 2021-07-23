@@ -16,7 +16,7 @@ import {
 import { combineLatest, ReplaySubject } from 'rxjs';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { ApplianceJobOutput, MetricsRetentionSurfaceItemEntity, TableStorageRetentionPolicy } from '@wizardcontroller/sac-appliance-lib/sac-appliance-api';
+import { ApplianceJobOutput, MetricsRetentionSurfaceItemEntity, TableStorageRetentionPolicy } from '@wizardcontroller/sac-appliance-lib';
 import { concatMap, map, withLatestFrom } from 'rxjs/operators';
 
 @Component({

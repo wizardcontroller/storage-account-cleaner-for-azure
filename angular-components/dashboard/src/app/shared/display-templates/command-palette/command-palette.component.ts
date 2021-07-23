@@ -11,18 +11,20 @@ import {
   WorkflowOperationCommand,
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { from, of, Operator, ReplaySubject, Subject } from 'rxjs';
+import { from, interval, Observable, of, Operator, ReplaySubject, Subject } from 'rxjs';
 import {
-    catchError,
+  catchError,
   concatMap,
+  debounce,
   map,
   merge,
   mergeMap,
   publishReplay,
+  refCount,
   share,
   shareReplay,
   tap,
-  withLatestFrom,
+  withLatestFrom, debounceTime
 } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -30,6 +32,7 @@ import { WorkflowOperationCommandImpl } from '../../models/WorkflowOperationComm
 import { DatePipe } from '@angular/common';
 import { MessageService } from 'primeng/api';
 import { ToastMessage } from '../../../models/ToastMessage';
+
 @Component({
   selector: 'app-command-palette',
   templateUrl: './command-palette.component.html',
@@ -65,7 +68,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           console.log("showing refresh toast");
           const toast = new ToastMessage();
           toast.detail = "checking the appliance state";
-          toast.summary = "command palette Updating";
+          toast.summary = "command palette Updating ";
           toast.sticky = false;
           toast.life = 1000 * 8;
           toast.severity = "info";
@@ -74,16 +77,19 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         }
 
       })
-  ).subscribe(data => { }, error => {
-    const toast = new ToastMessage();
-    toast.detail = JSON.stringify(error);
-    toast.summary = "Error";
-    toast.sticky = false;
-    toast.life = 1000 * 8;
-    toast.severity = "error";
-    this.showToast(toast);
-    this.isRefreshing = false; this.isRefreshingSource.next(false);
-  });
+
+    )
+
+    .subscribe(data => { }, error => {
+      const toast = new ToastMessage();
+      toast.detail = JSON.stringify(error);
+      toast.summary = "Error";
+      toast.sticky = false;
+      toast.life = 1000 * 8;
+      toast.severity = "error";
+      this.showToast(toast);
+      this.isRefreshing = false; this.isRefreshingSource.next(false);
+    });
 
   workflowCheckpoint!: WorkflowCheckpointDTO;
 
@@ -173,7 +179,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           toast.sticky = true;
           toast.life = 1000 * 8;
           toast.severity = "error";
-          // this.applianceAPiSvc.isRefreshingSource.next(false);
+          this.applianceAPiSvc.isRefreshingSource.next(false);
           this.isShowSpinnerSource.next(false);
           this.isRefreshing = false;
           this.showToast(toast);
@@ -190,7 +196,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           console.log("error submitting");
 
         }
-    );
+      );
 
   }
 
@@ -208,21 +214,32 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('command palette onInit');
 
-    this.apiConfigSvc.operatorPageModelChanges$.subscribe((pageModel) => {
-      console.log('command palette view has page model');
-      // metrics retention component has operator page model
-      this.pageModelSubject.next(pageModel);
-      this.currentPageModel = pageModel;
-    });
+    //this.apiConfigSvc.operatorPageModelChanges$.subscribe((pageModel) => {
+    //  console.log('command palette view has page model');
+    //  // metrics retention component has operator page model
+    //  this.pageModelSubject.next(pageModel);
+    //  this.currentPageModel = pageModel;
+    //});
 
-    this.applianceAPiSvc.workflowCheckpointChanges$.subscribe(
-      (workflowCheckpoint) => {
+    this.apiConfigSvc.operatorPageModelChanges$.
+      pipe(
+        map(changes => {
+          this.pageModelSubject.next(changes);
+          this.currentPageModel = changes;
+        })
+      ).subscribe();
 
-        this.workflowCheckpoint = workflowCheckpoint;
-        this.availableCommandSubject.next(
-          workflowCheckpoint.availableCommands as Array<AvailableCommand>
-        );
-      }
-    );
+    this.applianceAPiSvc.workflowCheckpointChanges$.
+      pipe(
+        map(workflowCheckpoint => {
+
+          this.workflowCheckpoint = workflowCheckpoint;
+          this.availableCommandSubject.next(
+            workflowCheckpoint.availableCommands as Array<AvailableCommand>
+          );
+        }))
+      .subscribe();
+
+
   }
 }

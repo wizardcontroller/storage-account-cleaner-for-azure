@@ -13,8 +13,8 @@ import {
 } from '@wizardcontroller/sac-appliance-lib';
 
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { BehaviorSubject, combineLatest, config, from, of, ReplaySubject, Subject, timer } from 'rxjs';
-import { concatMap, flatMap, map, mergeMap, share, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, config, from, interval, of, ReplaySubject, Subject, timer } from 'rxjs';
+import { concatMap, debounce, debounceTime, flatMap, map, mergeMap, publishReplay, refCount, share, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
 import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
@@ -28,7 +28,7 @@ import { OperationStatus } from '../models/OperationStatus';
 export class ApplianceApiService implements OnDestroy {
   operatorPageModel!: OperatorPageModel | null;
 
-  isRefreshingSource = new ReplaySubject<boolean>();
+  isRefreshingSource = new Subject<boolean>();
   isRefreshingChanges$ = this.isRefreshingSource.asObservable();
 
   statusFeedSource = new ReplaySubject<OperationStatus>();
@@ -44,7 +44,7 @@ export class ApplianceApiService implements OnDestroy {
   currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
 
   workflowCheckPoint!: WorkflowCheckpointDTO | null;
-  private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
+  private currentWorkflowCheckpointSource = new Subject<WorkflowCheckpointDTO>();
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
 
   isAutoRefreshWorkflowCheckpoint = true;
@@ -64,6 +64,7 @@ export class ApplianceApiService implements OnDestroy {
     this.apiConfigService.operatorPageModelChanges$
   )
     .pipe(
+
       tap(t => {
 
       }),
@@ -83,7 +84,7 @@ export class ApplianceApiService implements OnDestroy {
 
       }),
 
-    ).subscribe();
+    );
 
   public selectedStorageAccountSource = new BehaviorSubject<string>("");
   selectedStorageAccountAction$ = this.selectedStorageAccountSource.asObservable();
@@ -94,6 +95,7 @@ export class ApplianceApiService implements OnDestroy {
     ]
   )
     .pipe(
+
       map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
         filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
       )
@@ -128,6 +130,7 @@ export class ApplianceApiService implements OnDestroy {
 
     this.entityService.getApplianceSessionContext(tenantId, oid)
       .pipe(
+
         map(data => {
           this.isRefreshingSource.next(true);
 
@@ -183,6 +186,7 @@ export class ApplianceApiService implements OnDestroy {
 
       this.entityService.getWorkflowCheckpoint(tenantId, oid)
         .pipe(
+
           map(data => {
             this.isRefreshingSource.next(true);
 
@@ -221,6 +225,7 @@ export class ApplianceApiService implements OnDestroy {
 
     this.apiConfigService.operatorPageModelChanges$
       .pipe(
+
         map(data => {
           this.isRefreshingSource.next(true);
 
