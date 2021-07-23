@@ -1982,6 +1982,7 @@ namespace com.ataxlab.functions.table.retention.services
 
         public async Task Log(JobOutputLogEntry logEntry, string tenantId,string oid, IDurableEntityClient entityClient )
         {
+            try { 
             StackTrace stackTrace = new StackTrace();
             logEntry.source = stackTrace.GetFrame(1).GetMethod().Name;
 
@@ -1990,6 +1991,12 @@ namespace com.ataxlab.functions.table.retention.services
             {
                 proxy.appendLog(logEntry);
             });
+            }
+            catch(Exception e)
+            {
+                log.LogError($"exception writing appliance job log: {e.Message}")
+            }
+
         }
 
         private async Task<JsonMediaTypeFormatter> GetJsonFormatter()
