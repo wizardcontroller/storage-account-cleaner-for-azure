@@ -46,8 +46,8 @@ export class ApiConfigService {
     console.log("apiconfigsvc is getting operator page model");
     this.configService.configuration.basePath = window.location.origin;
     console.log('calling config service');
-    this.configService.getOperatorPageModel()
-      .pipe(
+    return this.configService.getOperatorPageModel()
+      .pipe( 
         map(data => {
           this.currentPageModelSource.next(data);
           const toast = new ToastMessage();
@@ -57,7 +57,7 @@ export class ApiConfigService {
           toast.sticky = false;
           this.showToast(toast);
         })
-      ).subscribe();
+      );
   }
 
   /**

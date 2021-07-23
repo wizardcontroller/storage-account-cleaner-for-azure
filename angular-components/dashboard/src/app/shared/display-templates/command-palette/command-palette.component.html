@@ -1,4 +1,7 @@
-<p-toast *ngIf="isRefreshingPipe"  position="bottom-right"></p-toast>
+
+<ng-container>
+  <p-toast position="bottom-right"></p-toast>
+</ng-container>
 <ng-container *ngIf="availableCommandChanges$ | async as commands; else noCommands">
 
   <div>

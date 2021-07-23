@@ -48,10 +48,10 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
 
   isRefreshing: boolean = false;
-  isRefreshingSource = new ReplaySubject<boolean>();
+  isRefreshingSource = new Subject<boolean>();
   isRefreshingChanges$ = this.isRefreshingSource.asObservable();
 
-  isShowSpinnerSource = new ReplaySubject<boolean>();
+  isShowSpinnerSource = new Subject<boolean>();
   isShowSpinnerChanges$ = this.isShowSpinnerSource.asObservable();
 
   isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$
@@ -75,6 +75,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.showToast(toast);
 
         }
+
 
       })
 
