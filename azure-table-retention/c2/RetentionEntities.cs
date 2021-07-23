@@ -18,15 +18,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using com.ataxlab.functions.table.retention.entities;
-using com.ataxlab.azure.table.retention.models.models.auth;
-using com.ataxlab.azure.table.retention.models.models.pagemodel;
-using com.ataxlab.azure.table.retention.models.models;
+
 using System.Linq;
 using System.Net.Http.Formatting;
 using Newtonsoft.Json.Serialization;
 using System.Security.Cryptography;
 using System.ComponentModel.DataAnnotations;
 using com.ataxlab.azure.table.retention.models.extensions;
+using com.ataxlab.azure.table.retention.state.entities;
+
+using System.Text;
+
 namespace com.ataxlab.functions.table.retention.c2
 {
 
@@ -247,10 +249,10 @@ namespace com.ataxlab.functions.table.retention.c2
         }
 
         [FunctionName("SetApplianceSessionContext")]
-        public async Task<ApplianceSessionContext> SetApplianceSessionContext([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                                                    [FromBody] ApplianceSessionContext applianceContext)
+        public async Task<ApplianceSessionContextEntity> SetApplianceSessionContext([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
+                                                    [FromBody] ApplianceSessionContextEntity applianceContext)
         {
-            return await Task.FromResult(new ApplianceSessionContext());
+            return await Task.FromResult(new ApplianceSessionContextEntity());
         }
 
         //[FunctionName("GetRetentionPolicyForStorageAccount")]
@@ -454,10 +456,24 @@ namespace com.ataxlab.functions.table.retention.c2
         ILogger log)
                 {
 
-            log.LogInformation("GetApplianceLogEntries HttpRequest {0}", req.RequestUri.AbsoluteUri);
-            var commandJson = await req.Content.ReadAsStringAsync();
+            var ret = new HttpResponseMessage(HttpStatusCode.OK);
+            bool isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
+            var impersonate = await this.TableRetentionApplianceEngine.GetImpersonationTokenFromHeaders(req.Headers);
 
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
+            var currentState = await durableClient.ReadEntityStateAsync<JobOutputLogEntity>(entityId);
+            if(currentState.EntityExists)
+            {
+                ret.Content = new StringContent(JsonConvert.SerializeObject(currentState.EntityState), Encoding.UTF8,
+                                    "application/json");   
+            }
+            else
+            {
+                ret.Content = new StringContent(JsonConvert.SerializeObject(new JobOutputLogEntity()), Encoding.UTF8,
+                                    "application/json");
+            }
+
+            return ret;
         }
 
     }

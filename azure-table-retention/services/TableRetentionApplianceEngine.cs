@@ -30,6 +30,7 @@ using com.ataxlab.functions.table.retention.entities;
 using WorkflowOperation = com.ataxlab.functions.table.retention.entities.WorkflowOperation;
 using Newtonsoft.Json.Serialization;
 using System.Net.Http.Formatting;
+using System.Diagnostics;
 
 namespace com.ataxlab.functions.table.retention.services
 {
@@ -1976,6 +1977,18 @@ namespace com.ataxlab.functions.table.retention.services
         public Task<TableStorageRetentionPolicyEntity> SetGetRetentionPolicy(string tenantId, string subscriptionId, string storageAccountId, string oid, TableStorageRetentionPolicyEntity policy, IDurableClient durableClient)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task Log(JobOutputLogEntry logEntry, string tenantId,string oid, IDurableEntityClient entityClient )
+        {
+            StackTrace stackTrace = new StackTrace();
+            logEntry.source = stackTrace.GetFrame(1).GetMethod().Name;
+
+            var entityId = await this.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
+            await entityClient.SignalEntityAsync<IJobOutputLogEntity>(entityId, proxy =>
+            {
+                proxy.appendLog(logEntry);
+            });
         }
 
         private async Task<JsonMediaTypeFormatter> GetJsonFormatter()
