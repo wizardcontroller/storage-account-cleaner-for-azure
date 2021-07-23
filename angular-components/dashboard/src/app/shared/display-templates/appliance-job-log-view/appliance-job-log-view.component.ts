@@ -16,8 +16,10 @@ import {LazyLoadEvent } from 'primeng/api'
 })
 export class ApplianceJobLogViewComponent implements OnInit {
 
+
+  isRefreshing = false;
   applianceLogChangesTimerPollingInterval: number = 1000 * 30;
-  applianceLogPageSize = 20;
+  applianceLogPageSize = 3;
   applianceLogPageCount = 1;
   applianceLogRowCount : number = this.applianceLogPageSize * this.applianceLogPageCount;
   applianceLogOffset = 0;
@@ -38,6 +40,7 @@ export class ApplianceJobLogViewComponent implements OnInit {
       tap(() => console.log("autorefresh filtered applianceLog changes firing")),
       map(([pageModel, elapsedEvent ]) => {
 
+        this.isRefreshing = true;
       var tenantid = pageModel.tenantid as string;
 
       var subscriptionId = pageModel.subscriptionId as string;
@@ -52,7 +55,10 @@ export class ApplianceJobLogViewComponent implements OnInit {
           map(logEntryEntity => {
             this.totalLogEntries = logEntryEntity.rowCount as number;
             this.jobOutputLogSubject.next(logEntryEntity.logEntries);
-              return logEntryEntity;
+
+
+        this.isRefreshing = false;
+            return logEntryEntity;
         })
       )
       .subscribe() ;
@@ -69,6 +75,7 @@ export class ApplianceJobLogViewComponent implements OnInit {
 
   ensureLogEntries(event: LazyLoadEvent) {
     this.applianceLogOffset = event.first as number;
+
 
     this.jobOutputLogChanges$.subscribe(data => {
 

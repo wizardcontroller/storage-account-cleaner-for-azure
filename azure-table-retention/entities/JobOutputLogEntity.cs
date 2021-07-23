@@ -14,7 +14,7 @@ namespace com.ataxlab.functions.table.retention.entities
     public interface IJobOutputLogEntity
     {
         void appendLog(JobOutputLogEntry logEntry);
-        Task<List<JobOutputLogEntry>> getLogEntries(int startoffset, int pageCount, int pageSize);
+        public Task<List<JobOutputLogEntry>> getLogEntries(LogEntryQuery query);
         Task<int> getLogEntryCount();
     }
 
@@ -39,8 +39,12 @@ namespace com.ataxlab.functions.table.retention.entities
             logEntries.Add(logEntry);
         }
 
-        public async Task<List<JobOutputLogEntry>> getLogEntries(int startoffset, int pageCount, int pageSize)
+        public async Task<List<JobOutputLogEntry>> getLogEntries(LogEntryQuery query)
         {
+            int startoffset = query.startoffset;
+            int pageCount = query.pageCount;
+            int pageSize = query.pageSize;
+
             var ret = new List<JobOutputLogEntry>();
             var outputList = this.logEntries.Skip(startoffset).Take(pageCount * pageSize).ToList< JobOutputLogEntry>();
             ret.AddRange(outputList);
@@ -64,5 +68,13 @@ namespace com.ataxlab.functions.table.retention.entities
 
         public List<JobOutputLogEntry> logEntries { get; set; }
 
+    }
+
+    public class LogEntryQuery
+    {
+        public int startoffset { get; set; } 
+        public int pageCount { get; set; } 
+        
+        public int pageSize { get; set; }
     }
 }

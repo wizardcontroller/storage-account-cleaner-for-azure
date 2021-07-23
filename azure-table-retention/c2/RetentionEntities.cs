@@ -464,7 +464,12 @@ namespace com.ataxlab.functions.table.retention.c2
             var currentState = await durableClient.ReadEntityStateAsync<JobOutputLogEntity>(entityId);
             if(currentState.EntityExists)
             {
-                ret.Content = new StringContent(JsonConvert.SerializeObject(currentState.EntityState), Encoding.UTF8,
+                // filter the entities to be returned
+                var returnedEntities = currentState.EntityState.logEntries.Skip(offset).Take(pageSize * pageCount).ToList();
+                var returnedEntity = currentState.EntityState;
+                returnedEntity.logEntries = returnedEntities;
+                returnedEntity.rowCount = currentState.EntityState.logEntries.Count();
+                ret.Content = new StringContent(JsonConvert.SerializeObject(returnedEntity), Encoding.UTF8,
                                     "application/json");   
             }
             else

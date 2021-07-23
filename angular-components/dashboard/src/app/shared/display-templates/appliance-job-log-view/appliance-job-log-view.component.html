@@ -1,8 +1,10 @@
 <ng-container *ngIf="jobOutputLogChanges$ | async as logEntities">
   <p-dataView [value]="logEntities"
               [paginator]="true"
-              [rows]="applianceLogRowCount"
+              [rows]="applianceLogPageSize"
               [lazy]="true"
+              [loading]="isRefreshing"
+              [showCurrentPageReport]="true"
               (onLazyLoad)="ensureLogEntries($event)">
               [totalRecords]="totalLogEntries"
 
@@ -10,10 +12,21 @@
                 <div>appliance log</div>
               </ng-template>
     <ng-template let-logentry pTemplate="listItem">
-      <div>
-        {{logentry.summary}}
+      <div style=" display: flex; align-items: left; width: 100%; ">
+        <div style="display: flex; align-items: left; padding: 1rem; width: 30%; ">{{logentry.timeStamp}} </div>
+        <div style="display: flex; align-items: left; padding: 1rem; width: 5%; ">{{logentry.source}}</div>
+
+        <div style="display: flex; align-items: left; padding: 1rem; width: 30%; ">{{logentry.summary}}</div>
+        <div style="display: flex; align-items: left; padding: 1rem; width: 30%; ">{{logentry.detail}}</div>
+
       </div>
+
+
+
     </ng-template>
 
+    <ng-template pTemplate="footer">
+      total entries {{totalLogEntries}}
+    </ng-template>
   </p-dataView>
 </ng-container>
