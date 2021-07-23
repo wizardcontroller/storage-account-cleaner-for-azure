@@ -339,31 +339,35 @@ namespace com.ataxlab.functions.table.retention
 
         [FunctionName(ControlChannelConstants.GetCurrentApplianceContextActivityEndpoint)]
         public async Task<ApplianceSessionContextEntity> GetApplianceSessionContextActivity(
-            [ActivityTrigger] IDurableActivityContext activityContext,
+            [ActivityTrigger] IDurableActivityContext context,
             [DurableClient] IDurableEntityClient entityClient, ILogger log)
         {
             ApplianceSessionContextEntity ret = new ApplianceSessionContextEntity();
+            string tenantId = string.Empty;
+            string oid = string.Empty;
 
             var input = new ActivityConfig();
             try
             {
-                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+
+
+                log.LogInformation("applying retention policy tuples. getting activity input");
+                input = context.GetInput<ActivityConfig>();
+                if (input != null && input.ActivityContext != null)
+                {
+                    tenantId = input.ActivityContext.TenantId;
+                    oid = input.ActivityContext.UserOid;
+                    var token = input.AuthToken;
+
+                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                     {
                         summary = "appliance session context",
                         detail = "workflow will retrieve appliance session context.",
                         severity = "info",
-                        timeStamp = context.CurrentUtcDateTime
+                        timeStamp = DateTime.UtcNow
                     },
-                tenantId, oid, entityClient);
-
-                log.LogInformation("applying retention policy tuples. getting activity input");
-                input = activityContext.GetInput<ActivityConfig>();
-                if (input != null && input.ActivityContext != null)
-                {
-                    var tenantid = input.ActivityContext.TenantId;
-                    var userOid = input.ActivityContext.UserOid;
-                    var token = input.AuthToken;
-                    var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantid, userOid);
+                    tenantId, oid, entityClient);
+                    var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
                     var entity = await entityClient.ReadEntityStateAsync<ApplianceSessionContextEntity>(entityId);
                     var entityJson = JsonConvert.SerializeObject(entity.EntityState);
                     ret = JsonConvert.DeserializeObject<ApplianceSessionContextEntity>(entityJson);
@@ -373,22 +377,22 @@ namespace com.ataxlab.functions.table.retention
                         summary = "appliance session context",
                         detail = "workflow has retrieved appliance session context.",
                         severity = "info",
-                        timeStamp = context.CurrentUtcDateTime
+                        timeStamp = DateTime.UtcNow
                     },
-                tenantId, oid, entityClient);
+                    tenantId, oid, entityClient);
                 }
             }
             catch (Exception e)
             {
                 log.LogError($"exception getting current session context {e.Message}");
-                                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "exception: appliance session context",
-                        detail = e.Message,
-                        severity = "error",
-                        timeStamp = context.CurrentUtcDateTime
-                    },
-                tenantId, oid, entityClient);
+                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                {
+                    summary = "exception: appliance session context",
+                    detail = e.Message,
+                    severity = "error",
+                    timeStamp = DateTime.UtcNow
+                },
+tenantId, oid, entityClient);
             }
 
             return ret;
@@ -406,15 +410,7 @@ namespace com.ataxlab.functions.table.retention
                 storageAccountOperation,cancelWorkflowOperation, buildRetentionPolicyOperation
             };
 
-            await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "workflow",
-                        detail = "workflow initialized menu selection state machine.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
-                tenantId, oid, entityClient);
+
         }
 
         [Obsolete]
@@ -484,6 +480,8 @@ namespace com.ataxlab.functions.table.retention
             ILogger log)
         {
             ApplianceSessionContextEntity ret = new ApplianceSessionContextEntity();
+            var tenantId = string.Empty;
+            var oid = string.Empty;
 
             var input = new ActivityConfig();
             List<Tuple<TableStorageRetentionPolicyEntity, StorageAccountEntity>> policies = new List<Tuple<TableStorageRetentionPolicyEntity, StorageAccountEntity>>();
@@ -491,33 +489,35 @@ namespace com.ataxlab.functions.table.retention
             {
                 log.LogInformation("applying retention policy tuples. getting activity input");
 
-                
+
                 input = context.GetInput<ActivityConfig>();
+                tenantId = input.ActivityContext.TenantId;
+                oid = input.ActivityContext.UserOid;
                 var jobOutput = await input.ActivityContext.GetCurrentJobOutput();
 
                 await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy",
-                        detail = "workflow will apply calculated retention policy.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
+                {
+                    summary = "retention policy",
+                    detail = "workflow will apply calculated retention policy.",
+                    severity = "info",
+                    timeStamp = DateTime.UtcNow,
+                    ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                },
                 tenantId, oid, entityClient);
                 policies = jobOutput.retentionPolicyJobs.Select(s => s.SourceTuple).ToList();
 
                 foreach (var policyTuple in policies)
                 {
                     log.LogInformation(string.Format("applying Retention Policy Tuples"));
-                                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
                     {
                         summary = "retention policy",
                         detail = $"applying retention policy to storage account: {policyTuple.Item2.Name}",
                         severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
+                        timeStamp = DateTime.UtcNow,
                         ExecutedCommand = input.WorkflowOperation.CandidateCommand
                     },
-                    tenantId, oid, entityClient);
+    tenantId, oid, entityClient);
 
                     TableStorageEntityRetentionPolicyEntity tableStorageEntityRetentionPolicy = policyTuple.Item1.TableStorageEntityRetentionPolicy;
                     TableStorageTableRetentionPolicyEntity tableStorageTableRetentionPolicy = policyTuple.Item1.TableStorageTableRetentionPolicy;
@@ -534,71 +534,71 @@ namespace com.ataxlab.functions.table.retention
                                 return "0" + DateTime.UtcNow.Subtract(new TimeSpan(tableStorageEntityRetentionPolicy.NumberOfDays, 0, 0, 0)).Ticks.ToString();
                             });
 
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy",
-                        detail = $"metrics retention policy applied to {storageAccount.Name}. Policy triggered {entityResult.PolicyTriggerCount} times",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
-                tenantId, oid, entityClient);
+                        await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                        {
+                            summary = "retention policy",
+                            detail = $"metrics retention policy applied to {storageAccount.Name}. Policy triggered {entityResult.PolicyTriggerCount} times",
+                            severity = "info",
+                            timeStamp = DateTime.UtcNow,
+                            ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                        },
+                    tenantId, oid, entityClient);
                     }
                     catch (Exception e)
                     {
-                    
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "metrics retention policy exception",
-                        detail = $"affected storage account {storageAccount.Name}: message: {e.Message}",
-                        severity = "error",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
-                        tenantId, oid, entityClient);
+
+                        await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                        {
+                            summary = "metrics retention policy exception",
+                            detail = $"affected storage account {storageAccount.Name}: message: {e.Message}",
+                            severity = "error",
+                            timeStamp = DateTime.UtcNow,
+                            ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                        },
+                            tenantId, oid, entityClient);
                         log.LogError("exception applying policy {0}", e.Message);
                     }
 
                     try
                     {
                         tableResult = await this.TableRetentionApplianceActivities.ApplyTableStorageTableRetentionPolicy(input.AuthToken, storageAccount, tableStorageTableRetentionPolicy);
-                        
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy",
-                        detail = $"diagnostics retention policy applied to {storageAccount.Name}. Policy triggered {entityResult.PolicyTriggerCount} times",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
-                tenantId, oid, entityClient);
+
+                        await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                        {
+                            summary = "retention policy",
+                            detail = $"diagnostics retention policy applied to {storageAccount.Name}. Policy triggered {entityResult.PolicyTriggerCount} times",
+                            severity = "info",
+                            timeStamp = DateTime.UtcNow,
+                            ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                        },
+                    tenantId, oid, entityClient);
                     }
                     catch (Exception e)
                     {
                         log.LogError("exception applying policy {0}", e.Message);
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "diagnostics retention policy exception",
-                        detail = $"affected storage account {storageAccount.Name}: message: {e.Message}",
-                        severity = "error",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
-                        tenantId, oid, entityClient);
+                        await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                        {
+                            summary = "diagnostics retention policy exception",
+                            detail = $"affected storage account {storageAccount.Name}: message: {e.Message}",
+                            severity = "error",
+                            timeStamp = DateTime.UtcNow,
+                            ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                        },
+                            tenantId, oid, entityClient);
 
                     }
 
                     try
                     {
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy",
-                        detail = "workflow will persist retention policy results.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
-                tenantId, oid, entityClient);
+                        await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                        {
+                            summary = "retention policy",
+                            detail = "workflow will persist retention policy results.",
+                            severity = "info",
+                            timeStamp = DateTime.UtcNow,
+                            ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                        },
+                    tenantId, oid, entityClient);
                         // persist the job output
                         var contextId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(input.ActivityContext.TenantId, input.ActivityContext.UserOid);
                         var currentState = await entityClient.ReadEntityStateAsync<IApplianceSessionContextEntity>(contextId);
@@ -623,28 +623,28 @@ namespace com.ataxlab.functions.table.retention
 
                         var currentCtx = await entityClient.ReadEntityStateAsync<ApplianceSessionContextEntity>(contextId);
                         ret = currentCtx.EntityState;
-                    await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy",
-                        detail = "workflow HAS persiStED retention policy results.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
-                tenantId, oid, entityClient);
+                        await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                        {
+                            summary = "retention policy",
+                            detail = "workflow HAS persiStED retention policy results.",
+                            severity = "info",
+                            timeStamp = DateTime.UtcNow,
+                            ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                        },
+                    tenantId, oid, entityClient);
 
                     }
                     catch (Exception e)
                     {
                         log.LogError("problem persisting result of applied tuples {0}", e.Message);
                         await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "persist retention policy exception",
-                        detail = $"affected storage account {storageAccount.Name}: message: {e.Message}",
-                        severity = "error",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
+                        {
+                            summary = "persist retention policy exception",
+                            detail = $"affected storage account {storageAccount.Name}: message: {e.Message}",
+                            severity = "error",
+                            timeStamp = DateTime.UtcNow,
+                            ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                        },
                         tenantId, oid, entityClient);
                     }
 
@@ -657,15 +657,15 @@ namespace com.ataxlab.functions.table.retention
             catch (Exception e)
             {
                 log.LogError("problem with input to apply retention policy activity {0}", e.Message);
-            await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "apply retention policy exception",
-                        detail = $"affected storage account {storageAccount.Name}: message: {e.Message}",
-                        severity = "error",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = input.WorkflowOperation.CandidateCommand
-                    },
-                        tenantId, oid, entityClient);
+                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                {
+                    summary = "apply retention policy exception",
+                    detail = $"message: {e.Message}",
+                    severity = "error",
+                    timeStamp = DateTime.UtcNow,
+                    ExecutedCommand = input.WorkflowOperation.CandidateCommand
+                },
+                            tenantId, oid, entityClient);
                 return ret;
             }
 
@@ -682,22 +682,25 @@ namespace com.ataxlab.functions.table.retention
             [ActivityTrigger] IDurableActivityContext context, ILogger log)
         {
             var ret = new ApplianceSessionContextEntity();
+            var oid = string.Empty;
+            var tenantId = string.Empty;
+            var activityConfig = new ActivityConfig();
             try
             {
 
-                var activityConfig = context.GetInput<ActivityConfig>();
-                var tenantId = activityConfig.ActivityContext.TenantId;
-                var oid = activityConfig.ActivityContext.UserOid;
+                 activityConfig = context.GetInput<ActivityConfig>();
+                tenantId = activityConfig.ActivityContext.TenantId;
+                oid = activityConfig.ActivityContext.UserOid;
                 var token = activityConfig.AuthToken;
-                
+
                 await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy",
-                        detail = "workflow is generating retention policy meta data.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
-                    },
+                {
+                    summary = "retention policy",
+                    detail = "workflow is generating retention policy meta data.",
+                    severity = "info",
+                    timeStamp = DateTime.UtcNow,
+                    ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
+                },
                 tenantId, oid, entityClient);
                 log.LogTrace("build retention policy tuples: using token {0}", token);
                 log.LogTrace("build retention policy tuples: using tenantId {0}", tenantId);
@@ -711,13 +714,13 @@ namespace com.ataxlab.functions.table.retention
                                                 activityConfig.ActivityContext);
 
                 await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy",
-                        detail = "workflow has generated retention policy meta data.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
-                    },
+                {
+                    summary = "retention policy",
+                    detail = "workflow has generated retention policy meta data.",
+                    severity = "info",
+                    timeStamp = DateTime.UtcNow,
+                    ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
+                },
                 tenantId, oid, entityClient);
                 var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
                 var currentCtx = await this.TableRetentionApplianceEngine.ActivitiesEngine.InitializeCurrentJobOutput(entityId,
@@ -725,28 +728,28 @@ namespace com.ataxlab.functions.table.retention
                 ret = currentCtx;
 
                 await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy",
-                        detail = "workflow has persisted retention policy meta data.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
-                    },
+                {
+                    summary = "retention policy",
+                    detail = "workflow has persisted retention policy meta data.",
+                    severity = "info",
+                    timeStamp = DateTime.UtcNow,
+                    ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
+                },
                 tenantId, oid, entityClient);
                 log.LogTrace("completed BuildRetentionPolicyTuples activity");
 
             }
             catch (Exception e)
             {
-                 await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "retention policy exception",
-                        detail = e.Message,
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
-                    },
-                tenantId, oid, entityClient);
+                await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
+                {
+                    summary = "retention policy exception",
+                    detail = e.Message,
+                    severity = "info",
+                    timeStamp = DateTime.UtcNow,
+                    ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
+                },
+               tenantId, oid, entityClient);
                 log.LogError("problem getting tuples {0}", e.Message);
             }
 
@@ -780,13 +783,13 @@ namespace com.ataxlab.functions.table.retention
             var oid = activityConfig.ActivityContext.UserOid;
             var token = activityConfig.AuthToken;
             await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "storage accounts",
-                        detail = "workflow is validating meta data for selected storage accounts.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
-                    },
+            {
+                summary = "storage accounts",
+                detail = "workflow is validating meta data for selected storage accounts.",
+                severity = "info",
+                timeStamp = DateTime.UtcNow,
+                ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
+            },
                 tenantId, oid, entityClient);
 
             // TODO - make a RESET current job output -
@@ -808,25 +811,25 @@ namespace com.ataxlab.functions.table.retention
                 }
 
                 await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "storage accounts",
-                        detail = "workflow has validated storage account meta data.",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
-                    },
+                {
+                    summary = "storage accounts",
+                    detail = "workflow has validated storage account meta data.",
+                    severity = "info",
+                    timeStamp = DateTime.UtcNow,
+                    ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
+                },
                 tenantId, oid, entityClient);
             }
             catch (Exception e)
             {
                 await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "storage account exception",
-                        detail = e.Message,
-                        severity = "error",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
-                    },
+                {
+                    summary = "storage account exception",
+                    detail = e.Message,
+                    severity = "error",
+                    timeStamp = DateTime.UtcNow,
+                    ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
+                },
                 tenantId, oid, entityClient);
                 log.LogError($"exception getting storage accounts {e.Message}");
             }

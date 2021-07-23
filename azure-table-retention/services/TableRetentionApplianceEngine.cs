@@ -152,15 +152,15 @@ namespace com.ataxlab.functions.table.retention.services
             try
             {
 
-                IEnumerable<string> listValues; 
+                IEnumerable<string> listValues;
                 var r = headers.TryGetValues(ControlChannelConstants.HEADER_IMPERSONATION_TOKEN, out listValues);
 
                 var keysList = new List<string>();
-                foreach(var h in headers)
+                foreach (var h in headers)
                 {
                     keysList.Add(h.Key);
                 }
-                    
+
                 var impersonate = headers.Where(w => w.Key.ToLower().Equals(ControlChannelConstants.HEADER_IMPERSONATION_TOKEN.ToLower())).Select(s => s.Value)?.FirstOrDefault();
                 impersonationToken = impersonate?.FirstOrDefault()?.TrimStart(',')?.Trim();
 
@@ -1980,21 +1980,22 @@ namespace com.ataxlab.functions.table.retention.services
             throw new NotImplementedException();
         }
 
-        public async Task Log(JobOutputLogEntry logEntry, string tenantId,string oid, IDurableEntityClient entityClient )
+        public async Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient)
         {
-            try { 
-            StackTrace stackTrace = new StackTrace();
-            logEntry.source = stackTrace.GetFrame(1).GetMethod().Name;
+            try
+            {
+                StackTrace stackTrace = new StackTrace();
+                logEntry.source = stackTrace.GetFrame(1).GetMethod().Name;
 
-            var entityId = await this.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
-            await entityClient.SignalEntityAsync<IJobOutputLogEntity>(entityId, proxy =>
-            {
-                proxy.appendLog(logEntry);
-            });
+                var entityId = await this.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
+                await entityClient.SignalEntityAsync<IJobOutputLogEntity>(entityId, proxy =>
+                {
+                    proxy.appendLog(logEntry);
+                });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                log.LogError($"exception writing appliance job log: {e.Message}")
+                log.LogError($"exception writing appliance job log: {e.Message}");
             }
 
         }
