@@ -1991,6 +1991,7 @@ namespace com.ataxlab.functions.table.retention.services
                 await entityClient.SignalEntityAsync<IJobOutputLogEntity>(entityId, proxy =>
                 {
                     proxy.appendLog(logEntry);
+                    log.LogInformation("operator log updated");
                 });
             }
             catch (Exception e)

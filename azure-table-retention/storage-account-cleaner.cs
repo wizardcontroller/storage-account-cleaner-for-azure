@@ -236,15 +236,7 @@ namespace com.ataxlab.functions.table.retention
                 try
                 {
                     log.LogInformation("user sent device apply retention policy");
-                    this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                    {
-                        summary = "workflow running",
-                        detail = "applying retention policy to calculate retention urface",
-                        severity = "info",
-                        timeStamp = context.CurrentUtcDateTime,
-                        ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
-                    },
-                tenantId, oid, entityClient).GetAwaiter().GetResult();
+
                     var currentCtx = await context.CallActivityAsync<ApplianceSessionContextEntity>(ControlChannelConstants.ApplyTableEntityRetentionPolicyTuplesEndpoint, currentActivityConfig);
                     appcontext = currentCtx;
 
@@ -270,29 +262,13 @@ namespace com.ataxlab.functions.table.retention
                         != WorkflowOperation.CommitRetentionPolicyConfiguration)
             {
 
-                this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                {
-                    summary = "workflow running",
-                    detail = "workflow is waiting for new commands",
-                    severity = "info",
-                    timeStamp = context.CurrentUtcDateTime,
-                    ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
-                },
-                  tenantId, oid, entityClient).GetAwaiter().GetResult();
+
 
                 context.ContinueAsNew(appcontext);
             }
             else
             {
-                this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
-                {
-                    summary = "workflow ended",
-                    detail = "workflow has ended",
-                    severity = "info",
-                    timeStamp = context.CurrentUtcDateTime,
-                    ExecutedCommand = currentActivityConfig.WorkflowOperation.CandidateCommand
-                },
-                  tenantId, oid, entityClient).GetAwaiter().GetResult();
+
                 context.SetCustomStatus("finished");
 
             }
