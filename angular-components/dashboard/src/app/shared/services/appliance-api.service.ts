@@ -28,7 +28,7 @@ import { OperationStatus } from '../models/OperationStatus';
 export class ApplianceApiService implements OnDestroy {
   operatorPageModel!: OperatorPageModel | null;
 
-  isRefreshingSource = new Subject<boolean>();
+  isRefreshingSource = new ReplaySubject<boolean>();
   isRefreshingChanges$ = this.isRefreshingSource.asObservable();
 
   statusFeedSource = new ReplaySubject<OperationStatus>();
@@ -70,7 +70,7 @@ export class ApplianceApiService implements OnDestroy {
       }),
       map(([elapsedEvent, pageModel]) => {
 
-        // this.isRefreshingSource.next(true);
+        this.isRefreshingSource.next(true);
 
         var tenantid = pageModel.tenantid as string;
 
@@ -80,11 +80,11 @@ export class ApplianceApiService implements OnDestroy {
 
         this.ensureWorkflowSessionContextSubject(tenantid, subscriptionId, oid);
 
-        // this.isRefreshingSource.next(false);
+        this.isRefreshingSource.next(false);
 
       }),
 
-    );
+  ).subscribe(); 
 
   public selectedStorageAccountSource = new BehaviorSubject<string>("");
   selectedStorageAccountAction$ = this.selectedStorageAccountSource.asObservable();
@@ -132,7 +132,6 @@ export class ApplianceApiService implements OnDestroy {
       .pipe(
 
         map(data => {
-          this.isRefreshingSource.next(true);
 
           console.log("apliance session context updated");
           this.currentApplianceSessionContextSource.next(data);
@@ -145,7 +144,7 @@ export class ApplianceApiService implements OnDestroy {
 
           // 'select' a newly available storage account
           this.selectedStorageAccountSource.next(accounts[0].id as string);
-          this.isRefreshingSource.next(false);
+
 
         })
       ).subscribe();
@@ -188,14 +187,13 @@ export class ApplianceApiService implements OnDestroy {
         .pipe(
 
           map(data => {
-            this.isRefreshingSource.next(true);
 
             console.log("workflow context updated");
 
 
             this.workflowCheckPoint = data;
             this.currentWorkflowCheckpointSource.next(data);
-            this.isRefreshingSource.next(false);
+
 
           })
       ).subscribe();
@@ -227,7 +225,7 @@ export class ApplianceApiService implements OnDestroy {
       .pipe(
 
         map(data => {
-          this.isRefreshingSource.next(true);
+
 
           console.log('appliance api service has operator page model');
           try {
@@ -250,12 +248,11 @@ export class ApplianceApiService implements OnDestroy {
 
           } catch (ex) {
             console.log('error starting ApplianceApiSvc ' + (ex as Error).message);
-            this.isRefreshingSource.next(false);
 
           }
 
           this.operatorPageModel = data;
-          this.isRefreshingSource.next(false);
+
 
         })
       ).subscribe();

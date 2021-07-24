@@ -27,13 +27,6 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
 
   isRefreshing!: boolean;
 
-  isRefreshingPipe = this.applianceSvc.isRefreshingChanges$
-    .pipe(
-      map(isRefreshing => {
-        isRefreshing = isRefreshing;
-      })
-    ).subscribe();
-
   operatorPageModel!: OperatorPageModel;
   // operator page model change notification support
   private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
@@ -63,7 +56,7 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
 
   ngOnDestroy(): void {
 
-    // do nothing.
+    // do no thing.
 
   }
 

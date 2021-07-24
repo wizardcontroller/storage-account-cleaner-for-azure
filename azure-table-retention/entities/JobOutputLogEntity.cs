@@ -46,7 +46,7 @@ namespace com.ataxlab.functions.table.retention.entities
             int pageSize = query.pageSize;
 
             var ret = new List<JobOutputLogEntry>();
-            var outputList = this.logEntries.Skip(startoffset).Take(pageCount * pageSize).ToList< JobOutputLogEntry>();
+            var outputList = this.logEntries.OrderByDescending(o => o.timeStamp).Skip(startoffset).Take(pageCount * pageSize).ToList< JobOutputLogEntry>();
             ret.AddRange(outputList);
             return await Task.FromResult(ret);
         }

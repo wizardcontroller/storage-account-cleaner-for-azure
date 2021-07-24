@@ -11,7 +11,7 @@ import {
   WorkflowOperationCommand,
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { from, interval, Observable, of, Operator, ReplaySubject, Subject } from 'rxjs';
+import { combineLatest, from, interval, Observable, of, Operator, ReplaySubject, Subject, timer } from 'rxjs';
 import {
   catchError,
   concatMap,
@@ -48,11 +48,42 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
 
   isRefreshing: boolean = false;
-  isRefreshingSource = new Subject<boolean>();
-  isRefreshingChanges$ = this.isRefreshingSource.asObservable();
 
-  isShowSpinnerSource = new Subject<boolean>();
+
+  isShowSpinnerSource = new ReplaySubject<boolean>();
   isShowSpinnerChanges$ = this.isShowSpinnerSource.asObservable();
+
+  refreshTimer$ = timer(0, (1000 * 30));
+
+  isRefreshingPipe$ = combineLatest(
+    this.refreshTimer$,
+    this.applianceAPiSvc.workflowCheckpointChanges$
+  )
+  .pipe
+    (
+      tap(tapped => {
+        console.log("command palette is refreshing = " + tapped);
+      }),
+      map(([isRefreshing,data]) => {
+        this.isRefreshing = true;
+        // this.isRefreshingSource.next(isRefreshing);
+
+        // if (isRefreshing) {
+        console.log("showing refresh toast");
+        const toast = new ToastMessage();
+        toast.detail = "checking the appliance state";
+        toast.summary = "command palette Updating ";
+        toast.sticky = false;
+        toast.life = 1000 * 8;
+        toast.severity = "info";
+        this.showToast(toast);
+
+        // this.getPagemodelChangesPipe().subscribe();
+        this.getWorkflowCheckpointChangesPipe().subscribe();
+        //}
+       this.isRefreshing = false;
+
+      })).subscribe();
 
   isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$
     .pipe
@@ -60,7 +91,6 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       tap(tapped => {
         console.log("command palette is refreshing = " + tapped);
       }),
-      filter(f => f),
       map(isRefreshing => {
         this.isRefreshing = isRefreshing;
         // this.isRefreshingSource.next(isRefreshing);
@@ -75,12 +105,14 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         toast.severity = "info";
         this.showToast(toast);
 
+        this.getPagemodelChangesPipe().subscribe();
+        this.getWorkflowCheckpointChangesPipe().subscribe();
         //}
 
 
       })
 
-    );
+  );
     /*
     .subscribe(data =>
     {
@@ -185,7 +217,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           toast.sticky = true;
           toast.life = 1000 * 8;
           toast.severity = "error";
-          this.applianceAPiSvc.isRefreshingSource.next(false);
+
           this.isShowSpinnerSource.next(false);
           this.isRefreshing = false;
           this.showToast(toast);
@@ -238,7 +270,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   }
 
   getWorkflowCheckpointChangesPipe() {
-
+    console.log("getWorkflowCheckpointChangesPipe()");
     return this.applianceAPiSvc.workflowCheckpointChanges$.
       pipe(
         tap(t => {
@@ -262,8 +294,5 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     console.log('command palette onInit');
-
-    this.getPagemodelChangesPipe().subscribe();
-    this.getWorkflowCheckpointChangesPipe().subscribe();
   }
 }

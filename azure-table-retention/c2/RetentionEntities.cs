@@ -28,6 +28,7 @@ using com.ataxlab.azure.table.retention.models.extensions;
 using com.ataxlab.azure.table.retention.state.entities;
 
 using System.Text;
+using System.Collections.Generic;
 
 namespace com.ataxlab.functions.table.retention.c2
 {
@@ -465,10 +466,20 @@ namespace com.ataxlab.functions.table.retention.c2
             if(currentState.EntityExists)
             {
                 // filter the entities to be returned
-                var returnedEntities = currentState.EntityState.logEntries.Skip(offset).Take(pageSize * pageCount).ToList();
-                var returnedEntity = currentState.EntityState;
-                returnedEntity.logEntries = returnedEntities;
-                returnedEntity.rowCount = currentState.EntityState.logEntries.Count();
+                var retContent = new List<JobOutputLogEntry>();
+                
+                var logs = await currentState.EntityState.getLogEntries(new LogEntryQuery()
+                { pageCount = pageCount, pageSize = pageSize, startoffset = offset});
+                
+                retContent.AddRange(logs);
+
+                var returnedEntity = new JobOutputLogEntity()
+                {
+                    userOid = oid, userTenantId = tenantId, 
+                    logEntries = retContent,
+                    rowCount = currentState.EntityState.logEntries.Count()
+                }; //  currentState.EntityState;
+
                 ret.Content = new StringContent(JsonConvert.SerializeObject(returnedEntity), Encoding.UTF8,
                                     "application/json");   
             }

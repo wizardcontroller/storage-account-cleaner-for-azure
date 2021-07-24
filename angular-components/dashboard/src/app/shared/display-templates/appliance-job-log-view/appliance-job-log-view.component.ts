@@ -19,9 +19,9 @@ export class ApplianceJobLogViewComponent implements OnInit {
 
   isRefreshing = false;
   applianceLogChangesTimerPollingInterval: number = 1000 * 30;
-  applianceLogPageSize = 3;
+  applianceLogPageSize = 5;
   applianceLogPageCount = 1;
-  applianceLogRowCount : number = this.applianceLogPageSize * this.applianceLogPageCount;
+
   applianceLogOffset = 0;
   totalLogEntries = 0;
 
@@ -75,7 +75,9 @@ export class ApplianceJobLogViewComponent implements OnInit {
 
   ensureLogEntries(event: LazyLoadEvent) {
     this.applianceLogOffset = event.first as number;
-
+    
+    this.applianceLogPageSize = event.rows as number;
+    console.log("ensuring log entries - component requested # of rows = " + event.rows);
 
     this.jobOutputLogChanges$.subscribe(data => {
 
