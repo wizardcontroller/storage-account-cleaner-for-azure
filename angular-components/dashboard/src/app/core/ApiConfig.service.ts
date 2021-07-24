@@ -3,7 +3,7 @@ import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigService, OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { ToastMessage } from '../models/ToastMessage';
@@ -42,7 +42,7 @@ export class ApiConfigService {
                including base url for discovery appliance
                and user appliances
            */
-  initPageModelSubject() {
+  initPageModelSubject(): Observable<OperatorPageModel>{
     console.log("apiconfigsvc is getting operator page model");
     this.configService.configuration.basePath = window.location.origin;
     console.log('calling config service');
@@ -50,12 +50,7 @@ export class ApiConfigService {
       .pipe( 
         map(data => {
           this.currentPageModelSource.next(data);
-          const toast = new ToastMessage();
-          toast.detail = "loaded operator page model";
-          toast.summary = "page model refreshed";
-          toast.severity = "info";
-          toast.sticky = false;
-          this.showToast(toast);
+          return data;
         })
       );
   }

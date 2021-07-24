@@ -12,6 +12,8 @@ import { ICanBeHiddenFromDisplay } from './shared/interfaces/ICanBeHiddenFromDis
 import { map, tap } from 'rxjs/operators';
 import { ThemePalette } from '@angular/material/core'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MessageService } from 'primeng/api';
+import { ToastMessage } from './models/ToastMessage';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -30,7 +32,7 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
       map(isRefreshing => {
         isRefreshing = isRefreshing;
       })
-  ).subscribe();
+    ).subscribe();
 
   operatorPageModel!: OperatorPageModel;
   // operator page model change notification support
@@ -39,7 +41,9 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
 
   baseUri: String | undefined;
   title = 'dashboard';
-  constructor(private apiConfigSvc: ApiConfigService, private applianceSvc: ApplianceApiService) {
+  constructor(private apiConfigSvc: ApiConfigService,
+    private messageService: MessageService,
+    private applianceSvc: ApplianceApiService) {
 
     this.isShow = false;
     this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
@@ -65,9 +69,23 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
 
   ngOnInit(): void {
     console.log("app component is initializing page model");
-    this.apiConfigSvc.initPageModelSubject().subscribe();
+    this.apiConfigSvc.initPageModelSubject()
+      .pipe(
+        tap(t => {
+          const toast = new ToastMessage();
+          toast.detail = "loaded operator page model";
+          toast.summary = "page model refreshed";
+          toast.severity = "info";
+          toast.sticky = false;
+          this.showToast(toast);
+        })
+      ).subscribe();
 
 
+  }
+
+  showToast(message: ToastMessage): void {
+    this.messageService.add(message);
   }
 
 }

@@ -24,7 +24,7 @@ import {
   share,
   shareReplay,
   tap,
-  withLatestFrom, debounceTime
+  withLatestFrom, debounceTime, filter
 } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -60,28 +60,32 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       tap(tapped => {
         console.log("command palette is refreshing = " + tapped);
       }),
+      filter(f => f),
       map(isRefreshing => {
         this.isRefreshing = isRefreshing;
-        this.isRefreshingSource.next(isRefreshing);
+        // this.isRefreshingSource.next(isRefreshing);
 
-        if (isRefreshing) {
-          console.log("showing refresh toast");
-          const toast = new ToastMessage();
-          toast.detail = "checking the appliance state";
-          toast.summary = "command palette Updating ";
-          toast.sticky = false;
-          toast.life = 1000 * 8;
-          toast.severity = "info";
-          this.showToast(toast);
+        // if (isRefreshing) {
+        console.log("showing refresh toast");
+        const toast = new ToastMessage();
+        toast.detail = "checking the appliance state";
+        toast.summary = "command palette Updating ";
+        toast.sticky = false;
+        toast.life = 1000 * 8;
+        toast.severity = "info";
+        this.showToast(toast);
 
-        }
+        //}
 
 
       })
 
-    )
+    );
+    /*
+    .subscribe(data =>
+    {
 
-    .subscribe(data => {  }, error => {
+    }, error => {
 
       const toast = new ToastMessage();
       toast.detail = JSON.stringify(error);
@@ -92,7 +96,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       this.showToast(toast);
       this.isRefreshing = false; this.isRefreshingSource.next(false);
     });
-
+  */
   workflowCheckpoint!: WorkflowCheckpointDTO;
 
   selectedCommand!: AvailableCommand;
@@ -213,12 +217,22 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     // nothing yet
   }
 
-  getPagemodelChangesPipe() {
+  getPagemodelChangesPipe(): Observable<OperatorPageModel>{
     return this.apiConfigSvc.operatorPageModelChanges$.
       pipe(
+        tap(t => {
+          const toast = new ToastMessage();
+          toast.detail = "operator pagemodel is available";
+          toast.summary = "updating";
+          toast.sticky = false;
+          toast.life = 1000 * 8;
+          toast.severity = "info";
+          this.showToast(toast);
+        }),
         map(changes => {
           this.pageModelSubject.next(changes);
           this.currentPageModel = changes;
+          return changes;
         })
       );
   }
@@ -227,6 +241,15 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
     return this.applianceAPiSvc.workflowCheckpointChanges$.
       pipe(
+        tap(t => {
+          const toast = new ToastMessage();
+          toast.detail = "checking the appliance state";
+          toast.summary = "command palette Updating ";
+          toast.sticky = false;
+          toast.life = 1000 * 8;
+          toast.severity = "info";
+          this.showToast(toast);
+        }),
         map(workflowCheckpoint => {
 
           this.workflowCheckpoint = workflowCheckpoint;
@@ -234,7 +257,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
             workflowCheckpoint.availableCommands as Array<AvailableCommand>
           );
         }));
-      
+
   }
 
   ngOnInit(): void {

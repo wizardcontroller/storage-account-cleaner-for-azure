@@ -34,7 +34,7 @@ const routesOrig: Routes = [
 
 
 
-  { path: 'workbench', component: ApplianceContextViewComponent ,
+  { path: '#workbench', component: ApplianceContextViewComponent ,
   children: [
     { path: 'subscriptions', component: SubscriptionsViewComponent,
       children:[
@@ -42,7 +42,7 @@ const routesOrig: Routes = [
       ] },
 
   ]},
-  { path: 'report', component: JobOutputViewComponent },
+  { path: '#report', component: JobOutputViewComponent },
   { path: '', redirectTo: 'workbench', pathMatch: 'full'},
   { path: '**', component: ApplianceContextViewComponent }
 ];
