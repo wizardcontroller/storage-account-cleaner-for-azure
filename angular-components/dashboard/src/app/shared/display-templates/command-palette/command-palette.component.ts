@@ -81,7 +81,8 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
     )
 
-    .subscribe(data => { }, error => {
+    .subscribe(data => {  }, error => {
+
       const toast = new ToastMessage();
       toast.detail = JSON.stringify(error);
       toast.summary = "Error";
@@ -212,25 +213,19 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     // nothing yet
   }
 
-  ngOnInit(): void {
-    console.log('command palette onInit');
-
-    //this.apiConfigSvc.operatorPageModelChanges$.subscribe((pageModel) => {
-    //  console.log('command palette view has page model');
-    //  // metrics retention component has operator page model
-    //  this.pageModelSubject.next(pageModel);
-    //  this.currentPageModel = pageModel;
-    //});
-
-    this.apiConfigSvc.operatorPageModelChanges$.
+  getPagemodelChangesPipe() {
+    return this.apiConfigSvc.operatorPageModelChanges$.
       pipe(
         map(changes => {
           this.pageModelSubject.next(changes);
           this.currentPageModel = changes;
         })
-      ).subscribe();
+      );
+  }
 
-    this.applianceAPiSvc.workflowCheckpointChanges$.
+  getWorkflowCheckpointChangesPipe() {
+
+    return this.applianceAPiSvc.workflowCheckpointChanges$.
       pipe(
         map(workflowCheckpoint => {
 
@@ -238,9 +233,14 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.availableCommandSubject.next(
             workflowCheckpoint.availableCommands as Array<AvailableCommand>
           );
-        }))
-      .subscribe();
+        }));
+      
+  }
 
+  ngOnInit(): void {
+    console.log('command palette onInit');
 
+    this.getPagemodelChangesPipe().subscribe();
+    this.getWorkflowCheckpointChangesPipe().subscribe();
   }
 }
