@@ -1,5 +1,6 @@
 {
   "version": "2.0",
+  "CORS": "*",
   "tracing": { "consoleLevel": "information" },
   "healthMonitor": { "enabled": "warning" },
   "extensions": {

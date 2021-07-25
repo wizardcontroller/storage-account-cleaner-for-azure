@@ -17,6 +17,9 @@ import {LazyLoadEvent } from 'primeng/api'
 export class ApplianceJobLogViewComponent implements OnInit {
 
 
+
+  cachedLogJson!: JobOutputLogEntry[];
+
   isRefreshing = false;
   applianceLogChangesTimerPollingInterval: number = 1000 * 30;
   applianceLogPageSize = 5;
@@ -31,40 +34,45 @@ export class ApplianceJobLogViewComponent implements OnInit {
   applianceLogChangesTimer$ = timer(0,
     this.applianceLogChangesTimerPollingInterval);
 
-  applianceLogChanges$ = combineLatest(
-    this.apiConfigSvc.operatorPageModelChanges$,
-    this.applianceLogChangesTimer$
-  )
-    .pipe(
-      filter(([pageModel$, elapsedEvent$]) => this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint),
-      tap(() => console.log("autorefresh filtered applianceLog changes firing")),
-      map(([pageModel, elapsedEvent ]) => {
+  logChanges$ = this.applianceLogChangesTimer$.pipe(
+    withLatestFrom(this.apiConfigSvc.operatorPageModelChanges$),
+    filter(([pageModel$, elapsedEvent$]) => this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint),
+    tap(() => console.log("withlatestFrom() autorefresh filtered applianceLog changes firing")),
+    map(([ elapsedEvent, pageModel ]) => {
 
-        this.isRefreshing = true;
-      var tenantid = pageModel.tenantid as string;
+      this.isRefreshing = true;
+    var tenantid = pageModel.tenantid as string;
 
-      var subscriptionId = pageModel.subscriptionId as string;
+    var subscriptionId = pageModel.subscriptionId as string;
 
-      var oid = pageModel.oid as string;
+    var oid = pageModel.oid as string;
+    console.log("withLatestFrom() is getting log entries");
+    this.applianceApiSvc.entityService
+      .getApplianceLogEntries(tenantid as string,
+        oid as string,this.applianceLogOffset, this.applianceLogPageSize + 1, this.applianceLogPageCount)
+      .pipe(
 
-      this.applianceApiSvc.entityService
-        .getApplianceLogEntries(tenantid as string,
-          oid as string, 0, this.applianceLogPageSize, 1)
-        .pipe(
+        map(logEntryEntity => {
 
-          map(logEntryEntity => {
-            this.totalLogEntries = logEntryEntity.rowCount as number;
-            this.jobOutputLogSubject.next(logEntryEntity.logEntries);
+          console.log("withLatestFrom() has retrieved log entries. rowcount = " + logEntryEntity.rowCount, " retrieved # of rows=" + logEntryEntity.logEntries?.length);
+          this.totalLogEntries = logEntryEntity.rowCount as number;
+          this.jobOutputLogSubject.next(logEntryEntity.logEntries);
 
+          // this.cachedLogJson = logEntryEntity.logEntries as JobOutputLogEntry[];
 
-        this.isRefreshing = false;
-            return logEntryEntity;
-        })
-      )
-      .subscribe() ;
-    })
-  )
-  .subscribe();
+            logEntryEntity.logEntries?.forEach(item => {
+              this.cachedLogJson.push(item);
+            });
+      this.isRefreshing = false;
+          return logEntryEntity;
+      })
+    ).subscribe()
+  }),
+  tap(t => {
+    this.isRefreshing = false;
+  })
+); //.subscribe(); //.subscribe(); //.subscribe();
+
 
   constructor(private apiConfigSvc: ApiConfigService,
     private retentionEntitiesSvc: RetentionEntitiesService,
@@ -75,9 +83,10 @@ export class ApplianceJobLogViewComponent implements OnInit {
 
   ensureLogEntries(event: LazyLoadEvent) {
     this.applianceLogOffset = event.first as number;
-    
+
     this.applianceLogPageSize = event.rows as number;
-    console.log("ensuring log entries - component requested # of rows = " + event.rows);
+    this.applianceLogOffset = event.first as number;
+    console.log("ensureLogEntries(): ensuring log entries - component requested # of rows = " + event.rows);
 
     this.jobOutputLogChanges$.subscribe(data => {
 
@@ -85,6 +94,9 @@ export class ApplianceJobLogViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.applianceLogPageCount = 2;
+    this.logChanges$.subscribe();
+    console.log("appliance job log is validting pagemodel subject");
 
   }
 

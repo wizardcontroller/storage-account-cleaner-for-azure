@@ -82,9 +82,9 @@ export class ApplianceApiService implements OnDestroy {
 
         this.isRefreshingSource.next(false);
 
-      }),
+      }),    share()
 
-  ).subscribe(); 
+  ).subscribe();
 
   public selectedStorageAccountSource = new BehaviorSubject<string>("");
   selectedStorageAccountAction$ = this.selectedStorageAccountSource.asObservable();
@@ -99,7 +99,7 @@ export class ApplianceApiService implements OnDestroy {
       map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
         filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
       )
-    );
+    ,     share());
 
 
   private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();
@@ -146,7 +146,7 @@ export class ApplianceApiService implements OnDestroy {
           this.selectedStorageAccountSource.next(accounts[0].id as string);
 
 
-        })
+        }),     share()
       ).subscribe();
 
     /**
@@ -195,7 +195,7 @@ export class ApplianceApiService implements OnDestroy {
             this.currentWorkflowCheckpointSource.next(data);
 
 
-          })
+          }),     share()
       ).subscribe();
 
       /*
@@ -254,7 +254,7 @@ export class ApplianceApiService implements OnDestroy {
           this.operatorPageModel = data;
 
 
-        })
+        }),     share()
       ).subscribe();
   }
 

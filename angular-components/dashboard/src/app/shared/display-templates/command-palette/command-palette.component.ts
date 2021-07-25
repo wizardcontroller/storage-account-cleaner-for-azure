@@ -24,7 +24,7 @@ import {
   share,
   shareReplay,
   tap,
-  withLatestFrom, debounceTime, filter
+  withLatestFrom, debounceTime, filter, publish
 } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -83,7 +83,8 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         //}
        this.isRefreshing = false;
 
-      })).subscribe();
+      }),
+      publish(), refCount()).subscribe();
 
   isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$
     .pipe
@@ -111,7 +112,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
 
       })
-
+      ,publish(), refCount()
   );
     /*
     .subscribe(data =>
@@ -210,6 +211,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.isShowSpinnerSource.next(false);
           this.isRefreshing = false;
         }),
+        publish(), refCount(),
         catchError(err => {
           const toast = new ToastMessage();
           toast.detail = "failed to submit command to the appliance";
@@ -265,7 +267,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.pageModelSubject.next(changes);
           this.currentPageModel = changes;
           return changes;
-        })
+        }),      publish(), refCount()
       );
   }
 
@@ -288,7 +290,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.availableCommandSubject.next(
             workflowCheckpoint.availableCommands as Array<AvailableCommand>
           );
-        }));
+        }),     publish(), refCount());
 
   }
 
