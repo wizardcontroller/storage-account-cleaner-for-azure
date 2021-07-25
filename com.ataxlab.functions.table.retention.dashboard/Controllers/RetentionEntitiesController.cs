@@ -55,7 +55,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
         [HttpPost(Name = "SetEntityRetentionPolicyForStorageAccount")]
         public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)], [FromBody] TableStorageEntityRetentionPolicy policy, string storageAccountId,                    
+                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,   [FromBody] TableStorageEntityRetentionPolicy policy,                  
                      string tableStorageEntityRetentionPolicyEntityId, string diagnosticsRetentionSurfaceEntityId)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
