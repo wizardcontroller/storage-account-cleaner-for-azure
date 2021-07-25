@@ -48,29 +48,29 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
         [HttpGet(Name = "GetEntityRetentionPolicyForStorageAccount")]
         public async Task<TableStorageEntityRetentionPolicy> GetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                     [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
+                     [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId, string tableStorageEntityRetentionPolicyEntityId, string diagnosticsRetentionSurfaceEntityId)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
         }
 
         [HttpPost(Name = "SetEntityRetentionPolicyForStorageAccount")]
         public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
-                     [FromBody] TableStorageEntityRetentionPolicy policy)
+                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)], [FromBody] TableStorageEntityRetentionPolicy policy, string storageAccountId,                    
+                     string tableStorageEntityRetentionPolicyEntityId, string diagnosticsRetentionSurfaceEntityId)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
         }
 
         [HttpGet(Name = "GetTableRetentionPolicyForStorageAccount")]
         public async Task<TableStorageTableRetentionPolicy> GetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-             [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
+             [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId, string tableStorageTableRetentionPolicyEntityId, string metricRetentionSurfaceEntity)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
 
         [HttpPost(Name = "SetTableRetentionPolicyForStorageAccount")]
         public async Task<TableStorageTableRetentionPolicy> SetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
+                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId, string tableStorageTableRetentionPolicyEntityId, string metricRetentionSurfaceEntity, 
                      [FromBody] TableStorageTableRetentionPolicy policy)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());

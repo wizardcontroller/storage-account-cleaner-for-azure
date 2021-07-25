@@ -143,7 +143,22 @@ namespace com.ataxlab.azure.table.retention.models.models
             Id = Guid.NewGuid();
             ItemExists = false;
             ItemWillBeDeleted = false;
+            RetentionPeriodInDays = 90;
+            RetainedEntitySampleSize = 1000;
+            Timestamp = DateTime.UtcNow;
         }
+
+        public DateTime Timestamp { get; set; }
+
+        public int RetentionPeriodInDays { get; set; }
+
+        /// <summary>
+        /// how many items should the appliance attempt to retrieve from the table
+        /// when calculating how many items will be triggered by the retention period
+        /// </summary>
+        public int RetainedEntitySampleSize { get; set; }
+
+        public int PolicyTriggerCount { get; set; }
 
         public virtual RetentionSurfaceItemDescriptor ItemType { get; set; }
 
