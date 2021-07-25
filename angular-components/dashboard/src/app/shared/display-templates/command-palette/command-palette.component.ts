@@ -53,7 +53,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   isShowSpinnerSource = new ReplaySubject<boolean>();
   isShowSpinnerChanges$ = this.isShowSpinnerSource.asObservable();
 
-  refreshTimer$ = timer((1000 * 30), (1000 * 30));
+  refreshTimer$ = timer(0, (1000 * 30));
 
   isRefreshingPipe$ = combineLatest(
     this.refreshTimer$,
@@ -62,10 +62,11 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   .pipe
     (
       distinctUntilChanged(),
+      // filter(f => this.workflowCheckpoint.timeStamp?.match(this.workflowCheckpoint.timeStamp) === null),
+      // filter(f => f[1].timeStamp === this.workflowCheckpoint.timeStamp),
       tap(tapped => {
         console.log("command palette is refreshing = " + tapped);
       }),
-      filter(f => f[1].timeStamp != this.workflowCheckpoint.timeStamp),
       map(([isRefreshing,data]) => {
         this.isRefreshing = true;
         // this.isRefreshingSource.next(isRefreshing);
@@ -116,22 +117,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       })
 
   );
-    /*
-    .subscribe(data =>
-    {
 
-    }, error => {
-
-      const toast = new ToastMessage();
-      toast.detail = JSON.stringify(error);
-      toast.summary = "Error";
-      toast.sticky = false;
-      toast.life = 1000 * 8;
-      toast.severity = "error";
-      this.showToast(toast);
-      this.isRefreshing = false; this.isRefreshingSource.next(false);
-    });
-  */
   workflowCheckpoint!: WorkflowCheckpointDTO;
 
   selectedCommand!: AvailableCommand;
@@ -261,7 +247,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         tap(t => {
           const toast = new ToastMessage();
           toast.detail = "operator pagemodel is available";
-          toast.summary = "updating pagemodel";
+          toast.summary = "updating";
           toast.sticky = false;
           toast.life = 1000 * 8;
           toast.severity = "info";
@@ -275,6 +261,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     return this.applianceAPiSvc.workflowCheckpointChanges$.
       pipe(
         distinctUntilChanged(),
+
         tap(t => {
           const toast = new ToastMessage();
           toast.detail = "checking the appliance workflow checkpoint";
@@ -285,6 +272,9 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.showToast(toast);
         }),
         map(workflowCheckpoint => {
+
+          // let difference = this.workflowCheckpoint.availableCommands?.filter(f => !workflowCheckpoint.availableCommands?.includes(f));
+          console.log(`command null workflow checkpoijnt ${this.workflowCheckpoint === null}`);
 
           this.workflowCheckpoint = workflowCheckpoint;
           this.availableCommandSubject.next(

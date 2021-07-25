@@ -44,11 +44,11 @@ export class ApplianceApiService implements OnDestroy {
   currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
 
   workflowCheckPoint!: WorkflowCheckpointDTO | null;
-  private currentWorkflowCheckpointSource = new Subject<WorkflowCheckpointDTO>();
+  private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
 
   isAutoRefreshWorkflowCheckpoint = true;
-  workflowCheckpointPollingStartDelay = 1500; //1.5 seconds
+  workflowCheckpointPollingStartDelay = 0; //1.5 seconds
   workflowCheckpointPollingInterval = (1000 * 1) * ( 1 * 60); // seconds * minutes
   storageAccounts: StorageAccountDTO[] = [];
   private storageAccountsSource = new ReplaySubject<StorageAccountDTO[] | undefined | null>();
@@ -149,34 +149,6 @@ export class ApplianceApiService implements OnDestroy {
         }),     share()
       ).subscribe();
 
-    /**
-    this.entityService.getApplianceSessionContext(tenantId, oid).subscribe(data => {
-      console.log("apliance session context updated");
-      this.currentApplianceSessionContextSource.next(data);
-      this.currentJobOutputSource.next(data.currentJobOutput);
-
-      var accounts = data.selectedStorageAccounts as Array<StorageAccountDTO>;
-
-      this.storageAccounts = accounts;
-      this.storageAccountsSource.next(accounts);
-
-      // 'select' a newly available storage account
-      this.selectedStorageAccountSource.next(accounts[0].id as string);
-
-      // can listen selected storage account changes
-      // required for calls to retention service that require storage account header
-      //this.selectedStorageAccount$.subscribe(selectedAcct => {
-      //var acct = selectedAcct.pop();
-
-      // this is where this code would go if needed
-      //console.log("using account name " + acct?.name);
-      // set the storage account header
-
-      //      });
-      //    }, error => {
-      //      console.log("error getting session context: " + (error as Error).message);
-    });
-    */
   }
 
   public ensureWorkflowSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void {
@@ -198,17 +170,6 @@ export class ApplianceApiService implements OnDestroy {
           }),     share()
       ).subscribe();
 
-      /*
-      this.entityService.getWorkflowCheckpoint(tenantId, oid).subscribe(data => {
-        console.log("workflow context updated");
-
-
-        this.workflowCheckPoint = data;
-        this.currentWorkflowCheckpointSource.next(data);
-      }, error => {
-        console.log("error getting workflow context: " + (error as Error).message);
-      });
-      */
     }
     else {
 

@@ -1985,7 +1985,9 @@ namespace com.ataxlab.functions.table.retention.services
             try
             {
                 StackTrace stackTrace = new StackTrace();
-                logEntry.source = stackTrace.GetFrame(1).GetMethod().Name;
+
+                var frames = stackTrace.GetFrames();
+                logEntry.source = frames[frames.Length - 2].GetMethod().Name; //stackTrace.GetFrame(2).GetMethod().Name;
 
                 var entityId = await this.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
                 await entityClient.SignalEntityAsync<IJobOutputLogEntity>(entityId, proxy =>
