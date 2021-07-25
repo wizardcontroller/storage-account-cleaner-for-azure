@@ -3,17 +3,19 @@
 >
   <div clas="card metricscard">
 
-    <p-dataView [value]="jobs"
+    <p-dataView #dv [value]="jobs"
                 layout="grid"
                 [paginator]="true"
                 [rows]="1"
+                filterBy="itemExists"
     >
 
       <ng-template pTemplate="header">
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
           <div>Metrics Retention Surface</div>
-        </div>
+          <p-toggleButton #filterItemsBtn [(ngModel)]="showOnlyExistingItems" (onChange)="filterChanged($event.checked)"   onLabel="extant items only" offLabel="non-extant items only" ></p-toggleButton>
+       </div>
       </ng-template>
 
       <ng-template let-job pTemplate="listItem">

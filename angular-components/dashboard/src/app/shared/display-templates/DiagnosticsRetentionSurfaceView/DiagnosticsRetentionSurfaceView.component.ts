@@ -10,7 +10,8 @@ import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDispla
 import { ApplianceApiService } from '../../services/appliance-api.service';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav'
 import { PrimeIcons } from 'primeng/api'
-
+import { DataView } from 'primeng/dataview';
+import { ToggleButton } from 'primeng/togglebutton'
 @Component({
 
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
@@ -19,6 +20,9 @@ import { PrimeIcons } from 'primeng/api'
 
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnInit, ICanBeHiddenFromDisplay {
+  @ViewChild('dv') dv!: DataView;
+  @ViewChild('filterItemsBtn') filterItemsBtn! : ToggleButton;
+  showOnlyExistingItems = false;
 
   isSideNavOpen = false;
 
@@ -82,6 +86,15 @@ export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnIn
   toggleSideNav(): void {
     console.log("toggling sidenav");
     this.isSideNavOpen = !this.isSideNavOpen;
+  }
+
+  filterChanged(e: boolean){
+
+    const filterExpression = e ? "true" : "false";
+
+    this.dv.filter(filterExpression);
+    console.log(`filter expression ${filterExpression}`);
+    // this.filterItemsBtn.checked = e.returnValue;
   }
 
 }
