@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { JobOutputLogEntry, RetentionEntitiesService } from '@wizardcontroller/sac-appliance-lib';
-import { combineLatest, iif, timer } from 'rxjs';
+import { combineLatest, iif, Subject, timer } from 'rxjs';
 import { concatMap, filter, map, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -49,14 +49,18 @@ export class ApplianceJobLogViewComponent implements OnInit {
     console.log("withLatestFrom() is getting log entries");
     this.applianceApiSvc.entityService
       .getApplianceLogEntries(tenantid as string,
-        oid as string,this.applianceLogOffset, this.applianceLogPageSize + 1, this.applianceLogPageCount)
+        oid as string,this.applianceLogOffset, this.applianceLogPageSize, this.applianceLogPageCount + 1)
       .pipe(
 
         map(logEntryEntity => {
 
           console.log("withLatestFrom() has retrieved log entries. rowcount = " + logEntryEntity.rowCount, " retrieved # of rows=" + logEntryEntity.logEntries?.length);
+
+          // this is the purpose of this pipe - to update the total record count
           this.totalLogEntries = logEntryEntity.rowCount as number;
-          this.jobOutputLogSubject.next(logEntryEntity.logEntries);
+
+          // don't do this here
+          // this.jobOutputLogSubject.next(logEntryEntity.logEntries);
 
           // this.cachedLogJson = logEntryEntity.logEntries as JobOutputLogEntry[];
 
@@ -82,20 +86,49 @@ export class ApplianceJobLogViewComponent implements OnInit {
   }
 
   ensureLogEntries(event: LazyLoadEvent) {
-    this.applianceLogOffset = event.first as number;
 
     this.applianceLogPageSize = event.rows as number;
     this.applianceLogOffset = event.first as number;
-    console.log("ensureLogEntries(): ensuring log entries - component requested # of rows = " + event.rows);
+    console.log("ensureLogEntries(): ensuring log entries - component requested # of rows = " + event.rows as string + " at offset " + this.applianceLogOffset as string);
 
-    this.jobOutputLogChanges$.subscribe(data => {
+    this.getLatestLogEntries(this.applianceLogOffset, this.applianceLogPageSize * 2 ).subscribe();
+  }
 
-    });
+  getLatestLogEntries(offset: number, rows: number){
+
+    return this.apiConfigSvc.operatorPageModelChanges$.pipe(
+      map(pageModel =>{
+        const tenantid = pageModel.tenantid as string;
+
+        const subscriptionId = pageModel.subscriptionId as string;
+
+        const oid = pageModel.oid as string;
+        console.log(`getLatestLogEntries() for tenantId= ${tenantid} oid= ${oid} offset= ${offset} rows= ${rows}`);
+        this.applianceApiSvc.entityService
+        .getApplianceLogEntries(tenantid, oid, offset, rows, 2).subscribe(
+          logEntryEntity => {
+
+            this.totalLogEntries = logEntryEntity.rowCount as number;
+
+            this.jobOutputLogSubject.next(logEntryEntity.logEntries);
+
+            console.log(`getLatestLogEntries() for tenantId= ${tenantid} oid= ${oid} offset= ${offset} rows= ${rows} retrieved ${this.totalLogEntries} total log entries and ${logEntryEntity.logEntries?.length} available entities`);
+
+          }
+        );
+      })
+    );
   }
 
   ngOnInit(): void {
-    this.applianceLogPageCount = 2;
-    this.logChanges$.subscribe();
+
+    this.getLatestLogEntries(0, 20).subscribe(
+        data => {
+
+         // console.log("appliance log initializng with " + data.lo);
+         }
+    );
+
     console.log("appliance job log is validting pagemodel subject");
 
   }

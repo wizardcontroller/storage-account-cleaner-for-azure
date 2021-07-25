@@ -14,7 +14,7 @@ import {
 
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { BehaviorSubject, combineLatest, config, from, interval, of, ReplaySubject, Subject, timer } from 'rxjs';
-import { concatMap, debounce, debounceTime, flatMap, map, mergeMap, publishReplay, refCount, share, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { concatMap, debounce, debounceTime, distinctUntilChanged, flatMap, map, mergeMap, publishReplay, refCount, share, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextService } from '../display-templates/services/ApplianceContext.service';
 import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
@@ -64,7 +64,7 @@ export class ApplianceApiService implements OnDestroy {
     this.apiConfigService.operatorPageModelChanges$
   )
     .pipe(
-
+      distinctUntilChanged(),
       tap(t => {
 
       }),
@@ -95,7 +95,7 @@ export class ApplianceApiService implements OnDestroy {
     ]
   )
     .pipe(
-
+      distinctUntilChanged(),
       map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
         filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
       )
@@ -130,7 +130,7 @@ export class ApplianceApiService implements OnDestroy {
 
     this.entityService.getApplianceSessionContext(tenantId, oid)
       .pipe(
-
+        distinctUntilChanged(),
         map(data => {
 
           console.log("apliance session context updated");
@@ -185,7 +185,7 @@ export class ApplianceApiService implements OnDestroy {
 
       this.entityService.getWorkflowCheckpoint(tenantId, oid)
         .pipe(
-
+          distinctUntilChanged(),
           map(data => {
 
             console.log("workflow context updated");
@@ -223,7 +223,7 @@ export class ApplianceApiService implements OnDestroy {
 
     this.apiConfigService.operatorPageModelChanges$
       .pipe(
-
+        distinctUntilChanged(),
         map(data => {
 
 

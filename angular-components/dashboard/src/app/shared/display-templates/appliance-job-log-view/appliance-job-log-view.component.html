@@ -8,14 +8,14 @@
                 [paginator]="true"
                 [first] = "applianceLogOffset"
                 paginatorPosition="both"
-                [rows]="applianceLogPageSize"
+                [rows]="5"
                 [showJumpToPageDropdown] = "true"
                 [lazy]="true"
                 layout="list"
                 sortField="timeStamp" [sortOrder] = "1"
                 [loading]="isRefreshing"
                 [showCurrentPageReport]="true"
-
+                [totalRecords]="totalLogEntries"
                 (onLazyLoad)="ensureLogEntries($event)">
 
                 <ng-template pTemplate="header">
@@ -23,11 +23,11 @@
                 </ng-template>
       <ng-template let-logentry pTemplate="listItem">
         <div style=" display: flex; align-items: left; width: 100%; ">
-          <div style="display: flex; align-items: left; width:25%; ">{{logentry.timeStamp}} </div>
+          <div style="display: flex; align-items: left; width:25%; ">{{logentry.timeStamp | date:'medium'}} </div>
           <div style="display: flex; align-items: left; width: 15%; ">{{logentry.source}}</div>
 
           <div style="display: flex; align-items: left; width: 20%; ">{{logentry.summary}}</div>
-          <div style="display: flex; align-items: left;  width: 30%; overflow-y: auto; ">{{logentry.detail}}</div>
+          <div style="display: flex; align-items: left;  width: 30%;">{{logentry.detail}}</div>
 
         </div>
 

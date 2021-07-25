@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ConfigService, OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
-import { map, share } from 'rxjs/operators';
+import { distinctUntilChanged, map, share } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { ToastMessage } from '../models/ToastMessage';
 @Injectable({
@@ -48,6 +48,7 @@ export class ApiConfigService {
     console.log('calling config service');
     return this.configService.getOperatorPageModel()
       .pipe(
+        distinctUntilChanged(),
         map(data => {
           this.currentPageModelSource.next(data);
           return data;

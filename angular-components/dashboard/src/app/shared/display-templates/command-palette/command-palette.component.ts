@@ -24,7 +24,7 @@ import {
   share,
   shareReplay,
   tap,
-  withLatestFrom, debounceTime, filter, publish
+  withLatestFrom, debounceTime, filter, publish, distinctUntilChanged
 } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -42,7 +42,7 @@ import { ToastMessage } from '../../../models/ToastMessage';
 @AutoUnsubscribe()
 export class CommandPaletteComponent implements OnInit, OnDestroy {
   availableCommands!: Array<AvailableCommand> | null | undefined;
-  availableCommandSubject = new ReplaySubject<Array<AvailableCommand>>();
+  availableCommandSubject = new Subject<Array<AvailableCommand>>();
   availableCommandChanges$ = this.availableCommandSubject.asObservable();
   hasSelectedCommand = false;
 
@@ -53,7 +53,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   isShowSpinnerSource = new ReplaySubject<boolean>();
   isShowSpinnerChanges$ = this.isShowSpinnerSource.asObservable();
 
-  refreshTimer$ = timer(0, (1000 * 30));
+  refreshTimer$ = timer((1000 * 30), (1000 * 30));
 
   isRefreshingPipe$ = combineLatest(
     this.refreshTimer$,
@@ -61,9 +61,11 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   )
   .pipe
     (
+      distinctUntilChanged(),
       tap(tapped => {
         console.log("command palette is refreshing = " + tapped);
       }),
+      filter(f => f[1].timeStamp != this.workflowCheckpoint.timeStamp),
       map(([isRefreshing,data]) => {
         this.isRefreshing = true;
         // this.isRefreshingSource.next(isRefreshing);
@@ -71,11 +73,11 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         // if (isRefreshing) {
         console.log("showing refresh toast");
         const toast = new ToastMessage();
-        toast.detail = "checking the appliance state";
+        toast.detail = "checking the appliance state ";
         toast.summary = "command palette Updating ";
         toast.sticky = false;
         toast.life = 1000 * 8;
-        toast.severity = "info";
+        toast.severity = "warning";
         this.showToast(toast);
 
         // this.getPagemodelChangesPipe().subscribe();
@@ -83,12 +85,12 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         //}
        this.isRefreshing = false;
 
-      }),
-      publish(), refCount()).subscribe();
+      })).subscribe();
 
   isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$
     .pipe
     (
+      distinctUntilChanged(),
       tap(tapped => {
         console.log("command palette is refreshing = " + tapped);
       }),
@@ -112,7 +114,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
 
       })
-      ,publish(), refCount()
+
   );
     /*
     .subscribe(data =>
@@ -138,7 +140,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
   selectedStorageAccountId!: string;
 
-  pageModelSubject = new ReplaySubject<OperatorPageModel>();
+  pageModelSubject = new Subject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubject.asObservable();
 
   constructor(
@@ -155,8 +157,16 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
 
   submitCommand(command: AvailableCommand): void {
     console.log('submitting command: ' + command.menuLabel);
+    const oid = this.currentPageModel.oid as string;
+    const tenantId = this.currentPageModel.tenantid as string;
+    const subscriptionId = this.currentPageModel
+      .selectedSubscriptionId as string;
+    const storageAccountId = this.selectedStorageAccountId as string;
+    const workflowOperationCommand = new WorkflowOperationCommandImpl();
+    const datepipe: DatePipe = new DatePipe('en-US');
+
     const toast = new ToastMessage();
-    toast.detail = command.worklowOperationDisplayMessage as string;
+    toast.detail = `${command.worklowOperationDisplayMessage}: oid=${oid}`;
     toast.summary = command.menuLabel as string;
 
     toast.severity = "info";
@@ -165,14 +175,6 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     // this.applianceAPiSvc.isRefreshingSource.next(true);
     this.isShowSpinnerSource.next(true);
     this.isRefreshing = true;
-    const oid = this.currentPageModel.oid as string;
-    const tenantId = this.currentPageModel.tenantid as string;
-    const subscriptionId = this.currentPageModel
-      .selectedSubscriptionId as string;
-    const storageAccountId = this.selectedStorageAccountId as string;
-    const workflowOperationCommand = new WorkflowOperationCommandImpl();
-    const datepipe: DatePipe = new DatePipe('en-US')
-    let formattedDate = datepipe.transform(new Date(), 'YYYY-mm-dd HH:mm:ss')
 
     workflowOperationCommand.candidateCommand = this.selectedCommand;
     // workflowOperationCommand.timeStamp = Date.UTC.toString();
@@ -211,8 +213,9 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.isShowSpinnerSource.next(false);
           this.isRefreshing = false;
         }),
-        publish(), refCount(),
+
         catchError(err => {
+          console.log("catchError(): error submitting command");
           const toast = new ToastMessage();
           toast.detail = "failed to submit command to the appliance";
           toast.summary = "update failed";
@@ -229,11 +232,6 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       .subscribe(
         (placeholder) => {
           console.log('');
-
-        },
-        (errors) => {
-          console.log(JSON.stringify(errors));
-          console.log("error submitting");
 
         }
       );
@@ -254,20 +252,21 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   getPagemodelChangesPipe(): Observable<OperatorPageModel>{
     return this.apiConfigSvc.operatorPageModelChanges$.
       pipe(
-        tap(t => {
-          const toast = new ToastMessage();
-          toast.detail = "operator pagemodel is available";
-          toast.summary = "updating";
-          toast.sticky = false;
-          toast.life = 1000 * 8;
-          toast.severity = "info";
-          this.showToast(toast);
-        }),
+        distinctUntilChanged(),
         map(changes => {
           this.pageModelSubject.next(changes);
           this.currentPageModel = changes;
           return changes;
-        }),      publish(), refCount()
+        }),
+        tap(t => {
+          const toast = new ToastMessage();
+          toast.detail = "operator pagemodel is available";
+          toast.summary = "updating pagemodel";
+          toast.sticky = false;
+          toast.life = 1000 * 8;
+          toast.severity = "info";
+          this.showToast(toast);
+        })
       );
   }
 
@@ -275,10 +274,11 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     console.log("getWorkflowCheckpointChangesPipe()");
     return this.applianceAPiSvc.workflowCheckpointChanges$.
       pipe(
+        distinctUntilChanged(),
         tap(t => {
           const toast = new ToastMessage();
-          toast.detail = "checking the appliance state";
-          toast.summary = "command palette Updating ";
+          toast.detail = "checking the appliance workflow checkpoint";
+          toast.summary = "workflow checkpoint updating ";
           toast.sticky = false;
           toast.life = 1000 * 8;
           toast.severity = "info";
@@ -290,11 +290,13 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.availableCommandSubject.next(
             workflowCheckpoint.availableCommands as Array<AvailableCommand>
           );
-        }),     publish(), refCount());
+        }));
 
   }
 
   ngOnInit(): void {
     console.log('command palette onInit');
+    this.getPagemodelChangesPipe().subscribe();
+    this.getWorkflowCheckpointChangesPipe().subscribe();
   }
 }
