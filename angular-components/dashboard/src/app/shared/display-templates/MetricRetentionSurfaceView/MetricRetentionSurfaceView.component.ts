@@ -10,7 +10,7 @@ import {
   RetentionEntitiesService,
   StorageAccountDTO,
   TableStorageEntityRetentionPolicy,
-  TableStorageEntityRetentionPolicyEnforcementResult,
+  TableStorageEntityRetentionPolicyEnforcementResult
 } from '@wizardcontroller/sac-appliance-lib';
 import { combineLatest, ReplaySubject } from 'rxjs';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';

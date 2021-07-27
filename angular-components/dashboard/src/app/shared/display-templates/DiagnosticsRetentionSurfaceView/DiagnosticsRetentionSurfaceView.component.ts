@@ -11,7 +11,7 @@ import { ApplianceApiService } from '../../services/appliance-api.service';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav'
 import { PrimeIcons } from 'primeng/api'
 import { DataView } from 'primeng/dataview';
-import { ToggleButton } from 'primeng/togglebutton'
+import { ToggleButton } from 'primeng/togglebutton';
 @Component({
 
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',

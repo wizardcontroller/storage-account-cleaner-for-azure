@@ -13,6 +13,7 @@
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
           <div>Diagnostics Retention Surface</div>
+
           <p-toggleButton #filterItemsBtn [(ngModel)]="showOnlyExistingItems" (onChange)="filterChanged($event.checked)"   onLabel="extant items only" offLabel="non-extant items only" ></p-toggleButton>
 
         </div>
