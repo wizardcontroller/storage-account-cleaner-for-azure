@@ -27,8 +27,9 @@
       <ng-template let-job pTemplate="gridItem">
         <div class="p-col-12 ">
           <mat-tab-group >
-            <mat-tab  style="max-height: 200px;" label="Calendar">
-                <span>calendar</span>
+            <mat-tab  style="width: 500px; max-height: 200px;" label="Calendar">
+              <p-fullCalendar style="width: 100%;" [events]="events" [options]="options"></p-fullCalendar>
+
             </mat-tab>
             <mat-tab label="Timeline">
               <p-card class="card">

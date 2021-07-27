@@ -11,3 +11,8 @@
   top: 0;
   background: blue;
 }
+
+:host ::ng-deep .fc-header-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+}

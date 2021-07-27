@@ -12,6 +12,10 @@ import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav'
 import { PrimeIcons } from 'primeng/api'
 import { DataView } from 'primeng/dataview';
 import { ToggleButton } from 'primeng/togglebutton';
+import {FullCalendarModule} from 'primeng/fullcalendar';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
 @Component({
 
@@ -23,8 +27,13 @@ import { ToggleButton } from 'primeng/togglebutton';
 export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnInit, ICanBeHiddenFromDisplay {
   @ViewChild('dv') dv!: DataView;
   @ViewChild('filterItemsBtn') filterItemsBtn! : ToggleButton;
+
   showOnlyExistingItems = false;
   isSideNavOpen = false;
+
+  events!: any[];
+
+  options!: any;
 
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
@@ -82,6 +91,39 @@ export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnIn
       // metrics retention component has operator page model
       this.pageModelSubuject.next(pageModel);
     });
+
+    this.options = {
+      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+
+      header: {
+          left: 'prev,next',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      editable: true,
+      dayMaxEvents: true
+  };
+
+  this.events = [
+    {
+        "id": 1,
+    "title": "All Day Event",
+    "start": "2017-02-01"
+    },
+  {
+        "id": 2,
+    "title": "Long Event",
+    "start": "2017-02-07",
+    "end": "2017-02-10"
+    },
+  {
+    "id": 3,
+    "title": "Repeating Event",
+    "start": "2017-02-09T16:00:00"
+
+  }
+  ];
+
   }
 
   toggleSideNav(): void {

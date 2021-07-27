@@ -41,6 +41,8 @@ import { ApplianceJobLogViewComponent } from './display-templates/appliance-job-
 import {CarouselModule} from 'primeng/carousel';
 
 import {MatTabsModule} from '@angular/material/tabs';
+import {FullCalendarModule} from 'primeng/fullcalendar';
+// import {FullCalendarModule} from '@fullcalendar/angular';
 @NgModule({
   imports: [
     CommonModule,
@@ -63,7 +65,8 @@ import {MatTabsModule} from '@angular/material/tabs';
     RouterModule,
     ToastModule,
     CarouselModule,
-    MatTabsModule
+    MatTabsModule,
+    FullCalendarModule
   ],
   exports: [
     SharedComponent,
