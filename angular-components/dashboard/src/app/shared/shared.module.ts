@@ -37,6 +37,15 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ApplianceJobLogViewComponent } from './display-templates/appliance-job-log-view/appliance-job-log-view.component';
+import { FullCalendarModule } from '@fullcalendar/angular'; // must go before plugins
+import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
+import interactionPlugin from '@fullcalendar/interaction'; // a plugin!
+import {CarouselModule} from 'primeng/carousel';
+FullCalendarModule.registerPlugins([ // register FullCalendar plugins
+  dayGridPlugin,
+  interactionPlugin
+]);
+import {MatTabsModule} from '@angular/material/tabs';
 @NgModule({
   imports: [
     CommonModule,
@@ -57,7 +66,10 @@ import { ApplianceJobLogViewComponent } from './display-templates/appliance-job-
     MatProgressSpinnerModule,
     ToggleButtonModule,
     RouterModule,
-    ToastModule
+    ToastModule,
+    FullCalendarModule,
+    CarouselModule,
+    MatTabsModule
   ],
   exports: [
     SharedComponent,

@@ -12,6 +12,7 @@ import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav'
 import { PrimeIcons } from 'primeng/api'
 import { DataView } from 'primeng/dataview';
 import { ToggleButton } from 'primeng/togglebutton';
+import { CalendarOptions } from '@fullcalendar/angular'; // useful for typechecking
 @Component({
 
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
@@ -23,8 +24,15 @@ export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnIn
   @ViewChild('dv') dv!: DataView;
   @ViewChild('filterItemsBtn') filterItemsBtn! : ToggleButton;
   showOnlyExistingItems = false;
-
   isSideNavOpen = false;
+
+  calendarOptions: CalendarOptions = {
+    initialView: 'dayGridMonth',
+    events: [
+      { title: 'event 1', date: '2019-04-01' },
+      { title: 'event 2', date: '2019-04-02' }
+    ]
+  };
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
