@@ -10,19 +10,22 @@ import { SubscriptionsViewComponent } from './shared/display-templates/Subscript
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ICanBeHiddenFromDisplay } from './shared/interfaces/ICanBeHiddenFromDisplay';
 import { map, tap } from 'rxjs/operators';
-import { ThemePalette } from '@angular/material/core'
-import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { ThemePalette } from '@angular/material/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MessageService } from 'primeng/api';
 import { ToastMessage } from './models/ToastMessage';
+import { PrimeNGConfig } from 'primeng/api';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
-
 @AutoUnsubscribe()
-export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
-  isAutoRefreshWorkflowCheckpoint = this.applianceSvc.isAutoRefreshWorkflowCheckpoint;
+export class AppComponent
+  implements OnInit, OnDestroy, ICanBeHiddenFromDisplay
+{
+  isAutoRefreshWorkflowCheckpoint =
+    this.applianceSvc.isAutoRefreshWorkflowCheckpoint;
   color: ThemePalette = 'accent';
 
   isRefreshing!: boolean;
@@ -34,51 +37,49 @@ export class AppComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay 
 
   baseUri: String | undefined;
   title = 'dashboard';
-  constructor(private apiConfigSvc: ApiConfigService,
+  constructor(
+    private apiConfigSvc: ApiConfigService,
+    private primengConfig: PrimeNGConfig,
     private messageService: MessageService,
-    private applianceSvc: ApplianceApiService) {
-
+    private applianceSvc: ApplianceApiService
+  ) {
+    this.primengConfig.ripple = true;
     this.isShow = false;
-    this.apiConfigSvc.operatorPageModelChanges$.subscribe(data => {
-      console.log("app component has operator page model");
+    this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
+      console.log('app component has operator page model');
       this.baseUri = data.applianceUrl?.toString();
       this.currentPageModelSource.next(data);
-      return this.operatorPageModel = data;
+      return (this.operatorPageModel = data);
     });
   }
   isShow!: boolean;
   toggleDisplay(): void {
-    console.log("toggling");
+    console.log('toggling');
     this.isShow = !this.isShow;
   }
 
-
-
   ngOnDestroy(): void {
-
     // do no thing.
-
   }
 
   ngOnInit(): void {
-    console.log("app component is initializing page model");
-    this.apiConfigSvc.initPageModelSubject()
+    console.log('app component is initializing page model');
+    this.apiConfigSvc
+      .initPageModelSubject()
       .pipe(
-        tap(t => {
+        tap((t) => {
           const toast = new ToastMessage();
-          toast.detail = "loaded operator page model";
-          toast.summary = "page model refreshed";
-          toast.severity = "info";
+          toast.detail = 'loaded operator page model';
+          toast.summary = 'page model refreshed';
+          toast.severity = 'info';
           toast.sticky = false;
           this.showToast(toast);
         })
-      ).subscribe();
-
-
+      )
+      .subscribe();
   }
 
   showToast(message: ToastMessage): void {
     this.messageService.add(message);
   }
-
 }

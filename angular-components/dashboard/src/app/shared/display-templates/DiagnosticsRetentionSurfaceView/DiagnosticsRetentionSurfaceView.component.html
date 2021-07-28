@@ -1,20 +1,30 @@
-<ng-container *ngIf="diagnosticsRetentionSurfaceEntityChanges$ | async as jobs; else noAccount">
-
+<ng-container
+  *ngIf="
+    diagnosticsRetentionSurfaceEntityChanges$ | async as jobs;
+    else noAccount
+  "
+>
   <div clas="card metricscard">
-
-    <p-dataView #dv [value]="jobs"
-                layout="grid"
-                [paginator]="true"
-                [rows]="1"
-                filterBy="itemExists"
+    <p-dataView
+      #dv
+      [value]="jobs"
+      layout="grid"
+      [paginator]="true"
+      [rows]="1"
+      filterBy="itemExists"
     >
-
       <ng-template pTemplate="header">
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
           <div>Diagnostics Retention Surface</div>
 
-          <p-toggleButton #filterItemsBtn [(ngModel)]="showOnlyExistingItems" (onChange)="filterChanged($event.checked)"   onLabel="extant items only" offLabel="non-extant items only" ></p-toggleButton>
+          <p-toggleButton
+            #filterItemsBtn
+            [(ngModel)]="showOnlyExistingItems"
+            (onChange)="filterChanged($event.checked)"
+            onLabel="extant items only"
+            offLabel="non-extant items only"
+          ></p-toggleButton>
         </div>
       </ng-template>
 
@@ -25,67 +35,69 @@
       </ng-template>
 
       <ng-template let-job pTemplate="gridItem">
-        <div class="p-col-12 ">
-          <mat-tab-group >
-            <mat-tab  style="width: 500px; max-height: 200px;" label="Calendar">
-              <p-fullCalendar style="width: 100%;" [events]="events" [options]="options"></p-fullCalendar>
-
+        <div class="p-col-12">
+          <mat-tab-group>
+            <mat-tab label="Calendar">
+              <p-fullCalendar
+              style="max-height:250px;"
+                #calendar
+                [events]="events"
+                [title]="job.tableName"
+                [options]="options"
+              ></p-fullCalendar>
             </mat-tab>
             <mat-tab label="Timeline">
               <p-card class="card">
-                <ng-template pTemplate="subtitle">{{ job.tableName }} </ng-template>
-                <ng-template class="p-d-flex" style="border: 8px;" pTemplate="content">
+                <ng-template pTemplate="subtitle"
+                  >{{ job.tableName }}
+                </ng-template>
+                <ng-template
+                  class="p-d-flex"
+                  style="border: 8px"
+                  pTemplate="content"
+                >
                   <div class="p-d-flex">
-                  <div class="p-d-inline-flex">
-                    <p-timeline [value]="job | datesToTimeLineEventsPipe">
-                      <ng-template pTemplate="content" let-event>
-                        {{ event.timestamp }}
-                      </ng-template>
-                      <ng-template pTemplate="opposite" let-event>
-                        {{ event.itemDescription }}
-                      </ng-template>
-                    </p-timeline>
-                  </div>
-                  <div class="p-d-inline-flex">
-                    <table>
-                      <tr>
-                        <td>Item Exists?</td>
-                        <td>{{ job.itemExists }}</td>
-                      </tr>
+                    <div class="p-d-inline-flex">
+                      <p-timeline [value]="job | datesToTimeLineEventsPipe">
+                        <ng-template pTemplate="content" let-event>
+                          {{ event.timestamp }}
+                        </ng-template>
+                        <ng-template pTemplate="opposite" let-event>
+                          {{ event.itemDescription }}
+                        </ng-template>
+                      </p-timeline>
+                    </div>
+                    <div class="p-d-inline-flex">
+                      <table>
+                        <tr>
+                          <td>Item Exists?</td>
+                          <td>{{ job.itemExists }}</td>
+                        </tr>
 
-
-                      <tr>
-                        <td><span>will be deleted?: </span></td>
-                        <td>{{ job.itemWillBeDeleted }}</td>
-                      </tr>
-                    </table>
-                  </div>
+                        <tr>
+                          <td><span>will be deleted?: </span></td>
+                          <td>{{ job.itemWillBeDeleted }}</td>
+                        </tr>
+                      </table>
+                    </div>
                   </div>
                 </ng-template>
                 <ng-template pTemplate="footer">
                   <p>
-                    <a href="{{ job.documentationLink }}">{{ job.itemDescription }}</a>
-
-                    </p>
-
+                    <a href="{{ job.documentationLink }}">{{
+                      job.itemDescription
+                    }}</a>
+                  </p>
                 </ng-template>
               </p-card>
             </mat-tab>
-
           </mat-tab-group>
           <p-carousel>
-            <ng-template >
-
-            </ng-template>
-            <ng-template>
-
-            </ng-template>
-        </p-carousel>
-
-
+            <ng-template> </ng-template>
+            <ng-template> </ng-template>
+          </p-carousel>
         </div>
       </ng-template>
-
 
       <ng-template pTemplate="footer">
         <p-dataViewLayoutOptions></p-dataViewLayoutOptions>

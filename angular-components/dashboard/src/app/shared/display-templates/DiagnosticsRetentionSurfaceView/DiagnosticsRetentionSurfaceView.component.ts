@@ -8,10 +8,11 @@ import { concatMap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from '../../../core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
-import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav'
-import { PrimeIcons } from 'primeng/api'
+import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
+import { PrimeIcons } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
 import { ToggleButton } from 'primeng/togglebutton';
+
 import {FullCalendarModule} from 'primeng/fullcalendar';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -32,7 +33,7 @@ export class DiagnosticsRetentionSurfaceViewComponent implements OnDestroy, OnIn
   isSideNavOpen = false;
 
   events!: any[];
-
+  header!: any;
   options!: any;
 
 
