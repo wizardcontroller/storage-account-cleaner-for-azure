@@ -41,7 +41,7 @@
               <p-fullCalendar
               style="max-height:250px;"
                 #calendar
-                [events]="events"
+                [events]="job | retentionPeriodForFullCalendar"
                 [title]="job.tableName"
                 [options]="options"
               ></p-fullCalendar>

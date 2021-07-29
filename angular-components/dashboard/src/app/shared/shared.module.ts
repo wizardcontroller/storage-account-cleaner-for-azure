@@ -1,6 +1,6 @@
 import { ApplianceApiService } from './services/appliance-api.service';
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { SharedComponent } from './shared.component';
 import { SubscriptionsViewComponent } from './display-templates/SubscriptionsView/SubscriptionsView.component';
 import { TableModule } from 'primeng/table';
@@ -43,6 +43,7 @@ import {CarouselModule} from 'primeng/carousel';
 import {MatTabsModule} from '@angular/material/tabs';
 
 import {FullCalendarModule} from 'primeng/fullcalendar';
+import { RetentionPeriodForFullCalendarPipe } from './pipes/retention-Period-For-FullCalendar.pipe';
 
 @NgModule({
   imports: [
@@ -79,7 +80,8 @@ import {FullCalendarModule} from 'primeng/fullcalendar';
     MetricRetentionSurfaceViewComponent,
     DatesToTimeLineEventsPipePipe,
     CommandPaletteComponent,
-    ApplianceJobLogViewComponent
+    ApplianceJobLogViewComponent,
+    RetentionPeriodForFullCalendarPipe
   ],
   declarations: [
     SharedComponent,
@@ -91,14 +93,16 @@ import {FullCalendarModule} from 'primeng/fullcalendar';
     MetricRetentionSurfaceViewComponent,
     DatesToTimeLineEventsPipePipe,
     CommandPaletteComponent,
-    ApplianceJobLogViewComponent
+    ApplianceJobLogViewComponent,
+    RetentionPeriodForFullCalendarPipe
   ],
   providers: [
     LoggingConfigurationService,
     HomeGrownLoggingService,
     ApplianceContextService,
     ApplianceApiService,
-    MessageService
+    MessageService,
+    DatePipe
   ]
 })
 export class SharedModule { }
