@@ -79,7 +79,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         toast.sticky = false;
         toast.life = 1000 * 8;
         toast.severity = "warning";
-        this.showToast(toast);
+        // this.showToast(toast);
 
         // this.getPagemodelChangesPipe().subscribe();
         this.getWorkflowCheckpointChangesPipe().subscribe();
@@ -107,7 +107,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
         toast.sticky = false;
         toast.life = 1000 * 8;
         toast.severity = "info";
-        this.showToast(toast);
+        // this.showToast(toast);
 
         this.getPagemodelChangesPipe().subscribe();
         this.getWorkflowCheckpointChangesPipe().subscribe();
@@ -251,7 +251,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           toast.sticky = false;
           toast.life = 1000 * 8;
           toast.severity = "info";
-          this.showToast(toast);
+          // this.showToast(toast);
         })
       );
   }
@@ -269,7 +269,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           toast.sticky = false;
           toast.life = 1000 * 8;
           toast.severity = "info";
-          this.showToast(toast);
+          // this.showToast(toast);
         }),
         map(workflowCheckpoint => {
 
