@@ -1986,8 +1986,13 @@ namespace com.ataxlab.functions.table.retention.services
             {
                 StackTrace stackTrace = new StackTrace();
 
-                var frames = stackTrace.GetFrames();
-                logEntry.source = frames[frames.Length - 2].GetMethod().Name; //stackTrace.GetFrame(2).GetMethod().Name;
+                var methods = stackTrace.GetFrames().Select(s => s.GetMethod()).ToList();
+                var filtered = methods.Select(s => s.DeclaringType).ToList();
+
+                var frames = filtered.Where( w => w != null &&  w.FullName != null && w.FullName.Contains("ataxlab")).ToList(); // stackTrace.GetFrames().Where(w => w.GetMethod().DeclaringType.FullName.ToLower().Contains("ataxlab".ToLower())).ToList();
+                
+                
+                logEntry.source = frames[2].Name ; //stackTrace.GetFrame(2).GetMethod().Name;
 
                 var entityId = await this.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
                 await entityClient.SignalEntityAsync<IJobOutputLogEntity>(entityId, proxy =>

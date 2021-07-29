@@ -26,6 +26,12 @@ using static System.Net.Mime.MediaTypeNames;
 namespace com.ataxlab.functions.table.retention.services
 {
 
+    public class TableEntityWaterMark
+    {
+        public DateTime WaterMark { get; set; }
+
+        public int EntitiesRetrieved { get; set; }
+    }
 
     public interface ITableRetentionApplianceActivities
     {
@@ -612,18 +618,18 @@ namespace com.ataxlab.functions.table.retention.services
             return await Task.FromResult<TableStorageEntityRetentionPolicyEntity>(policy);
         }
 
-        public async Task<DateTime> GetMostRecentTimestampForStorageTable(string authToken, string tableName, StorageAccountEntity storageAccount)
+        private async Task<TableEntityWaterMark> GetMostRecentTimestampForStorageTable(string authToken, string tableName, StorageAccountEntity storageAccount)
         {
-            var ret = DateTime.UtcNow;
-            var lowerlimit = DateTime.Today.AddMonths(-1000);
-            var upperLimit = DateTime.UtcNow.AddDays(1);
+            var ret = new TableEntityWaterMark(); // DateTime.UtcNow;
+            // var lowerlimit = DateTime.Today.AddMonths(-1000);
+            var upperLimit = DateTimeOffset.UtcNow.AddDays(1).Date;
             CloudTableClient cloudTableClient = GetCloudTableClientForAuthToken(authToken, storageAccount);
 
-            var dateRangeFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThanOrEqual, lowerlimit);
+            //var dateRangeFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThanOrEqual, upperLimit);
+            var dateRangeFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.LessThan, "0" + upperLimit.Ticks.ToString());
             TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> dateRangeQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { }.
             Where(dateRangeFilter)
-            .Select(new List<string>() { "PartitionKey", "RowKey" })
-            .Take(500);
+            .Select(new List<string>() { "PartitionKey", "RowKey" });
 
             var table = this.GetStorageTableReference(cloudTableClient, tableName);
             try
@@ -631,8 +637,11 @@ namespace com.ataxlab.functions.table.retention.services
                 var res = await table
                             .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
                                 (dateRangeQuery, null);
-                var highWatermark = res.Results[0].Timestamp.UtcDateTime;
-                ret = highWatermark;
+                
+                var highWatermark = res.Results.Max(m => m.Timestamp.UtcDateTime); // res.Results[0].Timestamp.UtcDateTime;
+                var also = res.Results.Min(m => m.Timestamp.UtcDateTime);
+                ret.WaterMark = highWatermark;
+                ret.EntitiesRetrieved = res.Results.Count();
             }
             catch (Exception e) { }
 
@@ -640,14 +649,15 @@ namespace com.ataxlab.functions.table.retention.services
             return await Task.FromResult(ret);
         }
 
-        public async Task<DateTime> GetLeastRecentTimestampForStorageTable(string authToken, string tableName, StorageAccountEntity storageAccount)
+        private async Task<TableEntityWaterMark> GetLeastRecentTimestampForStorageTable(string authToken, string tableName, StorageAccountEntity storageAccount)
         {
-            var ret = DateTime.UtcNow;
-            var lowerlimit = DateTime.Today.AddMonths(-1000);
-            var upperLimit = DateTime.UtcNow.AddDays(1);
+            var ret = new TableEntityWaterMark(); // DateTime.UtcNow;
+            var lowerlimit = DateTimeOffset.UtcNow.AddMonths(-(12 * 4)).Date;
+            // var upperLimit = DateTime.UtcNow.AddDays(1);
             CloudTableClient cloudTableClient = GetCloudTableClientForAuthToken(authToken, storageAccount);
 
-            var dateRangeFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual, upperLimit);
+            // var dateRangeFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual, lowerlimit);
+            var dateRangeFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThanOrEqual, "0" + lowerlimit.Ticks);
 
             var dateRangeQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { }.
             Where(dateRangeFilter)
@@ -661,8 +671,10 @@ namespace com.ataxlab.functions.table.retention.services
                 var res = await table
                             .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
                                 (dateRangeQuery, null);
-                var highWatermark = res.Results[res.Count() - 1].Timestamp.UtcDateTime;
-                ret = highWatermark;
+                var lowWaterMark = res.Results.Min(m => m.Timestamp.UtcDateTime);
+                var also = res.Results.Max(m => m.Timestamp.UtcDateTime); // res.Results[res.Count() - 1].Timestamp.UtcDateTime;
+                ret.WaterMark = lowWaterMark;
+                ret.EntitiesRetrieved = res.Results.Count();
             }
             catch (Exception e) { }
 
@@ -704,6 +716,7 @@ namespace com.ataxlab.functions.table.retention.services
                         {
                             var lowWaterMark = await this.GetLeastRecentTimestampForStorageTable(authToken, tableName, storageAccount);
                             var highWaterMark = await this.GetMostRecentTimestampForStorageTable(authToken, tableName, storageAccount);
+                            var samples = new List<TableEntityWaterMark>() { lowWaterMark, highWaterMark};
 
                             var newEntity = new MetricsRetentionSurfaceItemEntity()
                             {
@@ -717,10 +730,12 @@ namespace com.ataxlab.functions.table.retention.services
                                 StorageAccountId = storageAccount.Id,
                                 SuscriptionId = storageAccount.SubscriptionId,
                                 TableName = tableName,
-                                EntityTimestampLowWatermark = lowWaterMark,
-                                LeastRecentEntityTimestamp = lowWaterMark,
-                                EntityTimestampHighWatermark = highWaterMark,
-                                MostRecentEntityTimestamp = highWaterMark
+                                EntityTimestampLowWatermark = lowWaterMark.WaterMark,
+                                LeastRecentEntityTimestamp = lowWaterMark.WaterMark,
+                                EntityTimestampHighWatermark = highWaterMark.WaterMark,
+                                MostRecentEntityTimestamp = highWaterMark.WaterMark,
+                                RetainedEntitySampleSize = samples.Max(m => m.EntitiesRetrieved)
+                                
                             };
 
 
@@ -756,6 +771,8 @@ namespace com.ataxlab.functions.table.retention.services
                         {
                             var lowWaterMark = await this.GetLeastRecentTimestampForStorageTable(authToken, excludedTableName, storageAccount);
                             var highWaterMark = await this.GetMostRecentTimestampForStorageTable(authToken, excludedTableName, storageAccount);
+                            var samples = new List<TableEntityWaterMark>() { lowWaterMark, highWaterMark };
+
                             var newEntity = new MetricsRetentionSurfaceItemEntity()
                             {
                                 Id = Guid.NewGuid(),
@@ -769,10 +786,11 @@ namespace com.ataxlab.functions.table.retention.services
                                 SuscriptionId = storageAccount.SubscriptionId,
                                 TableName = excludedTableName,
                                 IsDeleted = false,
-                                EntityTimestampLowWatermark = lowWaterMark,
-                                LeastRecentEntityTimestamp = lowWaterMark,
-                                EntityTimestampHighWatermark = highWaterMark,
-                                MostRecentEntityTimestamp = highWaterMark
+                                EntityTimestampLowWatermark = lowWaterMark.WaterMark,
+                                LeastRecentEntityTimestamp = lowWaterMark.WaterMark,
+                                EntityTimestampHighWatermark = highWaterMark.WaterMark,
+                                MostRecentEntityTimestamp = highWaterMark.WaterMark,
+                                RetainedEntitySampleSize = samples.Max(m => m.EntitiesRetrieved)
                             };
 
                             ret.MetricsRetentionSurfaceItemEntities.Add(newEntity);
@@ -805,159 +823,6 @@ namespace com.ataxlab.functions.table.retention.services
             return cloudTableClient;
         }
 
-        [Obsolete]
-        public async Task<MetricRetentionSurfaceEntity> DeprecatedAuditMetricsRetentionSurface(string authToken, StorageAccountEntity storageAccount, TableStorageTableRetentionPolicyEntity policy)
-        {
-            // as per https://mysharepointlearnings.wordpress.com/2019/08/20/managing-azure-vm-diagnostics-data-in-table-storage/
-            string[] aggregationPrefixes = policy.MetricRetentionSurface.AggregationPrefixes; // { "PT1H", "PT1M" };
-            var ret = new MetricRetentionSurfaceEntity();
-            log.LogInformation("calculating table names");
-            try
-            {
-
-                if (authToken == null || storageAccount == null || policy == null)
-                {
-                    return ret;
-                }
-
-                var tokenCredentials = new TokenCredential(authToken);
-                var cred = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(authToken);
-                var cloudTableClient = new CloudTableClient(storageAccount.PrimaryTableStorageEndpoint, cred);
-
-                // 40 mths = 40/12 TODO validate rounding error captures remainder in months
-                var yearCount = policy.DeleteOlderTablesThanCurrentMonthMinusThis / 12 < 1 ? 1 : policy.DeleteOlderTablesThanCurrentMonthMinusThis / 12;
-
-                List<DateTime> years = new List<DateTime>();
-                for (var count = yearCount; count >= 0; count--)
-                {
-                    // subtract x number of years from now
-                    var year = DateTime.Now.Subtract(new TimeSpan(365 * count, 0, 0, 0));
-                    years.Add(year);
-                }
-
-                //do
-                //{
-                List<string> wadMetricsTables = await GetWadMetricsTablesInStorageAccount(policy, cloudTableClient);
-
-                // as per https://mysharepointlearnings.wordpress.com/2019/08/20/managing-azure-vm-diagnostics-data-in-table-storage/
-                // and https://mysharepointlearnings.wordpress.com/2019/08/20/managing-azure-vm-diagnostics-data-in-table-storage/
-                // and https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-template#wadmetrics-tables-in-storage
-                var order = years.OrderBy(o => o.Date).ToList();
-                foreach (var year in years.OrderBy(o => o.Date).ToList())
-                {
-                    string counterYear = year.ToString("yyyy"); // DateTime.Now.ToString("yyyy");
-                    var isCurrentYear = year.ToString("yyyy").Equals(DateTime.UtcNow.ToString("yyyy"));
-                    // to calculate the current mnonth range
-                    // count from 1 to the current month for the current year
-                    // count from 1 to 12 for other years - note the count-from specifics
-                    int maximalMonthInYear = isCurrentYear ? Convert.ToInt32(DateTime.UtcNow.ToString("MM")) :
-                                    13; // Convert.ToInt32(DateTime.Now.ToString("MM"));
-                    for (int counterMonth = 1; counterMonth < (maximalMonthInYear - 1); counterMonth++)
-                    {
-                        foreach (var aggregationPrefix in aggregationPrefixes)
-                        {
-                            string tableNameStem = policy.WADMetricsTableNamePrefix +
-                                               aggregationPrefix +
-                                               "P10DV2S" + counterYear + counterMonth.ToString("d2"); //convert single digit month to two digit
-
-
-                            string tableName = string.Empty;
-
-                            // note this line participates in count-from issues for this module
-
-
-                            try
-                            {
-                                try
-                                {
-                                    foreach (var day in this.AllDatesInMonth(int.Parse(counterYear), counterMonth))
-                                    {
-                                        tableName = tableNameStem + day.ToString("d2");
-
-                                        try
-                                        {
-                                            // var allTablesResult = await cloudTableClient.ListTablesSegmentedAsync(tableName, token);
-                                            // tableSegmentResult = allTablesResult;
-                                            // token = allTablesResult.ContinuationToken;
-                                            if (wadMetricsTables.Contains(tableName))
-                                            {
-                                                ret.MetricsRetentionSurfaceItemEntities.Add(new MetricsRetentionSurfaceItemEntity()
-                                                {
-                                                    Id = Guid.NewGuid(),
-                                                    DocumentationLink = new Uri("https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-template#wadmetrics-tables-in-storage"),
-                                                    ItemDescription = "WADMetrics: Standard prefix for all WADMetrics tables",
-                                                    ItemExists = true,
-                                                    ItemType = RetentionSurfaceItemDescriptor.IsMetricsTableItem,
-                                                    ItemWillBeDeleted = true,
-                                                    PolicyAgeTriggerInMonths = policy.DeleteOlderTablesThanCurrentMonthMinusThis,
-                                                    StorageAccountId = storageAccount.Id,
-                                                    SuscriptionId = storageAccount.SubscriptionId,
-                                                    TableName = tableName
-                                                });
-
-                                                log.LogInformation(tableName + " found");
-                                            }
-                                            else
-                                            {
-
-                                                log.LogTrace($"did not find table {tableName}");
-                                                ret.MetricsRetentionSurfaceItemEntities.Add(new MetricsRetentionSurfaceItemEntity()
-                                                {
-                                                    Id = Guid.NewGuid(),
-                                                    DocumentationLink = new Uri("https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-template#wadmetrics-tables-in-storage"),
-                                                    ItemDescription = "WADMetrics: Standard prefix for all WADMetrics tables",
-                                                    ItemExists = false,
-                                                    ItemType = RetentionSurfaceItemDescriptor.IsMetricsTableItem,
-                                                    ItemWillBeDeleted = true,
-                                                    PolicyAgeTriggerInMonths = policy.DeleteOlderTablesThanCurrentMonthMinusThis,
-                                                    StorageAccountId = storageAccount.Id,
-                                                    SuscriptionId = storageAccount.SubscriptionId,
-                                                    TableName = tableName
-                                                });
-
-                                                log.LogTrace(tableName + "not found");
-
-                                            }
-                                        }
-                                        catch (Exception e)
-                                        {
-
-                                            log.LogTrace($"exception testing table names {e.Message}");
-                                        }
-                                    }
-
-                                }
-                                catch (Exception e)
-                                {
-
-                                    log.LogTrace($"exception testing table names {e.Message}");
-                                    // ret.Add(tableName + " not found");
-
-                                }
-
-                            }
-                            catch (Exception e)
-                            {
-                                log.LogTrace($"exception testing table names {e.Message}");
-
-                            }
-
-                        }
-                    }
-                }
-
-
-                //} while (token != null);
-                Console.WriteLine("Old Tables audited");
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Exception occured while auditing tables " + ex.Message);
-            }
-
-            var returnedItems = ret.MetricsRetentionSurfaceItemEntities.Count();
-            return ret;
-        }
 
         /// <summary>
         /// audit WAD & LAD et all diagnostic log surface
@@ -1020,6 +885,7 @@ namespace com.ataxlab.functions.table.retention.services
                             {
                                 var lowWaterMark = await this.GetLeastRecentTimestampForStorageTable(authToken, table.TableName, storageAccount);
                                 var highWaterMark = await this.GetMostRecentTimestampForStorageTable(authToken, table.TableName, storageAccount);
+                                var samples = new List<TableEntityWaterMark>() { lowWaterMark, highWaterMark };
 
                                 ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).ItemExists = true;
 
@@ -1035,22 +901,22 @@ namespace com.ataxlab.functions.table.retention.services
                                 //            .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
                                 //                (query, null);
                                 //var highWatermark = res.Results[0].Timestamp.UtcDateTime;
-                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampHighWatermark = highWaterMark;
-                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).MostRecentEntityTimestamp = highWaterMark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampHighWatermark = highWaterMark.WaterMark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).MostRecentEntityTimestamp = highWaterMark.WaterMark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).RetainedEntitySampleSize = samples.Max(m => m.EntitiesRetrieved);
+                                // var lowWatermarkQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
+                                //.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "0" + DateTime.UtcNow.AddYears(-100).Ticks))
+                                //.Select(new List<string>() { "PartitionKey", "RowKey" })
+                                //.Take(1);
 
-                               // var lowWatermarkQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { TakeCount = 1 }
-                               //.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "0" + DateTime.UtcNow.AddYears(-100).Ticks))
-                               //.Select(new List<string>() { "PartitionKey", "RowKey" })
-                               //.Take(1);
+                                // res = await cloudTable
+                                //     .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
+                                //         (lowWatermarkQuery, null);
 
-                               // res = await cloudTable
-                               //     .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
-                               //         (lowWatermarkQuery, null);
-
-                               // var lowWatermark = res.Results[0].Timestamp.UtcDateTime;
-                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampLowWatermark = lowWaterMark;
-                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).LeastRecentEntityTimestamp = lowWaterMark;
-
+                                // var lowWatermark = res.Results[0].Timestamp.UtcDateTime;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).EntityTimestampLowWatermark = lowWaterMark.WaterMark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).LeastRecentEntityTimestamp = lowWaterMark.WaterMark;
+                                ret.DiagnosticsRetentionSurfaceEntities.Find(w => w.Id.Equals(table.Id)).RetainedEntitySampleSize = samples.Max(m => m.EntitiesRetrieved);
                             }
                             else
                             {

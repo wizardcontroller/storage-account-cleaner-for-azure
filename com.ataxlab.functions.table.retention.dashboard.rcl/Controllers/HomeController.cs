@@ -19,13 +19,16 @@ using Microsoft.Azure.Management.Network.Fluent.Models;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace com.ataxlab.functions.table.retention.dashboard.Controllers
@@ -57,7 +60,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             TableRetentionApplianceScopes = requiredScopes;
         }
 
-        [HttpGet(Name="Index")]
+        [HttpGet(Name = "Index")]
         [Route("/")]
         [ApiExplorerSettings(IgnoreApi = true)]
         // [Route("/[controller]")]
@@ -71,6 +74,26 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
             OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
 
+            if (User.Identity.IsAuthenticated)
+            {
+                if (OperatorPageModel.ImpersonationToken == null)
+                {
+                    return Redirect("/MicrosoftIdentity/Account/SignIn");
+                }
+
+                var exp = User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("exp")).FirstOrDefault()?.Value;
+                if(exp != null)
+                {
+                    int i = 0;
+                }
+
+                //var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
+                //if (expTime.DateTime < DateTime.UtcNow)
+                //{
+                //    return Redirect("/MicrosoftIdentity/Account/SignIn");
+                //}
+            }
+
             log.LogInformation("home controller has easy auth token = " + OperatorPageModel.EasyAuthAccessToken);
 
             return View(OperatorPageModel);
@@ -79,6 +102,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         private async Task<OperatorPageModel> InitializeOperatorPageModel()
         {
             OperatorPageModel OperatorPageModel = new OperatorPageModel();
+
 
 
             if (this.User.Identity.IsAuthenticated)
@@ -91,7 +115,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 // ensure subscriptions
                 OperatorPageModel.Subscriptions = await this.AzureManagementClient.GetSubscriptionsForLoggedInUser();
 
-  
+
 
                 OperatorPageModel.ApplianceSessionContext.AvailableSubscriptions = OperatorPageModel.Subscriptions;
 
@@ -218,14 +242,14 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                             .Where(s => s.subscriptionId.Equals(subscriptionId))
                             .FirstOrDefault();
 
-                if(validSubscription == null)
+                if (validSubscription == null)
                 {
                     // can happen when you delete all orchestrations
                     // since we're here you have subscriptions -choose arbitrarily the first one
                     // state should reset once appliance 'first' context is posted
                     validSubscription = OperatorPageModel.Subscriptions.First();
                 }
-                
+
                 validSubscription.IsSelected = true;
 
                 OperatorPageModel.ApplianceSessionContext.SelectedSubscription = validSubscription;
@@ -244,7 +268,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         private async Task<string> ApplyConfigureApplianceSubscriptionIdStrategy(OperatorPageModel OperatorPageModel)
         {
             var subscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
-            if(subscriptionId == null && OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId == string.Empty)
+            if (subscriptionId == null && OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId == string.Empty)
             {
                 subscriptionId = OperatorPageModel.Subscriptions.FirstOrDefault().subscriptionId;
             }
@@ -310,7 +334,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                     applianceSessionContext.AvailableStorageAccounts[i].SubscriptionId = applianceSessionContext.SelectedSubscriptionId;
                 }
 
-                foreach(var acct in applianceSessionContext.AvailableStorageAccounts
+                foreach (var acct in applianceSessionContext.AvailableStorageAccounts
                         .Where(w => w.IsSelected == true))
                 {
                     acct.SubscriptionId = applianceSessionContext.SelectedSubscriptionId;
@@ -516,6 +540,16 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         public async Task<IActionResult> Operator()
         {
             OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
+
+            if (User.Identity.IsAuthenticated)
+            {
+                if (OperatorPageModel.ImpersonationToken == null)
+                {
+                    return Redirect("/MicrosoftIdentity/Account/SignIn");
+                }
+
+
+            }
 
             //ViewData["EasyAuthAccessToken"] = await this.ApplianceClient.EnsureEasyAuth(); //await ApplianceClient.GetCurrentAccessToken(HttpContext);
             return View(nameof(Operator), OperatorPageModel);
