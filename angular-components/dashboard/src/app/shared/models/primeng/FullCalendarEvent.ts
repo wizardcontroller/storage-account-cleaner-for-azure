@@ -1,6 +1,6 @@
 export class FullCalendarEvent {
   id!: string;
-  title!: Date;
+  title!: string;
   start!: Date;
   end!: Date;
   rendering!: string;

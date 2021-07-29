@@ -18,8 +18,10 @@ export class RetentionPeriodForFullCalendarPipe implements PipeTransform {
     const instance = new FullCalendarEvent();
     Object.assign(instance, value);
 
+
     instance.start =  new Date(value.entityTimestampLowWatermark as string);
     instance.end = new Date(value.entityTimestampHighWatermark as string);
+    instance.title = value.tableName as string;
     ret.push(instance);
 
     return ret;

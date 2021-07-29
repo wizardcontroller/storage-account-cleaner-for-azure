@@ -622,29 +622,56 @@ namespace com.ataxlab.functions.table.retention.services
         {
             var ret = new TableEntityWaterMark(); // DateTime.UtcNow;
             // var lowerlimit = DateTime.Today.AddMonths(-1000);
-            var upperLimit = DateTimeOffset.UtcNow.AddDays(1).Date;
+            
+   
             CloudTableClient cloudTableClient = GetCloudTableClientForAuthToken(authToken, storageAccount);
-
-            //var dateRangeFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThanOrEqual, upperLimit);
-            var dateRangeFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.LessThan, "0" + upperLimit.Ticks.ToString());
-            TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> dateRangeQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { }.
-            Where(dateRangeFilter)
-            .Select(new List<string>() { "PartitionKey", "RowKey" });
-
             var table = this.GetStorageTableReference(cloudTableClient, tableName);
-            try
-            {
-                var res = await table
-                            .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
-                                (dateRangeQuery, null);
-                
-                var highWatermark = res.Results.Max(m => m.Timestamp.UtcDateTime); // res.Results[0].Timestamp.UtcDateTime;
-                var also = res.Results.Min(m => m.Timestamp.UtcDateTime);
-                ret.WaterMark = highWatermark;
-                ret.EntitiesRetrieved = res.Results.Count();
-            }
-            catch (Exception e) { }
+            //var dateRangeFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThanOrEqual, upperLimit);
 
+            var howManyMonths = -1;
+
+            TableContinuationToken continuationToken = null;
+            var waterMarks = new List<TableEntityWaterMark>();
+
+            do
+            {
+                // var upperLimit = DateTimeOffset.UtcNow.AddDays(1).Date;
+                var upperLimit = DateTimeOffset.UtcNow.AddMonths(howManyMonths).Date;
+                var dateRangeFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.GreaterThan, "0" + upperLimit.Ticks.ToString());
+                TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity> dateRangeQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { }.
+                Where(dateRangeFilter)
+                .Select(new List<string>() { "PartitionKey", "RowKey" }).Take(5000);
+                
+                try
+                {
+                    var res = await table
+                                .ExecuteQuerySegmentedAsync<Microsoft.WindowsAzure.Storage.Table.TableEntity>
+                                    (dateRangeQuery, continuationToken);
+
+                    if (res.Count() > 0)
+                    {
+                        
+                        var highWatermark = res.Results.Max(m => m.Timestamp.UtcDateTime); // res.Results[0].Timestamp.UtcDateTime;
+                        var also = res.Results.Min(m => m.Timestamp.UtcDateTime);
+                        ret.EntitiesRetrieved = res.Count();
+                        ret.WaterMark = highWatermark;
+
+                        waterMarks.Add(ret);
+                        continuationToken = res.ContinuationToken;
+                    }
+                    else
+                    {
+
+                    }
+
+                }
+                catch (Exception e) { }
+            }
+            // search further back in time until we find some entities or nothing
+            while (howManyMonths-- >= -56 && ret.EntitiesRetrieved == 0 && continuationToken != null);
+
+            ret.EntitiesRetrieved = waterMarks.Sum(s => s.EntitiesRetrieved);
+            ret.WaterMark = waterMarks.Max(m => m.WaterMark);
 
             return await Task.FromResult(ret);
         }
@@ -661,8 +688,7 @@ namespace com.ataxlab.functions.table.retention.services
 
             var dateRangeQuery = new TableQuery<Microsoft.WindowsAzure.Storage.Table.TableEntity>() { }.
             Where(dateRangeFilter)
-            .Select(new List<string>() { "PartitionKey", "RowKey" })
-            .Take(500);
+            .Select(new List<string>() { "PartitionKey", "RowKey" });
 
 
             var table = this.GetStorageTableReference(cloudTableClient, tableName);
@@ -673,8 +699,9 @@ namespace com.ataxlab.functions.table.retention.services
                                 (dateRangeQuery, null);
                 var lowWaterMark = res.Results.Min(m => m.Timestamp.UtcDateTime);
                 var also = res.Results.Max(m => m.Timestamp.UtcDateTime); // res.Results[res.Count() - 1].Timestamp.UtcDateTime;
+                ret.EntitiesRetrieved = res.Count();
                 ret.WaterMark = lowWaterMark;
-                ret.EntitiesRetrieved = res.Results.Count();
+
             }
             catch (Exception e) { }
 

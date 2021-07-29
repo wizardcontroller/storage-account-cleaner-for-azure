@@ -16,6 +16,7 @@ export class DatesToTimeLineEventsPipePipe implements PipeTransform {
 
       instance.itemDescription = "Least Recent Timestamp"
       instance.timestamp = value.entityTimestampLowWatermark;
+
       ret.push(instance);
 
       const instance2 = new TimelineEvent();

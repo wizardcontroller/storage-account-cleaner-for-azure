@@ -1,45 +1,65 @@
-
-<ng-container >
+<ng-container>
   <ng-container *ngIf="jobOutputLogChanges$ | async as logEntities">
-
-
-
-    <p-dataView #dv [value]="logEntities"
-                [paginator]="true"
-                [first] = "applianceLogOffset"
-                paginatorPosition="both"
-                [rows]="5"
-                [showJumpToPageDropdown] = "true"
-                [lazy]="true"
-                layout="list"
-                sortField="timeStamp" [sortOrder] = "1"
-                [loading]="isRefreshing"
-                [showCurrentPageReport]="true"
-                [totalRecords]="totalLogEntries"
-                (onLazyLoad)="ensureLogEntries($event)">
-
-                <ng-template pTemplate="header">
-
-                </ng-template>
+    <p-dataView
+      #dv
+      [value]="logEntities"
+      [paginator]="true"
+      [first]="applianceLogOffset"
+      paginatorPosition="both"
+      [rows]="5"
+      [showJumpToPageDropdown]="true"
+      [lazy]="true"
+      layout="grid"
+      sortField="timeStamp"
+      [sortOrder]="1"
+      [loading]="isRefreshing"
+      [showCurrentPageReport]="true"
+      [totalRecords]="totalLogEntries"
+      (onLazyLoad)="ensureLogEntries($event)"
+    >
+      <ng-template pTemplate="header">
+        <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+      </ng-template>
       <ng-template let-logentry pTemplate="listItem">
-        <div style=" display: flex; align-items: left; width: 100%; ">
-          <div style="display: flex; align-items: left; width:25%; ">{{logentry.timeStamp | date:'medium'}} </div>
-          <div style="display: flex; align-items: left; width: 15%; ">{{logentry.source}}</div>
+        <div style="display: flex; align-items: left; width: 100%">
+          <div style="display: flex; align-items: left; width: 25%">
+            {{ logentry.timeStamp | date: "medium" }}
+          </div>
+          <div style="display: flex; align-items: left; width: 15%">
+            {{ logentry.source }}
+          </div>
 
-          <div style="display: flex; align-items: left; width: 20%; ">{{logentry.summary}}</div>
-          <div style="display: flex; align-items: left;  width: 30%;">{{logentry.detail}}</div>
+          <div style="display: flex; align-items: left; width: 20%">
+            {{ logentry.summary }}
+          </div>
 
         </div>
-
-
-
       </ng-template>
 
+      <ng-template let-logentry pTemplate="gridItem">
+        <p-card>
+          <ng-template pTemplate="content">
+            <div style="display: flexbox; width: 200px; background-color: aqua;">
+              <div style="">
+               {{ logentry.timeStamp | date: "medium" }}
+              </div>
+              <div style="">
+                <span>source: </span>{{ logentry.source }}
+              </div>
+
+              <div style="">
+                <span>summary: </span>{{ logentry.summary }}
+              </div>
+              <div style="">
+                <span>detail: </span>{{ logentry.detail }}
+              </div>
+            </div>
+          </ng-template>
+        </p-card>
+      </ng-template>
       <ng-template pTemplate="footer">
-        total entries {{totalLogEntries}}
+        total entries {{ totalLogEntries }}
       </ng-template>
     </p-dataView>
-
   </ng-container>
-  </ng-container>
-
+</ng-container>
