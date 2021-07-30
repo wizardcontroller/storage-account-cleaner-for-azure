@@ -110,28 +110,10 @@ export class DiagnosticsRetentionSurfaceViewComponent
         right: 'dayGridMonth,timeGridWeek,timeGridDay',
       },
       editable: true,
-      dayMaxEvents: true,
+      dayMaxEvents: true
     };
 
-    this.events = [
-      {
-        id: 1,
-        title: 'the table name',
-        start: '2021-07-08',
-        end: '2021-09-08',
-      },
-      {
-        id: 2,
-        title: 'Long Event',
-        start: '2017-02-07',
-        end: '2017-02-10',
-      },
-      {
-        id: 3,
-        title: 'Repeating Event',
-        start: '2017-02-09T16:00:00',
-      },
-    ];
+
   }
 
   toggleSideNav(): void {

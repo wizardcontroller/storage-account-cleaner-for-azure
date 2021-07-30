@@ -39,7 +39,7 @@
           <mat-tab-group>
             <mat-tab label="Calendar">
               <p-fullCalendar
-                style="max-height: 250px"
+
                 #calendar
                 [events]="job | retentionPeriodForFullCalendar"
                 [title]="job.tableName"
@@ -88,14 +88,12 @@
                       job.itemDescription
                     }}</a>
                   </p>
+                  <p><span>items retrieved: {{job.retainedEntitySampleSize}}</span></p>
                 </ng-template>
               </p-card>
             </mat-tab>
           </mat-tab-group>
-          <p-carousel>
-            <ng-template> </ng-template>
-            <ng-template> </ng-template>
-          </p-carousel>
+
         </div>
       </ng-template>
 
