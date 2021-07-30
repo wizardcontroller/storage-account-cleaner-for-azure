@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StorageAccountDTO } from '@wizardcontroller/sac-appliance-lib';
 import { BehaviorSubject, combineLatest, ReplaySubject } from 'rxjs';
@@ -8,6 +8,7 @@ import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDispla
 import { ApplianceApiService } from '../../services/appliance-api.service';
 import { ButtonModule } from 'primeng/button';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
+import { MatButtonToggleChange, MatButtonToggleGroup } from '@angular/material/button-toggle';
 @Component({
   selector: 'app-StorageAccountView',
   templateUrl: './StorageAccountView.component.html',
@@ -16,6 +17,8 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 
 @AutoUnsubscribe()
 export class StorageAccountViewComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
+  @ViewChild('toolSelector') toolSelector!: MatButtonToggleGroup;
+
   cols!: any[];
   storageAccounts!: StorageAccountDTO[] | undefined | null;
   private storageAccountSource = new ReplaySubject<StorageAccountDTO[] | undefined | null>();
@@ -23,10 +26,16 @@ export class StorageAccountViewComponent implements OnInit, OnDestroy, ICanBeHid
 
   selectedStorageAccount!: StorageAccountDTO;
 
+  private toolSelectionSource = new ReplaySubject<string>();
+  toolSelectionChanges$ = this.toolSelectionSource.asObservable();
+  public selectedTool: string = 'DiagnosticsRetention';
 
   constructor(private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService, private route: ActivatedRoute) {
     this.isShow = false;
+
+    // preselect a tool
+    this.toolSelectionSource.next( this.selectedTool);
   }
   ngOnDestroy(): void {
     // nothing yet
@@ -64,6 +73,11 @@ export class StorageAccountViewComponent implements OnInit, OnDestroy, ICanBeHid
     // this.messageService.add({severity:'info', summary:'Product Selected', detail: product.name});
     console.log("account selected : " + storageAccount.id);
     this.applianceAPiSvc.selectedStorageAccountSource.next(storageAccount.id as string);
+  }
+
+  toolChanged(e: MatButtonToggleChange){
+    console.log("tool selected " + this.selectedTool);
+    this.toolSelectionSource.next(e.value);
   }
 
   private ensureStorageAccountsPTable() {

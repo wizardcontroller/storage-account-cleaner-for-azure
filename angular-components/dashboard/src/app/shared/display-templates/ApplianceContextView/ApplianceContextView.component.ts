@@ -55,6 +55,7 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
     private route: ActivatedRoute) {
     this.isWorkflowCheckpointPollingEnabled = this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint;
 
+      // preselect a tool
       this.toolSelectionSource.next( this.selectedTool);
 
 

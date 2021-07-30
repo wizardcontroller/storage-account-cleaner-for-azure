@@ -36,15 +36,29 @@ selectionMode="single" [(selection)]="selectedStorageAccount"
 </p-table>
 <div>
   <hr/>
-  <span>Retention</span>
-  <ul  aria-label="retention policies">
-    <li><a [routerLink]="['DiagnosticsRetention']">Diagnostics Retention</a></li>
+  <span>SELECT</span>
+  <mat-button-toggle-group
+  #toolSelector
+  [(ngModel)]="selectedTool"
+  (change)="toolChanged($event)">
+  <mat-button-toggle value="DiagnosticsRetention">Diagnostics Retention</mat-button-toggle>
+  <mat-button-toggle checked value="MetricRetention">Metrics Retention</mat-button-toggle>
+</mat-button-toggle-group>
 
-    <li><a [routerLink]="['MetricRetention']">Metrics Retention</a></li>
-  </ul>
 </div>
+
+<ng-container *ngIf="toolSelectionChanges$ | async as tool">
+  <div *ngIf="tool === 'DiagnosticsRetention'; else metricsRetention">
+    <app-DiagnosticsRetentionSurfaceView></app-DiagnosticsRetentionSurfaceView>
+  </div>
+
+  <ng-template #metricsRetention>
+    <app-MetricsRetentionSurfaceView></app-MetricsRetentionSurfaceView>
+  </ng-template>
+</ng-container>
+
 <ng-container  >
-  <router-outlet></router-outlet>
+
 </ng-container>
 
 
