@@ -1,7 +1,9 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MessageService } from 'primeng/api';
 import { AppComponent } from './app.component';
+import { ApiConfigService } from './core/ApiConfig.service';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -12,6 +14,7 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent
       ],
+      providers: [ApiConfigService, MessageService]
     }).compileComponents();
   });
 

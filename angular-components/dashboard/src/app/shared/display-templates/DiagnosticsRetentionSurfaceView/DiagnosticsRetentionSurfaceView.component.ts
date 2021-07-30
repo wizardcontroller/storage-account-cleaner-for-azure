@@ -13,7 +13,8 @@ import { ApiConfigService } from '../../../core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
-import { PrimeIcons } from 'primeng/api';
+import {  PrimeIcons } from 'primeng/api';
+import {MessageService} from 'primeng/api'
 import { DataView } from 'primeng/dataview';
 import { ToggleButton } from 'primeng/togglebutton';
 
@@ -82,8 +83,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
 
   constructor(
     private apiConfigSvc: ApiConfigService,
-    private applianceAPiSvc: ApplianceApiService,
-    private route: ActivatedRoute
+    private applianceAPiSvc: ApplianceApiService
   ) {
     this.isShow = false;
   }

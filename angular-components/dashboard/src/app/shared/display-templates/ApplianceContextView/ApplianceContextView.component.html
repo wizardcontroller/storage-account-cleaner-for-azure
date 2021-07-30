@@ -6,7 +6,7 @@
 >
   <mat-button-toggle-group
     #toolSelector
-    [(ngModel)]="selectedTool"
+    *ngModel="selectedTool"
     (change)="toolChanged($event)"
   >
     <mat-button-toggle value="subscriptions">subscriptions</mat-button-toggle>

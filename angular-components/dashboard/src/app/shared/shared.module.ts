@@ -96,15 +96,12 @@ import {MatRadioModule} from '@angular/material/radio';
     DatesToTimeLineEventsPipePipe,
     CommandPaletteComponent,
     ApplianceJobLogViewComponent,
-    RetentionPeriodForFullCalendarPipe,
+    RetentionPeriodForFullCalendarPipe
   ],
   providers: [
     LoggingConfigurationService,
-    HomeGrownLoggingService,
-    ApplianceContextService,
-    ApplianceApiService,
     MessageService,
-    DatePipe,
-  ],
+    DatePipe
+  ]
 })
 export class SharedModule {}

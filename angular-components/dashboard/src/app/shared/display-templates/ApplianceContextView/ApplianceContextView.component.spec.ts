@@ -10,6 +10,11 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MessageService } from 'primeng/api';
+import { ApiConfigService } from 'src/app/core/ApiConfig.service';
+import { RetentionEntitiesService } from '@wizardcontroller/sac-appliance-lib';
+import { ApplianceApiService } from '../../services/appliance-api.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 describe('ApplianceContextViewComponent', () => {
   let component: ApplianceContextViewComponent;
@@ -18,7 +23,8 @@ describe('ApplianceContextViewComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [ ButtonModule, CardModule, HttpClientTestingModule, RouterTestingModule, MatMenuModule, MatToolbarModule],
-      declarations: [ ApplianceContextViewComponent ]
+      declarations: [ ApplianceContextViewComponent ],
+      providers: [MessageService, ApiConfigService, RetentionEntitiesService, ApplianceApiService]
     })
     .compileComponents();
   }));

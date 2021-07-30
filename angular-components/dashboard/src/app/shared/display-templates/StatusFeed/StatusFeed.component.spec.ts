@@ -4,14 +4,20 @@ import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { StatusFeedComponent } from './StatusFeed.component';
-
+import { MessageService } from 'primeng/api';
+import { ApiConfigService } from 'src/app/core/ApiConfig.service';
+import { ApplianceApiService } from '../../services/appliance-api.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 describe('StatusFeedComponent', () => {
   let component: StatusFeedComponent;
   let fixture: ComponentFixture<StatusFeedComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ StatusFeedComponent ]
+      imports: [HttpClientTestingModule, RouterTestingModule],
+      declarations: [ StatusFeedComponent ],
+      providers: [MessageService, ApiConfigService, ApplianceApiService]
     })
     .compileComponents();
   }));

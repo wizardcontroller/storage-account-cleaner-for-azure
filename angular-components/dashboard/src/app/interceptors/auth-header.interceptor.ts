@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
@@ -13,8 +13,10 @@ import { ApplianceApiService } from '../shared/services/appliance-api.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CoreModule } from '../core/core.module';
 import { map } from 'rxjs/operators';
+import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 @Injectable()
-export class AuthHeaderInterceptor implements HttpInterceptor {
+@AutoUnsubscribe()
+export class AuthHeaderInterceptor implements HttpInterceptor, OnDestroy {
   private pageModel!: OperatorPageModel;
   private applianceUrl!: string;
   private HEADER_IMPERSONATION_TOKEN = 'x-table-retention-mgmt-impersonation';
@@ -61,4 +63,9 @@ export class AuthHeaderInterceptor implements HttpInterceptor {
 
     return next.handle(request.clone());
   }
+
+  ngOnDestroy(): void {
+    // nothing yet
+  }
+
 }

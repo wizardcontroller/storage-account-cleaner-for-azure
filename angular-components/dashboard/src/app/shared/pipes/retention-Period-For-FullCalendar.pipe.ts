@@ -8,7 +8,7 @@ import { FullCalendarEvent } from '../models/primeng/FullCalendarEvent';
 })
 export class RetentionPeriodForFullCalendarPipe implements PipeTransform {
 
-  constructor(private datePipe: DatePipe){
+  constructor(){
 
   }
 

@@ -1,5 +1,7 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
+import { MessageService } from 'primeng/api';
 import { ApplianceJobLogViewComponent } from './appliance-job-log-view.component';
 
 describe('ApplianceJobLogViewComponent', () => {
@@ -8,7 +10,9 @@ describe('ApplianceJobLogViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ApplianceJobLogViewComponent ]
+      imports: [HttpClientTestingModule, RouterTestingModule],
+      declarations: [ ApplianceJobLogViewComponent ],
+      providers: [MessageService]
     })
     .compileComponents();
   });

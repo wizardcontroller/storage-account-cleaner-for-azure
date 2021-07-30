@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import {
   ApplianceSessionContext,
   ConfigService,
   OperatorPageModel,
   RetentionEntitiesService,
 } from '@wizardcontroller/sac-appliance-lib';
+import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { ReplaySubject } from 'rxjs';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceContextServiceBase } from './ApplianceContextServiceBase';
@@ -12,7 +13,8 @@ import { ApplianceContextServiceBase } from './ApplianceContextServiceBase';
 @Injectable({
   providedIn: 'root'
 })
-export class ApplianceContextService extends ApplianceContextServiceBase {
+@AutoUnsubscribe()
+export class ApplianceContextService  extends ApplianceContextServiceBase implements OnDestroy{
 
 
 constructor(
@@ -20,11 +22,14 @@ constructor(
   retentionSvc : RetentionEntitiesService
   ) {
   super(apiConfigSvc, retentionSvc);
-  
+
   this.subscribeToOperatorPageModel();
 
 
 }
+  ngOnDestroy(): void {
+
+  }
 
   initApplianceContextSubject(){
 

@@ -21,7 +21,7 @@ import { GlobalOhNoConstants } from '../GlobalOhNoConstants';
 import { OperationStatus } from '../models/OperationStatus';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 
 @AutoUnsubscribe()

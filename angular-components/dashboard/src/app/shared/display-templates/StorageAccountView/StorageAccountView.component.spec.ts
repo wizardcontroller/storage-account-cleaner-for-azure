@@ -9,6 +9,7 @@ import { CardModule } from 'primeng/card';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
 
 describe('StorageAccountViewComponent', () => {
   let component: StorageAccountViewComponent;
@@ -17,7 +18,8 @@ describe('StorageAccountViewComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [ ButtonModule, CardModule, HttpClientTestingModule, RouterTestingModule],
-      declarations: [ StorageAccountViewComponent ]
+      declarations: [ StorageAccountViewComponent ],
+      providers: [MessageService]
     })
     .compileComponents();
   }));

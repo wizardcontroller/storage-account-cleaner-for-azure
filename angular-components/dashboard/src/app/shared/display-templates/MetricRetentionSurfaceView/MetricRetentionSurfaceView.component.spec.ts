@@ -9,6 +9,9 @@ import { CardModule, Card } from 'primeng/card';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
+import { ApiConfigService } from 'src/app/core/ApiConfig.service';
+import { ApplianceApiService } from '../../services/appliance-api.service';
 
 describe('MetricRetentionSurfaceViewComponent', () => {
   let component: MetricRetentionSurfaceViewComponent;
@@ -17,7 +20,8 @@ describe('MetricRetentionSurfaceViewComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [ ButtonModule, CardModule, HttpClientTestingModule, RouterTestingModule],
-      declarations: [ MetricRetentionSurfaceViewComponent ]
+      declarations: [ MetricRetentionSurfaceViewComponent ],
+      providers: [MessageService, ApiConfigService, ApplianceApiService]
     })
     .compileComponents();
   }));

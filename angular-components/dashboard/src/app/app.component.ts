@@ -1,13 +1,13 @@
 import { ApplianceApiService } from './shared/services/appliance-api.service';
 
 import { ApiConfigService } from './core/ApiConfig.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CoreComponent } from './core/core.component';
 import { OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { BehaviorSubject, Operator, ReplaySubject, Subject } from 'rxjs';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { SubscriptionsViewComponent } from './shared/display-templates/SubscriptionsView/SubscriptionsView.component';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonToggleChange, MatButtonToggleGroup, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ICanBeHiddenFromDisplay } from './shared/interfaces/ICanBeHiddenFromDisplay';
 import { map, tap } from 'rxjs/operators';
 import { ThemePalette } from '@angular/material/core';
@@ -24,6 +24,8 @@ import { PrimeNGConfig } from 'primeng/api';
 export class AppComponent
   implements OnInit, OnDestroy, ICanBeHiddenFromDisplay
 {
+  @ViewChild('toolSelector') toolSelector!: MatButtonToggleGroup;
+
   isAutoRefreshWorkflowCheckpoint =
     this.applianceSvc.isAutoRefreshWorkflowCheckpoint;
   color: ThemePalette = 'accent';
@@ -37,12 +39,21 @@ export class AppComponent
 
   baseUri: String | undefined;
   title = 'dashboard';
+
+  private toolSelectionSource = new ReplaySubject<string>();
+  toolSelectionChanges$ = this.toolSelectionSource.asObservable();
+  public selectedView: string = 'workbench';
+
   constructor(
     private apiConfigSvc: ApiConfigService,
     private primengConfig: PrimeNGConfig,
     private messageService: MessageService,
     private applianceSvc: ApplianceApiService
   ) {
+
+        // preselect a tool
+        this.toolSelectionSource.next( this.selectedView);
+
     this.primengConfig.ripple = true;
     this.isShow = false;
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
@@ -51,6 +62,7 @@ export class AppComponent
       this.currentPageModelSource.next(data);
       return (this.operatorPageModel = data);
     });
+
   }
   isShow!: boolean;
   toggleDisplay(): void {
@@ -77,6 +89,11 @@ export class AppComponent
         })
       )
       .subscribe();
+  }
+
+  toolChanged(e: MatButtonToggleChange): void{
+    // console.log("tool selected " + this.selectedView);
+    this.toolSelectionSource.next(e.value);
   }
 
   showToast(message: ToastMessage): void {

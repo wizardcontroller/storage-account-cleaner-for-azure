@@ -4,12 +4,13 @@ import { RouterTestingModule } from '@angular/router/testing';
 import {CoreModule} from '../core/core.module'
 import { AuthHeaderInterceptor } from './auth-header.interceptor';
 import { ICanBeHiddenFromDisplay } from '../shared/interfaces/ICanBeHiddenFromDisplay';
+import { MessageService } from 'primeng/api';
 describe('AuthHeaderInterceptor', () => {
   beforeEach(() => TestBed.configureTestingModule({
     imports: [HttpClientTestingModule, RouterTestingModule],
 
     providers: [
-      AuthHeaderInterceptor
+      AuthHeaderInterceptor, MessageService
       ]
   }));
 

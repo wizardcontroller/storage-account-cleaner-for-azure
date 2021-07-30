@@ -6,13 +6,14 @@ import { ApplianceApiService } from './appliance-api.service';
 import {OperatorPageModel} from '@wizardcontroller/sac-appliance-lib'
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MessageService } from 'primeng/api';
 describe('Service: ApplianceApi', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule, RouterTestingModule
         ],
-      providers: [ ApplianceApiService ]
+      providers: [ ApplianceApiService, MessageService ]
     });
   });
 

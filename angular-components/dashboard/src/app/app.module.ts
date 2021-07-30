@@ -27,6 +27,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { ThemePalette } from '@angular/material/core'
 import { ToastModule } from 'primeng/toast';
+import { MatRadioModule } from '@angular/material/radio';
+import { MessageService } from 'primeng/api';
 
 
 @NgModule({
@@ -50,9 +52,11 @@ import { ToastModule } from 'primeng/toast';
     MatToolbarModule,
     MatIconModule,
     MatSlideToggleModule,
-    ToastModule
+    ToastModule,
+    MatRadioModule
   ],
   providers: [
+    MessageService,
   {
     provide: BASE_PATH,
     useValue: environment.API_BASE_PATH

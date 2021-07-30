@@ -27,16 +27,21 @@
       </mat-icon>
       <div style=" width:100%;">
 
+
         <ul>
           <li><a routerLink="workbench">workbench</a></li>
           <li><a routerLink="report">report</a></li>
           <li style="margin-top:15px;background-color: white; display: flex;">
-            <mat-slide-toggle 
+            <mat-slide-toggle
               [color]="color" [checked]="isAutoRefreshWorkflowCheckpoint">
               Auto Refresh
             </mat-slide-toggle>
           </li>
         </ul>
+        <mat-button-toggle-group #toolSelector selected="selectedView" (change)="toolChanged($event)">
+        <mat-button-toggle checked value="workbench">workbench</mat-button-toggle>
+        <mat-button-toggle  value="report">report</mat-button-toggle>
+      </mat-button-toggle-group>
 
       </div>
     </mat-toolbar>

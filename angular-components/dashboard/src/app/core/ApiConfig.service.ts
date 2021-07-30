@@ -1,5 +1,5 @@
 
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigService, OperatorPageModel } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
@@ -10,8 +10,8 @@ import { ToastMessage } from '../models/ToastMessage';
 @Injectable({
   providedIn: 'root'
 })
-
-export class ApiConfigService {
+@AutoUnsubscribe()
+export class ApiConfigService implements OnDestroy{
   operatorPageModel!: OperatorPageModel;
   // operator page model change notification support
   private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
@@ -24,6 +24,10 @@ export class ApiConfigService {
     this.configService = cfgSvc;
     this.configService.configuration.basePath = window.location.origin;
     this.initService();
+  }
+
+  ngOnDestroy(): void {
+
   }
 
   showToast(message: ToastMessage): void{

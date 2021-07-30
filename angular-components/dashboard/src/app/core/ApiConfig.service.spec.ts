@@ -9,7 +9,7 @@ import { ApiConfigService } from './ApiConfig.service';
 describe('Service: ApiConfig', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-    imports: [ HttpClientTestingModule, RouterTestingModule````],
+    imports: [ HttpClientTestingModule, RouterTestingModule],
       providers: [ApiConfigService, MessageService]
     });
   });
