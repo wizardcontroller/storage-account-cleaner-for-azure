@@ -23,8 +23,9 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { RetentionPeriodForFullCalendarPipe } from '../../pipes/retention-Period-For-FullCalendar.pipe';
 @Component({
+  selector: 'app-DiagnosticsRetentionSurfaceView',
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
-  styleUrls: ['./DiagnosticsRetentionSurfaceView.component.css'],
+  styleUrls: ['./DiagnosticsRetentionSurfaceView.component.css']
 })
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent

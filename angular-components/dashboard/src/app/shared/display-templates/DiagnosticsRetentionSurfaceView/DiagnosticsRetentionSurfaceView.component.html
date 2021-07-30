@@ -37,15 +37,6 @@
       <ng-template let-job pTemplate="gridItem">
         <div class="p-col-12">
           <mat-tab-group>
-            <mat-tab label="Calendar">
-              <p-fullCalendar
-
-                #calendar
-                [events]="job | retentionPeriodForFullCalendar"
-                [title]="job.tableName"
-                [options]="options"
-              ></p-fullCalendar>
-            </mat-tab>
             <mat-tab label="Timeline">
               <p-card class="card">
                 <ng-template pTemplate="subtitle"
@@ -88,12 +79,24 @@
                       job.itemDescription
                     }}</a>
                   </p>
-                  <p><span>items retrieved: {{job.retainedEntitySampleSize}}</span></p>
+                  <p>
+                    <span
+                      >items retrieved: {{ job.retainedEntitySampleSize }}</span
+                    >
+                  </p>
                 </ng-template>
               </p-card>
             </mat-tab>
-          </mat-tab-group>
 
+            <mat-tab label="Calendar">
+              <p-fullCalendar
+                #calendar
+                [events]="job | retentionPeriodForFullCalendar"
+                [title]="job.tableName"
+                [options]="options"
+              ></p-fullCalendar>
+            </mat-tab>
+          </mat-tab-group>
         </div>
       </ng-template>
 

@@ -1,10 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ApiConfigService } from 'src/app/core/ApiConfig.service';
-import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
-import { ApplianceApiService } from '../../services/appliance-api.service';
-import { DatesToTimeLineEventsPipePipe } from '../../pipes/dates-to-time-line-events-pipe.pipe';
-import { PrimeIcons } from 'primeng/api';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import timeGridPlugin from '@fullcalendar/timegrid';
 import {
   OperatorPageModel,
   RetentionEntitiesService,
@@ -12,25 +10,37 @@ import {
   TableStorageEntityRetentionPolicy,
   TableStorageEntityRetentionPolicyEnforcementResult
 } from '@wizardcontroller/sac-appliance-lib';
-import { combineLatest, ReplaySubject } from 'rxjs';
-import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
-import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import {
   ApplianceJobOutput,
   MetricsRetentionSurfaceItemEntity,
-  TableStorageRetentionPolicy,
+  TableStorageRetentionPolicy
 } from '@wizardcontroller/sac-appliance-lib';
-import { concatMap, map, withLatestFrom } from 'rxjs/operators';
+import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
+import { PrimeIcons } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
+import { FullCalendarModule } from 'primeng/fullcalendar';
+import { combineLatest, ReplaySubject } from 'rxjs';
+import { concatMap, map, withLatestFrom } from 'rxjs/operators';
+import { ApiConfigService } from 'src/app/core/ApiConfig.service';
+import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
+import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
+import { DatesToTimeLineEventsPipePipe } from '../../pipes/dates-to-time-line-events-pipe.pipe';
+import { RetentionPeriodForFullCalendarPipe } from '../../pipes/retention-Period-For-FullCalendar.pipe';
+import { ApplianceApiService } from '../../services/appliance-api.service';
 @Component({
+  selector: 'app-MetricsRetentionSurfaceView',
   templateUrl: './MetricRetentionSurfaceView.component.html',
-  styleUrls: ['./MetricRetentionSurfaceView.component.css'],
+  styleUrls: ['./MetricRetentionSurfaceView.component.css']
 })
 @AutoUnsubscribe()
 export class MetricRetentionSurfaceViewComponent
   implements OnInit, OnDestroy, ICanBeHiddenFromDisplay
 {
   @ViewChild('dv') dv!: DataView;
+
+  events!: Array<any>;
+  header!: any;
+  options!: any;
   showOnlyExistingItems = false;
 
   private acctSubject = new ReplaySubject<string>();
@@ -50,8 +60,8 @@ export class MetricRetentionSurfaceViewComponent
   metricEntities$ = this.pageModelChanges$
     .pipe(concatMap((dependencyData) => this.metricsItemDependencies$))
     .subscribe((dependencyData) => {
-      var pageModel = dependencyData[0];
-      var storageAccountId = dependencyData[1];
+      const pageModel = dependencyData[0];
+      const storageAccountId = dependencyData[1];
 
       console.log('getting metric entities');
       this.applianceAPiSvc.entityService
@@ -65,7 +75,7 @@ export class MetricRetentionSurfaceViewComponent
           console.log('retention policy ' + JSON.stringify(data));
           this.metricsRetentionSurfaceEntitiesSource.next(
             data?.tableStorageTableRetentionPolicy?.metricRetentionSurface
-              ?.metricsRetentionSurfaceItemEntities as MetricsRetentionSurfaceItemEntity[]
+              ?.metricsRetentionSurfaceItemEntities as Array<MetricsRetentionSurfaceItemEntity>
           );
         });
     });
@@ -78,13 +88,13 @@ export class MetricRetentionSurfaceViewComponent
   selectedStorageAccount!: StorageAccountDTO;
   operatorPageModel!: OperatorPageModel;
 
-  currentJobOutput: ApplianceJobOutput[] | undefined;
-  private currentJobOutputSource = new ReplaySubject<ApplianceJobOutput[]>();
+  currentJobOutput: Array<ApplianceJobOutput> | undefined;
+  private currentJobOutputSource = new ReplaySubject<Array<ApplianceJobOutput>>();
   currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
 
-  metricsRetentionSurfaceEntities!: MetricsRetentionSurfaceItemEntity[];
+  metricsRetentionSurfaceEntities!: Array<MetricsRetentionSurfaceItemEntity>;
   private metricsRetentionSurfaceEntitiesSource = new ReplaySubject<
-    MetricsRetentionSurfaceItemEntity[]
+    Array<MetricsRetentionSurfaceItemEntity>
   >();
   metricsRetentionSurfaceEntityChanges$ =
     this.metricsRetentionSurfaceEntitiesSource.asObservable();
@@ -104,6 +114,19 @@ export class MetricRetentionSurfaceViewComponent
   toggleDisplay(): void {}
 
   ngOnInit() {
+
+    this.options = {
+      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+
+      header: {
+        left: 'prev,next',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+      },
+      editable: true,
+      dayMaxEvents: true
+    };
+
     this.applianceAPiSvc.selectedStorageAccountAction$.subscribe((data) => {
       console.log('metrics retention surface has new selected storage account');
 

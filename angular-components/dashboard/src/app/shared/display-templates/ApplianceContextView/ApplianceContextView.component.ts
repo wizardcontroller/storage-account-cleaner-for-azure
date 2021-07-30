@@ -4,11 +4,12 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { ReplaySubject } from 'rxjs';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonToggleChange, MatButtonToggleGroup, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { Router, ActivatedRoute, ParamMap, Routes } from '@angular/router';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatAccordion } from '@angular/material/expansion';
+import { MatButtonToggle } from '@angular/material/button-toggle';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { SubscriptionsViewComponent } from '../SubscriptionsView/SubscriptionsView.component';
@@ -26,8 +27,10 @@ import { ApplianceApiService } from '../../services/appliance-api.service';
 @AutoUnsubscribe()
 export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeHiddenFromDisplay {
   @ViewChild(MatAccordion) accordion!: MatAccordion;
+  @ViewChild('toolSelector') toolSelector!: MatButtonToggleGroup;
 
   private baseUri: string = '';
+  public selectedTool: string = 'storage';
 
   isWorkflowCheckpointPollingEnabled!: boolean;
 
@@ -35,13 +38,6 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
   private currentApplianceContextSource = new ReplaySubject<ApplianceSessionContext>();
   applianceContextChanges$ = this.currentApplianceContextSource.asObservable();
   id: any;
-  constructor(private apiConfigSvc: ApiConfigService,
-    private retentionEntitiesSvc: RetentionEntitiesService,
-    private applianceApiSvc: ApplianceApiService,
-    private router: Router,
-    private route: ActivatedRoute) {
-    this.isWorkflowCheckpointPollingEnabled = this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint;
-  }
 
 
   operatorPageModel!: OperatorPageModel;
@@ -49,6 +45,21 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
   private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
   operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
 
+  private toolSelectionSource = new ReplaySubject<string>();
+  toolSelectionChanges$ = this.toolSelectionSource.asObservable();
+
+  constructor(private apiConfigSvc: ApiConfigService,
+    private retentionEntitiesSvc: RetentionEntitiesService,
+    private applianceApiSvc: ApplianceApiService,
+    private router: Router,
+    private route: ActivatedRoute) {
+    this.isWorkflowCheckpointPollingEnabled = this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint;
+
+      this.toolSelectionSource.next( this.selectedTool);
+
+
+    //this.toolSelectionSource.next(selectedToggle.value);
+  }
 
   handleAutoRefreshSelectionChange(e: { checked: any; }) {
     this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint = e.checked;
@@ -59,6 +70,7 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
   }
 
   ngOnInit() {
+
 
     this.ensureOperatorPageModel();
 
@@ -90,4 +102,11 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
   toggleDisplay() {
     this.isShow = !this.isShow;
   }
+
+  toolChanged(e: MatButtonToggleChange){
+    console.log("tool selected " + this.selectedTool);
+    this.toolSelectionSource.next(e.value);
+  }
+
+
 }

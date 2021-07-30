@@ -38,12 +38,13 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ApplianceJobLogViewComponent } from './display-templates/appliance-job-log-view/appliance-job-log-view.component';
 
-import {CarouselModule} from 'primeng/carousel';
+import { CarouselModule } from 'primeng/carousel';
 
-import {MatTabsModule} from '@angular/material/tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 
-import {FullCalendarModule} from 'primeng/fullcalendar';
+import { FullCalendarModule } from 'primeng/fullcalendar';
 import { RetentionPeriodForFullCalendarPipe } from './pipes/retention-Period-For-FullCalendar.pipe';
+import {MatRadioModule} from '@angular/material/radio';
 
 @NgModule({
   imports: [
@@ -68,7 +69,8 @@ import { RetentionPeriodForFullCalendarPipe } from './pipes/retention-Period-For
     ToastModule,
     CarouselModule,
     MatTabsModule,
-    FullCalendarModule
+    FullCalendarModule,
+    MatRadioModule
   ],
   exports: [
     SharedComponent,
@@ -81,7 +83,7 @@ import { RetentionPeriodForFullCalendarPipe } from './pipes/retention-Period-For
     DatesToTimeLineEventsPipePipe,
     CommandPaletteComponent,
     ApplianceJobLogViewComponent,
-    RetentionPeriodForFullCalendarPipe
+    RetentionPeriodForFullCalendarPipe,
   ],
   declarations: [
     SharedComponent,
@@ -94,7 +96,7 @@ import { RetentionPeriodForFullCalendarPipe } from './pipes/retention-Period-For
     DatesToTimeLineEventsPipePipe,
     CommandPaletteComponent,
     ApplianceJobLogViewComponent,
-    RetentionPeriodForFullCalendarPipe
+    RetentionPeriodForFullCalendarPipe,
   ],
   providers: [
     LoggingConfigurationService,
@@ -102,7 +104,7 @@ import { RetentionPeriodForFullCalendarPipe } from './pipes/retention-Period-For
     ApplianceContextService,
     ApplianceApiService,
     MessageService,
-    DatePipe
-  ]
+    DatePipe,
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}

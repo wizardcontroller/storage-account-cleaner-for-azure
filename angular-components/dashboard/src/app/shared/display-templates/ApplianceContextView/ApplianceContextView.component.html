@@ -1,71 +1,79 @@
-
-<div  *ngIf=" applianceContextChanges$ | async as applianceContext else noApplianceContext">
-
-  <ul  aria-label="modules">
-    <li><a [routerLink]="['subscriptions']">subscriptions</a></li>
-
-    <li><a [routerLink]="['storageaccounts']">storage accounts</a></li>
-
-  </ul>
-
+<div
+  *ngIf="
+    applianceContextChanges$ | async as applianceContext;
+    else noApplianceContext
+  "
+>
+  <mat-button-toggle-group
+    #toolSelector
+    [(ngModel)]="selectedTool"
+    (change)="toolChanged($event)"
+  >
+    <mat-button-toggle value="subscriptions">subscriptions</mat-button-toggle>
+    <mat-button-toggle checked value="storage"
+      >storage accounts</mat-button-toggle
+    >
+  </mat-button-toggle-group>
   <p-card>
-    <ng-template pTemplate="header">
-      <div>appliance log</div>
-      <div style="display: flex; overflow:auto; max-height: 250px;">
-        <app-appliance-job-log-view></app-appliance-job-log-view>
-      </div>
-    </ng-template>
-    <ng-template #noPageModel>
-      no operator data
-    </ng-template>
-    <ng-template pTemplate="footer">
+    <ng-template pTemplate="header"> </ng-template>
+    <ng-template #noPageModel> no operator data </ng-template>
+    <ng-template pTemplate="footer"> </ng-template>
 
-    </ng-template>
+    <mat-accordion>
+      <mat-expansion-panel expanded>
+        <mat-expansion-panel-header style="border: aqua 1px">
+          <mat-panel-title
+            style="background-color: rgb(231, 214, 214); padding: 3px"
+          >
+            Workbench Tool
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-container *ngIf="toolSelectionChanges$ | async as tool">
+          <div *ngIf="tool === 'subscriptions'; else storageAccounts">
+            <app-SubscriptionsView></app-SubscriptionsView>
+          </div>
 
-    <mat-accordion></mat-accordion>
-   <mat-expansion-panel expanded>
-      <mat-expansion-panel-header>
-        <mat-panel-title style="background-color: rgb(231, 214, 214);   padding: 3px;">
-          Appliance Summary
+          <ng-template #storageAccounts>
+            <app-StorageAccountView></app-StorageAccountView>
+          </ng-template>
+        </ng-container>
+      </mat-expansion-panel>
 
-        </mat-panel-title>
-
-      </mat-expansion-panel-header>
-      <p-card>
-
-
-        <fieldset style="float:initial" title="Appliance Summary">
-          <ng-container class="a-ng-container" *ngIf=" operatorPageModelChanges$ | async as operatorPageModel else noPageModel">
-            <div class="container">
-              <span class="">Appliance URL</span>
-              <div class="">{{ operatorPageModel?.applianceUrl }}</div>
-              <span class="">Tenant Id</span>
-              <div class="">{{ operatorPageModel?.applianceSessionContext?.tenantId}}</div>
-            </div>
-
-          </ng-container>
-
-
-        </fieldset>
-
-
-      </p-card>
-    </mat-expansion-panel>
-
-    <mat-expansion-panel expanded>
-      <mat-expansion-panel-header style="border: aqua 1px; ">
-        <mat-panel-title style="background-color: rgb(231, 214, 214); padding: 3px;">
-        Workbench Tool
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <router-outlet></router-outlet>
-    </mat-expansion-panel>
-
-
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title
+            style="background-color: rgb(231, 214, 214); padding: 3px"
+          >
+            Appliance Summary
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <p-card>
+          <fieldset style="float: initial" title="Appliance Summary">
+            <ng-container
+              class="a-ng-container"
+              *ngIf="
+                operatorPageModelChanges$ | async as operatorPageModel;
+                else noPageModel
+              "
+            >
+              <div class="container">
+                <span class="">Appliance URL</span>
+                <div class="">{{ operatorPageModel?.applianceUrl }}</div>
+                <span class="">Tenant Id</span>
+                <div class="">
+                  {{ operatorPageModel?.applianceSessionContext?.tenantId }}
+                </div>
+              </div>
+            </ng-container>
+          </fieldset>
+        </p-card>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div>appliance log</div>
+    <div style="display: flex; overflow: auto; max-height: 250px">
+      <app-appliance-job-log-view></app-appliance-job-log-view>
+    </div>
   </p-card>
 </div>
 
-<ng-template #noApplianceContext>
-  no appliance data
-</ng-template>
+<ng-template #noApplianceContext> no appliance data </ng-template>
