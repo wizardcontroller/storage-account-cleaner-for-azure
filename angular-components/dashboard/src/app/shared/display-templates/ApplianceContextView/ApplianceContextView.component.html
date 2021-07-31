@@ -4,16 +4,7 @@
     else noApplianceContext
   "
 >
-  <mat-button-toggle-group
-    #toolSelector
-    *ngModel="selectedTool"
-    (change)="toolChanged($event)"
-  >
-    <mat-button-toggle value="subscriptions">subscriptions</mat-button-toggle>
-    <mat-button-toggle checked value="storage"
-      >storage accounts</mat-button-toggle
-    >
-  </mat-button-toggle-group>
+
   <p-card>
     <ng-template pTemplate="header"> </ng-template>
     <ng-template #noPageModel> no operator data </ng-template>
@@ -41,7 +32,7 @@
 
       </mat-expansion-panel>
 
-      <mat-expansion-panel>
+      <mat-expansion-panel hidden>
         <mat-expansion-panel-header>
           <mat-panel-title
             style="background-color: rgb(231, 214, 214); padding: 3px"

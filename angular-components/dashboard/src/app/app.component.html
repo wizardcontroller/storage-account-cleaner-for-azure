@@ -65,17 +65,22 @@
       </div>
     </mat-toolbar>
 
-    <div class="main contents">
-      <app-core></app-core>
-      <mat-tab-group>
-        <mat-tab label="workbench">
-          <app-Workbench></app-Workbench>
-        </mat-tab>
-        <mat-tab label="report">
-          <app-JobOutputView></app-JobOutputView>
-        </mat-tab>
-      </mat-tab-group>
-    </div>
+    <p-card>
+      <ng-template  pTemplate="content">
+        <div class="main contents">
+          <app-core></app-core>
+          <mat-tab-group>
+            <mat-tab label="workbench">
+              <app-Workbench></app-Workbench>
+            </mat-tab>
+            <mat-tab label="report">
+              <app-JobOutputView></app-JobOutputView>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+
+      </ng-template>
+    </p-card>
 
     <mat-toolbar class="main footer"> </mat-toolbar>
   </mat-drawer-content>
