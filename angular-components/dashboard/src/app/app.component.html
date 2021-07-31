@@ -1,49 +1,71 @@
-
-<mat-drawer-container [class.drawer-opened]="drawer.opened"
-                      class="example-container">
-  <mat-drawer #drawer
-              class="drawer"
-              mode="side"
-              opened="true">
-
-
+<mat-drawer-container
+  [class.drawer-opened]="drawer.opened"
+  class="example-container"
+>
+  <mat-drawer #drawer class="drawer" mode="side" opened="true">
     <mat-toolbar class="header">
       <span>Available Commands</span>
-      <mat-icon class="close"
-                (click)="drawer.close()">close</mat-icon>
+      <mat-icon class="close" (click)="drawer.close()">close</mat-icon>
     </mat-toolbar>
 
     <div class="drawer contents">
-
       <app-command-palette></app-command-palette>
     </div>
   </mat-drawer>
 
   <mat-drawer-content>
-    <mat-toolbar  class="main header">
-      <mat-icon *ngIf="!drawer.opened"
-                (click)="drawer.toggle()">
+    <mat-toolbar class="main header">
+      <mat-icon *ngIf="!drawer.opened" (click)="drawer.toggle()">
         menu
       </mat-icon>
-      <div style=" width:100%;">
-
-
+      <div style="width: 100%">
         <ul hidden>
-
-          <li style="margin-top:15px;background-color: white; display: flex;">
-
-          </li>
+          <li
+            style="margin-top: 15px; background-color: white; display: flex"
+          ></li>
         </ul>
 
-      <mat-slide-toggle
-      [color]="color" [checked]="isAutoRefreshWorkflowCheckpoint">
-      Auto Refresh
-    </mat-slide-toggle>
+
+
+        <ng-container *ngIf="operatorPageModelChanges$ | async as operatorPageModel; else noPageModelheader">
+          <p-card>
+            <ng-template  pTemplate="header">
+
+            </ng-template>
+
+            <ng-template  pTemplate="content">
+
+              <div>
+                {{ operatorPageModel?.applianceUrl }}
+
+              <div class="">
+                <span style="float: left;">Tenant Id</span>
+                {{ operatorPageModel?.applianceSessionContext?.tenantId }}
+
+              <mat-slide-toggle
+              style="float: right;"
+              [color]="color"
+              [checked]="isAutoRefreshWorkflowCheckpoint"
+            >
+              Auto Refresh
+            </mat-slide-toggle>
+              </div>
+
+
+            </div>
+            </ng-template>
+
+            <ng-template  pTemplate="footer">
+
+            </ng-template>
+          </p-card>
+
+        </ng-container>
+        <ng-template #noPageModelheader></ng-template>
       </div>
     </mat-toolbar>
 
     <div class="main contents">
-
       <app-core></app-core>
       <mat-tab-group>
         <mat-tab label="workbench">
@@ -55,10 +77,6 @@
       </mat-tab-group>
     </div>
 
-
-    <mat-toolbar class="main footer">
-
-    </mat-toolbar>
+    <mat-toolbar class="main footer"> </mat-toolbar>
   </mat-drawer-content>
-
 </mat-drawer-container>
