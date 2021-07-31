@@ -29,6 +29,7 @@ import { ThemePalette } from '@angular/material/core'
 import { ToastModule } from 'primeng/toast';
 import { MatRadioModule } from '@angular/material/radio';
 import { MessageService } from 'primeng/api';
+import { MatTabsModule } from '@angular/material/tabs';
 
 
 @NgModule({
@@ -50,6 +51,7 @@ import { MessageService } from 'primeng/api';
     MatButtonToggleModule,
     MatSidenavModule,
     MatToolbarModule,
+    MatTabsModule,
     MatIconModule,
     MatSlideToggleModule,
     ToastModule,

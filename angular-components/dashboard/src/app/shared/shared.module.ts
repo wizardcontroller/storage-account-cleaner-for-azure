@@ -45,6 +45,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { FullCalendarModule } from 'primeng/fullcalendar';
 import { RetentionPeriodForFullCalendarPipe } from './pipes/retention-Period-For-FullCalendar.pipe';
 import {MatRadioModule} from '@angular/material/radio';
+import { JobOutputViewComponent } from './display-templates/JobOutputView/JobOutputView.component';
 
 @NgModule({
   imports: [
@@ -84,6 +85,7 @@ import {MatRadioModule} from '@angular/material/radio';
     CommandPaletteComponent,
     ApplianceJobLogViewComponent,
     RetentionPeriodForFullCalendarPipe,
+    JobOutputViewComponent
   ],
   declarations: [
     SharedComponent,
@@ -96,7 +98,8 @@ import {MatRadioModule} from '@angular/material/radio';
     DatesToTimeLineEventsPipePipe,
     CommandPaletteComponent,
     ApplianceJobLogViewComponent,
-    RetentionPeriodForFullCalendarPipe
+    RetentionPeriodForFullCalendarPipe,
+    JobOutputViewComponent
   ],
   providers: [
     LoggingConfigurationService,

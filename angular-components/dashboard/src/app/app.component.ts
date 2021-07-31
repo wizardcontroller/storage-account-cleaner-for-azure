@@ -15,16 +15,24 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MessageService } from 'primeng/api';
 import { ToastMessage } from './models/ToastMessage';
 import { PrimeNGConfig } from 'primeng/api';
+import { IToggleToolChooser } from './shared/interfaces/IToggleToolChooser';
+
+export enum ToggleEnum {
+  workbench,
+  report
+}
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.css']
 })
 @AutoUnsubscribe()
 export class AppComponent
-  implements OnInit, OnDestroy, ICanBeHiddenFromDisplay
-{
+  implements OnInit, OnDestroy, ICanBeHiddenFromDisplay, IToggleToolChooser {
   @ViewChild('toolSelector') toolSelector!: MatButtonToggleGroup;
+
+  toggleEnum = ToggleEnum;
+  selectedState = ToggleEnum.workbench;
 
   isAutoRefreshWorkflowCheckpoint =
     this.applianceSvc.isAutoRefreshWorkflowCheckpoint;
@@ -39,10 +47,10 @@ export class AppComponent
 
   baseUri: String | undefined;
   title = 'dashboard';
-
-  private toolSelectionSource = new ReplaySubject<string>();
-  toolSelectionChanges$ = this.toolSelectionSource.asObservable();
   public selectedView: string = 'workbench';
+  toolSelectionSource = new BehaviorSubject<string>(this.selectedView);
+  toolSelectionChanges$ = this.toolSelectionSource.asObservable();
+
 
   constructor(
     private apiConfigSvc: ApiConfigService,
@@ -89,14 +97,20 @@ export class AppComponent
         })
       )
       .subscribe();
+
+        this.toolSelectionSource.next(this.selectedView);
   }
 
   toolChanged(e: MatButtonToggleChange): void{
     // console.log("tool selected " + this.selectedView);
-    this.toolSelectionSource.next(e.value);
+    this.selectedView = e.value;
+    this.selectedState = e.value;
+    // this.toolSelectionSource.next(e.value);
+
   }
 
   showToast(message: ToastMessage): void {
+
     this.messageService.add(message);
   }
 }

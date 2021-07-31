@@ -18,7 +18,7 @@ import { ApplianceApiService } from '../../services/appliance-api.service';
 
 
 @Component({
-
+  selector: 'app-Workbench',
   templateUrl: './ApplianceContextView.component.html',
   styleUrls: ['./ApplianceContextView.component.css']
 })

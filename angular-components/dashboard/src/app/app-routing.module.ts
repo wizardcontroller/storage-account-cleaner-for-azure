@@ -9,7 +9,8 @@ import { ApplianceContextService } from './shared/display-templates/services/App
 import { StorageAccountViewComponent } from './shared/display-templates/StorageAccountView/StorageAccountView.component';
 import { SubscriptionsViewComponent } from './shared/display-templates/SubscriptionsView/SubscriptionsView.component';
 
-const routes: Routes = [
+const routes: Routes = [];
+const Notroutes: Routes = [
 
 
 
