@@ -35,6 +35,7 @@
       </ng-template>
 
       <ng-template let-job pTemplate="gridItem">
+        <form>
         <div class="p-col-12">
           <mat-tab-group>
             <mat-tab label="Timeline">
@@ -69,6 +70,16 @@
                           <td><span>will be deleted?: </span></td>
                           <td>{{ job.itemWillBeDeleted }}</td>
                         </tr>
+
+                        <tr>
+                          <td><span>retention period</span></td>
+                          <td>
+                            <div class="p-field p-col-12 p-md-4">
+                              <label for="range">Range</label>
+                              <p-calendar [(ngModel)]="rangeDates" selectionMode="range" inputId="range"></p-calendar>
+                          </div>
+                          </td>
+                        </tr>
                       </table>
                     </div>
                   </div>
@@ -98,6 +109,7 @@
             </mat-tab>
           </mat-tab-group>
         </div>
+        </form>
       </ng-template>
 
       <ng-template pTemplate="footer">

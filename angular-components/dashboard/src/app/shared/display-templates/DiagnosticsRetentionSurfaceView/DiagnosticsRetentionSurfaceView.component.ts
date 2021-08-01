@@ -37,6 +37,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
 
   showOnlyExistingItems = false;
   isSideNavOpen = false;
+  rangeDates!: Array<Date>;
 
   events!: any[];
   header!: any;
