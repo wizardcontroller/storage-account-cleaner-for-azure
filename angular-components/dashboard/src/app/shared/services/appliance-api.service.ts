@@ -60,8 +60,8 @@ export class ApplianceApiService implements OnDestroy {
   workflowCheckpointTimer$ = timer(this.workflowCheckpointPollingStartDelay,
     this.workflowCheckpointPollingInterval);
   workflowCheckpoints$ = combineLatest(
-    this.workflowCheckpointTimer$,
-    this.apiConfigService.operatorPageModelChanges$
+    [this.workflowCheckpointTimer$,
+    this.apiConfigService.operatorPageModelChanges$]
   )
     .pipe(
       distinctUntilChanged(),
@@ -143,7 +143,9 @@ export class ApplianceApiService implements OnDestroy {
           this.storageAccountsSource.next(accounts);
 
           // 'select' a newly available storage account
-          this.selectedStorageAccountSource.next(accounts[0].id as string);
+          // note very strong dependency on default selection state of
+          // storage accounts display component
+          this.selectedStorageAccountSource.next(accounts[accounts.length - 1].id as string);
 
 
         }),     share()

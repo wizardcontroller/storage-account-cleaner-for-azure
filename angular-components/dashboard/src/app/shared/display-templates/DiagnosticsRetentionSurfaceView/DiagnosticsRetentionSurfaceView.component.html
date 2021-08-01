@@ -4,9 +4,13 @@
     else noAccount
   "
 >
-  <div clas="card metricscard">
+
+  <p-card>
+
+
     <p-dataView
       #dv
+
       [value]="jobs"
       layout="grid"
       [paginator]="true"
@@ -16,7 +20,7 @@
       <ng-template pTemplate="header">
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
-          <div>Diagnostics Retention Surface</div>
+          <div>Diagnostics Retention Surface: {{curentStorageAccount.name}} </div>
 
           <p-toggleButton
             #filterItemsBtn
@@ -37,6 +41,7 @@
       <ng-template let-job pTemplate="gridItem">
 
         <div class="p-col-12">
+          {{job.id}}
           <mat-tab-group>
             <mat-tab label="Timeline">
               <p-card class="card">
@@ -116,7 +121,8 @@
         <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
       </ng-template>
     </p-dataView>
-  </div>
+  </p-card>
+
 </ng-container>
 
 <ng-template #noAccount>

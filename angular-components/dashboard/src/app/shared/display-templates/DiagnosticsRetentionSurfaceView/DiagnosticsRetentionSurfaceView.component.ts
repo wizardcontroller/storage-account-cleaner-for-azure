@@ -4,17 +4,18 @@ import { ActivatedRoute } from '@angular/router';
 import {
   DiagnosticsRetentionSurfaceItemEntity,
   OperatorPageModel,
+  StorageAccountDTO,
   TableStorageRetentionPolicy,
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { ReplaySubject } from 'rxjs';
-import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
+import { combineLatest, ReplaySubject } from 'rxjs';
+import { concatMap, map, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from '../../../core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
-import {  PrimeIcons } from 'primeng/api';
-import {MessageService} from 'primeng/api'
+import { PrimeIcons } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
 import { ToggleButton } from 'primeng/togglebutton';
 
@@ -26,7 +27,7 @@ import { RetentionPeriodForFullCalendarPipe } from '../../pipes/retention-Period
 @Component({
   selector: 'app-DiagnosticsRetentionSurfaceView',
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
-  styleUrls: ['./DiagnosticsRetentionSurfaceView.component.css']
+  styleUrls: ['./DiagnosticsRetentionSurfaceView.component.css'],
 })
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent
@@ -46,13 +47,17 @@ export class DiagnosticsRetentionSurfaceViewComponent
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
 
-
-  a = this.applianceAPiSvc.selectedStorageAccountAction$
-  .pipe(
-    tap(t => {
-      console.log("diagnostics retention view has selected storage account");
-    })
-  ).subscribe();
+  curentStorageAccount!: StorageAccountDTO;
+  currentStorageAccount$ =
+    this.applianceAPiSvc.selectedStorageAccount$.subscribe((data) => {
+      const newData = data.pop();
+      if (newData) {
+        this.curentStorageAccount = newData;
+        console.log(
+          `diagnosticentities$ updated with storage account ${this.curentStorageAccount.name}`
+        );
+      }
+    });
 
   diagnosticsItemDependencies$ = this.pageModelChanges$.pipe(
     withLatestFrom(
@@ -84,9 +89,42 @@ export class DiagnosticsRetentionSurfaceViewComponent
         });
     });
 
+  diagnosticEntities$ = combineLatest([
+    this.pageModelChanges$,
+    this.applianceAPiSvc.selectedStorageAccountAction$,
+  ])
+    .pipe(
+      tap((t) => {
+        console.log('diagnosticentities$ updated');
+      }),
+      map((dependencyData) => {
+        var pageModel = dependencyData[0];
+        var storageAccountId = dependencyData[1];
+
+        this.applianceAPiSvc.entityService
+          .getRetentionPolicyForStorageAccount(
+            pageModel.tenantid as string,
+            pageModel.oid as string,
+            pageModel.selectedSubscriptionId as string,
+            storageAccountId as string
+          )
+          .pipe(tap((t) => {}))
+          .subscribe((data: TableStorageRetentionPolicy) => {
+            this.diagnosticsRetentionSurfaceEntitySource.next(
+              data?.tableStorageEntityRetentionPolicy
+                ?.diagnosticsRetentionSurface
+                ?.diagnosticsRetentionSurfaceEntities as DiagnosticsRetentionSurfaceItemEntity[]
+            );
+            // console.log(`diagnosticentities$ updated storage account ${storageAccountId}`)
+          });
+      })
+    )
+    .subscribe();
+
   private diagnosticsRetentionSurfaceEntitySource = new ReplaySubject<
     DiagnosticsRetentionSurfaceItemEntity[]
   >();
+
   diagnosticsRetentionSurfaceEntityChanges$ =
     this.diagnosticsRetentionSurfaceEntitySource.asObservable();
 
@@ -120,10 +158,8 @@ export class DiagnosticsRetentionSurfaceViewComponent
         right: 'dayGridMonth,timeGridWeek,timeGridDay',
       },
       editable: true,
-      dayMaxEvents: true
+      dayMaxEvents: true,
     };
-
-
   }
 
   toggleSideNav(): void {
