@@ -11,29 +11,32 @@
     <p-dataView [value]="commands"
                 sortField="menuLabel" [sortOrder]="1"
                 layout="list"
-                [paginator]="true"
+                [paginator]="false"
                 [rows]="10"
                 [showCurrentPageReport]="true"
                 [loading]="isRefreshing"
+                class="p-dataview"
                 rowHover="true">
       <ng-template pTemplate="header">
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
-          <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+
         </div>
 
       </ng-template>
 
       <ng-template let-command pTemplate="listItem">
 
-        <div class="uniform-button hovered focussed"
-             (click)="onSelect(command)">
-          {{ command.menuLabel }}
+        <div class="p-dataview-content">
+          <div class="uniform-button hovered focussed p-dataview-list"
+          (mouseover)="mouseOver(command)"
+          (click)="onSelect(command)">
+            {{ command.menuLabel }}
+          </div>
         </div>
+
       </ng-template>
 
       <ng-template pTemplate="footer">
-        <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
-
 
         <p-card *ngIf="hasSelectedCommand">
           <ng-template pTemplate="header">
@@ -80,14 +83,6 @@
               <span style="font-weight: bold">Affected Subscription</span>
               <div>
                 {{ selectedCommand.subscriptionId }}
-              </div>
-              <hr />
-            </div>
-
-            <div *ngIf="selectedCommand.availableCommandId">
-              <span style="font-weight: bold">Command Id</span>
-              <div>
-                {{ selectedCommand.availableCommandId }}
               </div>
               <hr />
             </div>

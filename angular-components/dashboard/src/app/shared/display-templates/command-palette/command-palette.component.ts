@@ -11,7 +11,17 @@ import {
   WorkflowOperationCommand,
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
-import { combineLatest, from, interval, Observable, of, Operator, ReplaySubject, Subject, timer } from 'rxjs';
+import {
+  combineLatest,
+  from,
+  interval,
+  Observable,
+  of,
+  Operator,
+  ReplaySubject,
+  Subject,
+  timer,
+} from 'rxjs';
 import {
   catchError,
   concatMap,
@@ -24,7 +34,11 @@ import {
   share,
   shareReplay,
   tap,
-  withLatestFrom, debounceTime, filter, publish, distinctUntilChanged
+  withLatestFrom,
+  debounceTime,
+  filter,
+  publish,
+  distinctUntilChanged,
 } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -46,76 +60,71 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
   availableCommandChanges$ = this.availableCommandSubject.asObservable();
   hasSelectedCommand = false;
 
+  isMousingOver = true;
 
   isRefreshing: boolean = false;
-
 
   isShowSpinnerSource = new ReplaySubject<boolean>();
   isShowSpinnerChanges$ = this.isShowSpinnerSource.asObservable();
 
-  refreshTimer$ = timer(0, (1000 * 30));
+  refreshTimer$ = timer(0, 1000 * 30);
 
   isRefreshingPipe$ = combineLatest(
     this.refreshTimer$,
     this.applianceAPiSvc.workflowCheckpointChanges$
   )
-  .pipe
-    (
+    .pipe(
       distinctUntilChanged(),
       // filter(f => this.workflowCheckpoint.timeStamp?.match(this.workflowCheckpoint.timeStamp) === null),
       // filter(f => f[1].timeStamp === this.workflowCheckpoint.timeStamp),
-      tap(tapped => {
-        console.log("command palette is refreshing = " + tapped);
+      tap((tapped) => {
+        console.log('command palette is refreshing = ' + tapped);
       }),
-      map(([isRefreshing,data]) => {
+      map(([isRefreshing, data]) => {
         this.isRefreshing = true;
         // this.isRefreshingSource.next(isRefreshing);
 
         // if (isRefreshing) {
-        console.log("showing refresh toast");
+        console.log('showing refresh toast');
         const toast = new ToastMessage();
-        toast.detail = "checking the appliance state ";
-        toast.summary = "command palette Updating ";
+        toast.detail = 'checking the appliance state ';
+        toast.summary = 'command palette Updating ';
         toast.sticky = false;
         toast.life = 1000 * 8;
-        toast.severity = "warning";
+        toast.severity = 'warning';
         // this.showToast(toast);
 
         // this.getPagemodelChangesPipe().subscribe();
         this.getWorkflowCheckpointChangesPipe().subscribe();
         //}
-       this.isRefreshing = false;
-
-      })).subscribe();
-
-  isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$
-    .pipe
-    (
-      distinctUntilChanged(),
-      tap(tapped => {
-        console.log("command palette is refreshing = " + tapped);
-      }),
-      map(isRefreshing => {
-        this.isRefreshing = isRefreshing;
-        // this.isRefreshingSource.next(isRefreshing);
-
-        // if (isRefreshing) {
-        console.log("showing refresh toast");
-        const toast = new ToastMessage();
-        toast.detail = "checking the appliance state";
-        toast.summary = "command palette Updating ";
-        toast.sticky = false;
-        toast.life = 1000 * 8;
-        toast.severity = "info";
-        // this.showToast(toast);
-
-        this.getPagemodelChangesPipe().subscribe();
-        this.getWorkflowCheckpointChangesPipe().subscribe();
-        //}
-
-
+        this.isRefreshing = false;
       })
+    )
+    .subscribe();
 
+  isRefreshingPipe = this.applianceAPiSvc.isRefreshingChanges$.pipe(
+    distinctUntilChanged(),
+    tap((tapped) => {
+      console.log('command palette is refreshing = ' + tapped);
+    }),
+    map((isRefreshing) => {
+      this.isRefreshing = isRefreshing;
+      // this.isRefreshingSource.next(isRefreshing);
+
+      // if (isRefreshing) {
+      console.log('showing refresh toast');
+      const toast = new ToastMessage();
+      toast.detail = 'checking the appliance state';
+      toast.summary = 'command palette Updating ';
+      toast.sticky = false;
+      toast.life = 1000 * 8;
+      toast.severity = 'info';
+      // this.showToast(toast);
+
+      this.getPagemodelChangesPipe().subscribe();
+      this.getWorkflowCheckpointChangesPipe().subscribe();
+      //}
+    })
   );
 
   workflowCheckpoint!: WorkflowCheckpointDTO;
@@ -155,7 +164,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
     toast.detail = `${command.worklowOperationDisplayMessage}: oid=${oid}`;
     toast.summary = command.menuLabel as string;
 
-    toast.severity = "info";
+    toast.severity = 'info';
     this.showToast(toast);
 
     // this.applianceAPiSvc.isRefreshingSource.next(true);
@@ -186,6 +195,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
             result.availableCommands as Array<AvailableCommand>
           );
 
+          this.isMousingOver = true;
           this.applianceAPiSvc.ensurePageModelSubject();
 
           // update dependencies
@@ -200,88 +210,97 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
           this.isRefreshing = false;
         }),
 
-        catchError(err => {
-          console.log("catchError(): error submitting command");
+        catchError((err) => {
+          console.log('catchError(): error submitting command');
           const toast = new ToastMessage();
-          toast.detail = "failed to submit command to the appliance";
-          toast.summary = "update failed";
+          toast.detail = 'failed to submit command to the appliance';
+          toast.summary = 'update failed';
           toast.sticky = true;
           toast.life = 1000 * 8;
-          toast.severity = "error";
+          toast.severity = 'error';
 
           this.isShowSpinnerSource.next(false);
           this.isRefreshing = false;
           this.showToast(toast);
+
+          this.isMousingOver = true;
           return of([]);
         })
       )
-      .subscribe(
-        (placeholder) => {
-          console.log('');
+      .subscribe((placeholder) => {
+        console.log('');
+      });
+  }
 
-        }
-      );
-
+  focusOut() : void{
+    this.isMousingOver = true;
+  }
+  mouseOver(command: AvailableCommand): void {
+    if (this.isMousingOver) {
+      this.selectedCommand = command;
+      this.hasSelectedCommand = true;
+    }
   }
 
   onSelect(command: AvailableCommand): void {
     // nothing yet
     this.selectedCommand = command;
     this.hasSelectedCommand = true;
-    console.log('command selected: ' + command.menuLabel);
+    this.isMousingOver = false;
   }
 
   ngOnDestroy(): void {
     // nothing yet
   }
 
-  getPagemodelChangesPipe(): Observable<OperatorPageModel>{
-    return this.apiConfigSvc.operatorPageModelChanges$.
-      pipe(
-        distinctUntilChanged(),
-        map(changes => {
-          this.pageModelSubject.next(changes);
-          this.currentPageModel = changes;
-          return changes;
-        }),
-        tap(t => {
-          const toast = new ToastMessage();
-          toast.detail = "operator pagemodel is available";
-          toast.summary = "updating";
-          toast.sticky = false;
-          toast.life = 1000 * 8;
-          toast.severity = "info";
-          // this.showToast(toast);
-        })
-      );
+  getPagemodelChangesPipe(): Observable<OperatorPageModel> {
+    return this.apiConfigSvc.operatorPageModelChanges$.pipe(
+      distinctUntilChanged(),
+      map((changes) => {
+        this.pageModelSubject.next(changes);
+        this.currentPageModel = changes;
+        return changes;
+      }),
+      tap((t) => {
+        const toast = new ToastMessage();
+        toast.detail = 'operator pagemodel is available';
+        toast.summary = 'updating';
+        toast.sticky = false;
+        toast.life = 1000 * 8;
+        toast.severity = 'info';
+        // this.showToast(toast);
+      })
+    );
   }
 
   getWorkflowCheckpointChangesPipe() {
-    console.log("getWorkflowCheckpointChangesPipe()");
-    return this.applianceAPiSvc.workflowCheckpointChanges$.
-      pipe(
-        distinctUntilChanged(),
+    console.log('getWorkflowCheckpointChangesPipe()');
+    return this.applianceAPiSvc.workflowCheckpointChanges$.pipe(
+      distinctUntilChanged(),
 
-        tap(t => {
-          const toast = new ToastMessage();
-          toast.detail = "checking the appliance workflow checkpoint";
-          toast.summary = "workflow checkpoint updating ";
-          toast.sticky = false;
-          toast.life = 1000 * 8;
-          toast.severity = "info";
-          // this.showToast(toast);
-        }),
-        map(workflowCheckpoint => {
+      tap((t) => {
+        const toast = new ToastMessage();
+        toast.detail = 'checking the appliance workflow checkpoint';
+        toast.summary = 'workflow checkpoint updating ';
+        toast.sticky = false;
+        toast.life = 1000 * 8;
+        toast.severity = 'info';
+        // this.showToast(toast);
+      }),
+      map((workflowCheckpoint) => {
+        // let difference = this.workflowCheckpoint.availableCommands?.filter(f => !workflowCheckpoint.availableCommands?.includes(f));
+        console.log(
+          `command null workflow checkpoijnt ${
+            this.workflowCheckpoint === null
+          }`
+        );
 
-          // let difference = this.workflowCheckpoint.availableCommands?.filter(f => !workflowCheckpoint.availableCommands?.includes(f));
-          console.log(`command null workflow checkpoijnt ${this.workflowCheckpoint === null}`);
-
-          this.workflowCheckpoint = workflowCheckpoint;
-          this.availableCommandSubject.next(
-            workflowCheckpoint.availableCommands as Array<AvailableCommand>
-          );
-        }));
-
+        this.workflowCheckpoint = workflowCheckpoint;
+        this.availableCommandSubject.next(
+          workflowCheckpoint.availableCommands as Array<AvailableCommand>
+        );
+      })
+    );
   }
 
   ngOnInit(): void {
