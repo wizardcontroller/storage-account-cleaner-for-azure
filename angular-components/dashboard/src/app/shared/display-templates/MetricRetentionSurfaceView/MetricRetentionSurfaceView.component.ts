@@ -49,6 +49,7 @@ export class MetricRetentionSurfaceViewComponent
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
 
+
   metricsItemDependencies$ = this.pageModelChanges$.pipe(
     withLatestFrom(
       this.applianceAPiSvc.selectedStorageAccountAction$
@@ -58,7 +59,9 @@ export class MetricRetentionSurfaceViewComponent
 
   // metricEntities$ = this.metricsItemDependencies$.subscribe(
   metricEntities$ = this.pageModelChanges$
-    .pipe(concatMap((dependencyData) => this.metricsItemDependencies$))
+    .pipe(
+      concatMap((dependencyData) => this.metricsItemDependencies$)
+    )
     .subscribe((dependencyData) => {
       const pageModel = dependencyData[0];
       const storageAccountId = dependencyData[1];
@@ -79,6 +82,7 @@ export class MetricRetentionSurfaceViewComponent
           );
         });
     });
+
 
   private entityRetentionPolicySource =
     new ReplaySubject<TableStorageEntityRetentionPolicy>();
@@ -131,6 +135,7 @@ export class MetricRetentionSurfaceViewComponent
       console.log('metrics retention surface has new selected storage account');
 
       this.acctSubject.next(data);
+
     });
 
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((pageModel) => {

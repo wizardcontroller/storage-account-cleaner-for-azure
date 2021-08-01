@@ -8,7 +8,7 @@ import {
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { ReplaySubject } from 'rxjs';
-import { concatMap, withLatestFrom } from 'rxjs/operators';
+import { concatMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from '../../../core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -45,6 +45,14 @@ export class DiagnosticsRetentionSurfaceViewComponent
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
+
+
+  a = this.applianceAPiSvc.selectedStorageAccountAction$
+  .pipe(
+    tap(t => {
+      console.log("diagnostics retention view has selected storage account");
+    })
+  ).subscribe();
 
   diagnosticsItemDependencies$ = this.pageModelChanges$.pipe(
     withLatestFrom(

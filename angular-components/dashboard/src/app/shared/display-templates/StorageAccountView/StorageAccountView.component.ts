@@ -82,7 +82,7 @@ export class StorageAccountViewComponent implements OnInit, OnDestroy, ICanBeHid
 
   private ensureStorageAccountsPTable() {
     this.cols = [
-      { field: 'isSelected', header: 'Is Selected' },
+
       { field: 'name', header: 'Name' },
       { field: 'id', header: 'Account ID' },
       { field: 'tenantId', header: 'Tenant Id' }

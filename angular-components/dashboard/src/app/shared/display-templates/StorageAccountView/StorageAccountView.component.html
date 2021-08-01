@@ -9,9 +9,11 @@
     [columns]="cols"
     [value]="availableStorageAccounts"
     [scrollable]="true"
-    scrollHeight="200px"
+    scrollHeight="300px"
     selectionMode="single"
-    [(selection)]="selectedStorageAccount"
+    dataKey="id"
+    (onRowSelect)="selectStorageAccount($event)"
+
   >
     <ng-template pTemplate="caption"> Storage Accounts </ng-template>
     <ng-template pTemplate="header" let-columns>
@@ -19,47 +21,34 @@
         <th *ngFor="let col of columns">
           {{ col.header }}
         </th>
-        <th style="width: 4rem"></th>
+        <th  ></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-storageAccount let-columns="columns">
-      <tr>
-        <td style="overflow-x: auto" *ngFor="let col of columns">
-          {{ storageAccount[col.field] }}
-        </td>
-        <td>
-          <button
-            class="p-button-raised"
-            label="select"
-            type="button"
-            pButton
-            pRipple
-            icon="pi"
+
+        <tr>
+
+          <td style="overflow:auto; " *ngFor="let col of columns">
+            {{ storageAccount[col.field] }}
+          </td>
+          <td >
+            <mat-radio-button
             (click)="selectStorageAccount(storageAccount)"
-          ></button>
-        </td>
-      </tr>
+            name="storageAccountBtn" value="stoageAccount"
+            checked="true">selected</mat-radio-button>
+
+
+          </td>
+
+        </tr>
+
     </ng-template>
     <ng-template pTemplate="summary">
       Storage Accounts On Appliance: {{ availableStorageAccounts?.length }}
     </ng-template>
   </p-table>
-  <div>
-    <hr />
-    <span>SELECT</span>
-    <mat-button-toggle-group
-      #toolSelector
-      *ngModel="selectedTool"
-      (change)="toolChanged($event)"
-    >
-      <mat-button-toggle value="DiagnosticsRetention"
-        >Diagnostics Retention</mat-button-toggle
-      >
-      <mat-button-toggle checked value="MetricRetention"
-        >Metrics Retention</mat-button-toggle
-      >
-    </mat-button-toggle-group>
-  </div>
+
+
 
   <mat-tab-group>
     <mat-tab label="diagnostics retention surface">
