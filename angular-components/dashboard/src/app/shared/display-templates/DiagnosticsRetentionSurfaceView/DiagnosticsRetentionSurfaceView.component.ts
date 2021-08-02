@@ -59,36 +59,6 @@ export class DiagnosticsRetentionSurfaceViewComponent
       }
     });
 
-  diagnosticsItemDependencies$ = this.pageModelChanges$.pipe(
-    withLatestFrom(
-      this.applianceAPiSvc.selectedStorageAccountAction$
-      // this.selectedAccountChanges$
-    )
-  );
-
-  metricEntities$ = this.pageModelChanges$
-    .pipe(concatMap((dependencyData) => this.diagnosticsItemDependencies$))
-    .subscribe((dependencyData) => {
-      var pageModel = dependencyData[0];
-      var storageAccountId = dependencyData[1];
-
-      console.log('getting metric entities');
-      this.applianceAPiSvc.entityService
-        .getRetentionPolicyForStorageAccount(
-          pageModel.tenantid as string,
-          pageModel.oid as string,
-          pageModel.selectedSubscriptionId as string,
-          storageAccountId as string
-        )
-        .subscribe((data: TableStorageRetentionPolicy) => {
-          console.log('retention policy ' + JSON.stringify(data));
-          this.diagnosticsRetentionSurfaceEntitySource.next(
-            data?.tableStorageEntityRetentionPolicy?.diagnosticsRetentionSurface
-              ?.diagnosticsRetentionSurfaceEntities as DiagnosticsRetentionSurfaceItemEntity[]
-          );
-        });
-    });
-
   diagnosticEntities$ = combineLatest([
     this.pageModelChanges$,
     this.applianceAPiSvc.selectedStorageAccountAction$,
@@ -108,7 +78,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
             pageModel.selectedSubscriptionId as string,
             storageAccountId as string
           )
-          //.pipe(tap((t) => {}))
+          .pipe(tap((t) => {}))
           .subscribe((data: TableStorageRetentionPolicy) => {
             this.diagnosticsRetentionSurfaceEntitySource.next(
               data?.tableStorageEntityRetentionPolicy
@@ -128,6 +98,14 @@ export class DiagnosticsRetentionSurfaceViewComponent
   diagnosticsRetentionSurfaceEntityChanges$ =
     this.diagnosticsRetentionSurfaceEntitySource.asObservable();
 
+  pageModelPipe = this.apiConfigSvc.operatorPageModelChanges$.pipe(
+    map((pageModel) => {
+      console.log('diagnostics retention view has updated page model');
+      // metrics retention component has operator page model
+      this.pageModelSubuject.next(pageModel);
+    })
+  );
+
   constructor(
     private apiConfigSvc: ApiConfigService,
     private applianceAPiSvc: ApplianceApiService
@@ -143,11 +121,12 @@ export class DiagnosticsRetentionSurfaceViewComponent
   toggleDisplay(): void {}
 
   ngOnInit() {
+    this.pageModelPipe.subscribe();
+    /*
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((pageModel) => {
-      console.log('diagnostics retention view has page model');
-      // metrics retention component has operator page model
+      console.log('diagnostics retention view has updated page model');
       this.pageModelSubuject.next(pageModel);
-    });
+    }); */
 
     this.options = {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
