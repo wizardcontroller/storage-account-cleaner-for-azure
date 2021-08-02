@@ -6,9 +6,13 @@
     <mat-toolbar class="header">
       <span>Available Commands</span>
       <mat-icon class="close" (click)="drawer.close()">close</mat-icon>
+
     </mat-toolbar>
 
     <div class="drawer contents">
+      <div style="margin-top: 15px;">
+        auth token expiry {{authExpiryTime | date: 'MMMM d, y, h:mm:ss a z'}}
+      </div>
       <app-command-palette></app-command-palette>
     </div>
   </mat-drawer>
@@ -19,20 +23,11 @@
         menu
       </mat-icon>
       <div style="width: 100%">
-        <ul hidden>
-          <li
-            style="margin-top: 15px; background-color: white; display: flex"
-          ></li>
-        </ul>
-
-
 
         <ng-container *ngIf="operatorPageModelChanges$ | async as operatorPageModel; else noPageModelheader">
-          <p-card>
+          <p-card >
             <ng-template  pTemplate="header">
-              <div>
-                auth token expiry {{authExpiryTime}}
-              </div>
+
             </ng-template>
 
             <ng-template  pTemplate="content">
@@ -41,6 +36,7 @@
                 {{ operatorPageModel?.applianceUrl }}
 
               <div class="">
+
                 <span style="float: left;">Tenant Id</span>
                 {{ operatorPageModel?.applianceSessionContext?.tenantId }}
 

@@ -35,7 +35,7 @@ export class AppComponent
   toggleEnum = ToggleEnum;
   selectedState = ToggleEnum.workbench;
 
-  authExpiryTime! : Date;
+  authExpiryTime: Date = new Date();
 
   isAutoRefreshWorkflowCheckpoint =
     this.applianceSvc.isAutoRefreshWorkflowCheckpoint;
@@ -71,12 +71,29 @@ export class AppComponent
       console.log('app component has operator page model');
 
       try{
-        const decodedJwt = jwt_decode(data.easyAuthAccessToken as string) as Jwt;
-        const newDate = decodedJwt.payload.exp;
 
-        this.authExpiryTime = new Date(newDate as number);
+        const decodedJwt = jwt_decode(data.easyAuthAccessToken as string);
+        // console.log("jwt decoded as " + JSON.stringify(decodedJwt));
+
+        const jsonToken = JSON.parse(JSON.stringify(decodedJwt as string));
+        // console.log(`jwt jsontoken ${jsonToken}`);
+        const newDate = jsonToken.exp;
+
+        console.log(`jwt exp = ${newDate}`);
+        this.authExpiryTime = new Date((newDate as number) * 1000);
+        console.log(`jwt expiry time ${this.authExpiryTime}`);
+        const now = new Date();
+
+        if(this.authExpiryTime.getTime() < now.getTime()){
+          console.log("expired jwt");
+        }
+        else{
+          console.log("not expired jwt");
+        }
       }
-      catch(e){}
+      catch(e){
+        console.log(`jwt exception ${e}`);
+      }
 
       this.baseUri = data.applianceUrl?.toString();
       this.currentPageModelSource.next(data);
