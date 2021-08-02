@@ -87,6 +87,9 @@ export class ApplianceApiService implements OnDestroy {
 
   public selectedStorageAccountSource = new BehaviorSubject<string>("");
   selectedStorageAccountAction$ = this.selectedStorageAccountSource.asObservable();
+  currentStorageAccountSource = new ReplaySubject<StorageAccountDTO>();
+  currentStorageAccountChanges$ = this.currentStorageAccountSource.asObservable();
+
   selectedStorageAccount$ = combineLatest(
     [
       this.storageAccountChanges$,
@@ -94,11 +97,19 @@ export class ApplianceApiService implements OnDestroy {
     ]
   )
     .pipe(
-      distinctUntilChanged(),
       map(([storageAccounts, selectedStorageAccountId]) => this.storageAccounts.
         filter(storageAccount => selectedStorageAccountId ? storageAccount.id === selectedStorageAccountId : true)
       )
-    ,     share());
+  ,     share());
+
+
+  currentStorageAccount$ =
+    this.selectedStorageAccount$.pipe(
+      map(data =>{
+        const nextResult = data.pop();
+        this.currentStorageAccountSource.next(nextResult);
+      })
+    ).subscribe();
 
 
   private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();

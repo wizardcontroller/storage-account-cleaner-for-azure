@@ -49,23 +49,23 @@ export class MetricRetentionSurfaceViewComponent
 
   curentStorageAccount!: StorageAccountDTO;
   currentStorageAccount$ =
-    this.applianceAPiSvc.selectedStorageAccount$.subscribe((data) => {
-      const newData = data.pop();
+    this.applianceAPiSvc.currentStorageAccountChanges$.subscribe((data) => {
+      const newData = data;
       if (newData) {
         this.curentStorageAccount = newData;
         console.log(
-          `diagnosticentities$ updated with storage account ${this.curentStorageAccount.name}`
+          `metricsCurrentStorageAccount$ updated with storage account ${this.curentStorageAccount.name}`
         );
       }
     });
 
   metricEntitiesPipe$ = combineLatest([
     this.pageModelChanges$,
-    this.applianceAPiSvc.selectedStorageAccountAction$,
+    this.applianceAPiSvc.currentStorageAccountChanges$
   ])
     .pipe(
       tap((t) => {
-        console.log('metric$ updated with dependencies');
+        console.log('metricEntitiesPipe$ updated with dependencies');
       }),
       map((dependencyData) => {
         var pageModel = dependencyData[0];
@@ -76,9 +76,11 @@ export class MetricRetentionSurfaceViewComponent
             pageModel.tenantid as string,
             pageModel.oid as string,
             pageModel.selectedSubscriptionId as string,
-            storageAccountId as string
+            storageAccountId.id as string
           )
-          .pipe(tap((t) => {}))
+          .pipe(tap((t) => {
+            console.log(`metrics has updated retention surface for ${storageAccountId.id}`);
+          }))
           .subscribe((data: TableStorageRetentionPolicy) => {
             this.metricsRetentionSurfaceEntitiesSource.next(
               data?.tableStorageTableRetentionPolicy?.metricRetentionSurface
@@ -105,7 +107,7 @@ export class MetricRetentionSurfaceViewComponent
 
   pageModelPipe = this.apiConfigSvc.operatorPageModelChanges$.pipe(
     map((pageModel) => {
-      console.log('diagnostics retention view has updated page model');
+      console.log('metrics retention view has updated page model');
       // metrics retention component has operator page model
       this.pageModelSubuject.next(pageModel);
     })

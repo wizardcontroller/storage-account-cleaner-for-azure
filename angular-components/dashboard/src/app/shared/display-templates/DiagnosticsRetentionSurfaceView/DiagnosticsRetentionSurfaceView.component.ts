@@ -47,25 +47,27 @@ export class DiagnosticsRetentionSurfaceViewComponent
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
 
+
   curentStorageAccount!: StorageAccountDTO;
   currentStorageAccount$ =
-    this.applianceAPiSvc.selectedStorageAccount$.subscribe((data) => {
-      const newData = data.pop();
+    this.applianceAPiSvc.currentStorageAccountChanges$.subscribe((data) => {
+      const newData = data;
       if (newData) {
         this.curentStorageAccount = newData;
         console.log(
-          `diagnosticentities$ updated with storage account ${this.curentStorageAccount.name}`
+          `diagnosticsCurrentStorageAccount$ updated with storage account ${this.curentStorageAccount.name}`
         );
       }
     });
 
+
   diagnosticEntitiesPipe$ = combineLatest([
     this.pageModelChanges$,
-    this.applianceAPiSvc.selectedStorageAccountAction$,
+    this.applianceAPiSvc.currentStorageAccountChanges$
   ])
     .pipe(
       tap((t) => {
-        console.log('diagnosticentities$ updated');
+        console.log('diagnosticEntitiesPipe$ updated with dependencies');
       }),
       map((dependencyData) => {
         var pageModel = dependencyData[0];
@@ -76,9 +78,11 @@ export class DiagnosticsRetentionSurfaceViewComponent
             pageModel.tenantid as string,
             pageModel.oid as string,
             pageModel.selectedSubscriptionId as string,
-            storageAccountId as string
+            storageAccountId.id as string
           )
-          .pipe(tap((t) => {}))
+          .pipe(tap((t) => {
+            console.log(`diagnostics has updated retention surface for ${storageAccountId.id}`);
+          }))
           .subscribe((data: TableStorageRetentionPolicy) => {
             this.diagnosticsRetentionSurfaceEntitySource.next(
               data?.tableStorageEntityRetentionPolicy
@@ -122,11 +126,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
 
   ngOnInit() {
     this.pageModelPipe.subscribe();
-    /*
-    this.apiConfigSvc.operatorPageModelChanges$.subscribe((pageModel) => {
-      console.log('diagnostics retention view has updated page model');
-      this.pageModelSubuject.next(pageModel);
-    }); */
+
 
     this.options = {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
