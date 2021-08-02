@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import {
   DiagnosticsRetentionSurfaceItemEntity,
   OperatorPageModel,
+  PolicyEnforcementMode,
   StorageAccountDTO,
   TableStorageRetentionPolicy,
 } from '@wizardcontroller/sac-appliance-lib';
@@ -45,6 +46,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
   header!: any;
   options!: any;
 
+  enforcementMode = [PolicyEnforcementMode.applyPolicy, PolicyEnforcementMode.whatIf];
   currentRetentionPolicy! : TableStorageRetentionPolicy;
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();

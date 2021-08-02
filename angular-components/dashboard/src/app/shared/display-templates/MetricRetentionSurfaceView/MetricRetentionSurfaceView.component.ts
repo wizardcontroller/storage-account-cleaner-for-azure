@@ -10,6 +10,7 @@ import {
   TableStorageEntityRetentionPolicy,
   TableStorageEntityRetentionPolicyEnforcementResult,
 } from '@wizardcontroller/sac-appliance-lib';
+import { PolicyEnforcementMode } from '@wizardcontroller/sac-appliance-lib';
 import {
   ApplianceJobOutput,
   MetricsRetentionSurfaceItemEntity,
@@ -45,6 +46,7 @@ export class MetricRetentionSurfaceViewComponent
 
   isShow: boolean;
 
+  enforcementMode = [PolicyEnforcementMode.applyPolicy, PolicyEnforcementMode.whatIf];
   currentRetentionPolicy! : TableStorageRetentionPolicy;
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();

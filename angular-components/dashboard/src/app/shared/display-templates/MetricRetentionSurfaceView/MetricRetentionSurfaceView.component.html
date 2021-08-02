@@ -107,18 +107,39 @@
                               [size]="90"
                               [showValue]="true"
                             ></p-knob>
-                            <div style="align-self: center;">
-                              <p-button
-                              type="button"
-                              (onClick)="updateRetentionPolicy($event)"
-                              label="commit"
-                              class="p-button-text"
-                            ></p-button>
-                            </div>
+
 
                           </td>
                           </ng-container>
                         </tr>
+
+                        <tr>
+                          <ng-container *ngIf="!isShow">
+                              <td>enforcement mode</td>
+                              <td>{{job.policyEnforcementMode}}</td>
+                          </ng-container>
+                          <ng-container *ngIf="isShow">
+                            <td>enforcement mode</td>
+                            <td>
+                              <p-dropdown [options]="enforcementMode" [(ngModel)]="job.policyEnforcementMode"></p-dropdown>
+                            </td>
+
+                          </ng-container>
+                        </tr>
+                        <ng-container *ngIf="isShow">
+                          <tr>
+                            <td>
+                              <div style="align-self: center;">
+                                <p-button
+                                type="button"
+                                (onClick)="updateRetentionPolicy($event)"
+                                label="commit"
+                                class="p-button-text"
+                              ></p-button>
+                              </div>
+                            </td>
+                          </tr>
+                        </ng-container>
                       </table>
                     </div>
                   </div>
