@@ -43,7 +43,9 @@ export class MetricRetentionSurfaceViewComponent
   options!: any;
   showOnlyExistingItems = false;
 
+  isShow: boolean;
 
+  currentRetentionPolicy! : TableStorageRetentionPolicy;
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
 
@@ -87,6 +89,8 @@ export class MetricRetentionSurfaceViewComponent
               data?.tableStorageTableRetentionPolicy?.metricRetentionSurface
                 ?.metricsRetentionSurfaceItemEntities as Array<MetricsRetentionSurfaceItemEntity>
             );
+
+            this.currentRetentionPolicy = data
           });
       })
     )
@@ -125,7 +129,6 @@ export class MetricRetentionSurfaceViewComponent
     // nothing yet
   }
 
-  isShow: boolean;
   toggleDisplay(): void {}
 
   ngOnInit() {

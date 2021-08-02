@@ -1,5 +1,6 @@
 ﻿using com.ataxlab.azure.table.retention.models.models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,6 +11,7 @@ using System.Text;
 namespace com.ataxlab.azure.table.retention.models
 {
     ///todo enumerate these numerically wherever they appear
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PolicyEnforcementMode { WhatIf, ApplyPolicy}
 
     public class TableStorageTableRetentionPolicy
@@ -31,6 +33,7 @@ namespace com.ataxlab.azure.table.retention.models
 
         public MetricRetentionSurfaceEntity MetricRetentionSurface { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
@@ -126,6 +129,7 @@ namespace com.ataxlab.azure.table.retention.models
         public Guid Id { get; set; }
 
         public DiagnosticsRetentionSurfaceEntity DiagnosticsRetentionSurface { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>

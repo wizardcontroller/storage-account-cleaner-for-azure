@@ -30,6 +30,7 @@ using Microsoft.Graph;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Polly;
 using Polly.Extensions.Http;
@@ -54,6 +55,14 @@ namespace com.ataxlab.functions.table.retention.dashboard
         {
             model.Properties =
                 model.Properties.ToDictionary(d => d.Key.Substring(0, 1).ToLower() + d.Key.Substring(1), d => d.Value);
+            if (context.Type.IsEnum)
+            {
+                model.Enum.Clear();
+                Enum.GetNames(context.Type)
+                    .ToList()
+                    .ForEach(n => model.Enum.Add(new OpenApiString(n)));
+            }
+
         }
     }
 
@@ -189,6 +198,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
                 c.SchemaFilter<CamelCasingPropertiesFilter>();
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                 c.IgnoreObsoleteProperties();
+                
             });
 
             // as per https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/tree/master/3-WebApp-multi-APIs
@@ -391,7 +401,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Storage Account Cleaner For Azure");
-
+               ;
             });
 
 

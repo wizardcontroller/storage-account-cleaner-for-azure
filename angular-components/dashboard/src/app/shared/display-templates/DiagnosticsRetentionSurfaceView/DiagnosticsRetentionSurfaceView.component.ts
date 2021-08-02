@@ -32,7 +32,7 @@ import { RetentionSurfaceToolBase } from '../RetentionSurfaceToolBase';
 })
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent
-  implements OnDestroy, OnInit
+  implements OnDestroy, OnInit, ICanBeHiddenFromDisplay
 {
   @ViewChild('dv') dv!: DataView;
   @ViewChild('filterItemsBtn') filterItemsBtn!: ToggleButton;
@@ -44,6 +44,8 @@ export class DiagnosticsRetentionSurfaceViewComponent
   events!: any[];
   header!: any;
   options!: any;
+
+  currentRetentionPolicy! : TableStorageRetentionPolicy;
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
@@ -91,6 +93,8 @@ export class DiagnosticsRetentionSurfaceViewComponent
                 ?.diagnosticsRetentionSurface
                 ?.diagnosticsRetentionSurfaceEntities as DiagnosticsRetentionSurfaceItemEntity[]
             );
+
+            this.currentRetentionPolicy = data;
             // console.log(`diagnosticentities$ updated storage account ${storageAccountId}`)
           });
       })
@@ -165,6 +169,6 @@ export class DiagnosticsRetentionSurfaceViewComponent
     console.log("policy submitted");
   }
 
-
+  toggleDisplay(): void {}
 
 }

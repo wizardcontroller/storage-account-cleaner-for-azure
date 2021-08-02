@@ -49,6 +49,7 @@ import { JobOutputViewComponent } from './display-templates/JobOutputView/JobOut
 import {KnobModule} from 'primeng/knob';
 import {SliderModule} from 'primeng/slider';
 import {ToolbarModule} from 'primeng/toolbar';
+import { DropdownModule } from 'primeng/dropdown';
 @NgModule({
   imports: [
     CommonModule,
@@ -76,7 +77,8 @@ import {ToolbarModule} from 'primeng/toolbar';
     MatRadioModule,
     KnobModule,
     SliderModule,
-    ToolbarModule
+    ToolbarModule,
+    DropdownModule
   ],
   exports: [
     SharedComponent,

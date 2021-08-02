@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace com.ataxlab.functions.table.retention.entities
 {
@@ -117,6 +118,7 @@ namespace com.ataxlab.functions.table.retention.entities
         [JsonProperty("metricRetentionSurface")]
         public MetricRetentionSurfaceEntity MetricRetentionSurface { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty("policyEnforcementMode")]
         public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
 
@@ -211,6 +213,7 @@ namespace com.ataxlab.functions.table.retention.entities
 
         public Guid Id { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty("PolicyEnforcementMode")]
         public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
 

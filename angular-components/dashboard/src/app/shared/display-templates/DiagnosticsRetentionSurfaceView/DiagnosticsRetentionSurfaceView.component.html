@@ -120,6 +120,16 @@
                           </td>
                           </ng-container>
                         </tr>
+
+                        <tr>
+                          <ng-container *ngIf="!isShow">
+                              <td>enforcement mode</td>
+                              <td>{{job.policyEnforcementMode}}</td>
+                          </ng-container>
+                          <ng-container *ngIf="isShow">
+                            <p-dropdown [options]="job.policyEnforcementMode" [(ngModel)]="job.policyEnforcementMode"></p-dropdown>
+                          </ng-container>
+                        </tr>
                       </table>
                     </div>
                   </div>
