@@ -42,8 +42,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
-
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
 namespace com.ataxlab.functions.table.retention.dashboard
 {
     /// <summary>
@@ -58,6 +58,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
             if (context.Type.IsEnum)
             {
                 model.Enum.Clear();
+                
                 Enum.GetNames(context.Type)
                     .ToList()
                     .ForEach(n => model.Enum.Add(new OpenApiString(n)));
@@ -291,8 +292,17 @@ namespace com.ataxlab.functions.table.retention.dashboard
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
+              
 
             }).AddRazorRuntimeCompilation()
+                .AddJsonOptions(opts =>
+                {
+                    // as per https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1269
+                    // https://gist.github.com/regisdiogo/27f62ef83a804668eb0d9d0f63989e3e
+                    // https://medium.com/@jrhodes.home/exposing-enums-through-swagger-in-net-core-api-616d3727a02c
+                    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    opts.JsonSerializerOptions.IgnoreNullValues = true;
+                })
                 .AddMicrosoftIdentityUI();
             // as per https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/tree/master/3-WebApp-multi-APIs
 
