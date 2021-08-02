@@ -48,6 +48,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import { JobOutputViewComponent } from './display-templates/JobOutputView/JobOutputView.component';
 import {KnobModule} from 'primeng/knob';
 import {SliderModule} from 'primeng/slider';
+import {ToolbarModule} from 'primeng/toolbar';
 @NgModule({
   imports: [
     CommonModule,
@@ -74,7 +75,8 @@ import {SliderModule} from 'primeng/slider';
     FullCalendarModule,
     MatRadioModule,
     KnobModule,
-    SliderModule
+    SliderModule,
+    ToolbarModule
   ],
   exports: [
     SharedComponent,

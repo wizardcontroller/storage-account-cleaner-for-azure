@@ -11,16 +11,37 @@
       filterBy="itemExists"
     >
       <ng-template pTemplate="header">
-        <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
+        <div class="">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
-          <div>Metrics Retention Surface {{curentStorageAccount.name}}   </div>
-          <p-toggleButton
-            #filterItemsBtn
-            [(ngModel)]="showOnlyExistingItems"
-            (onChange)="filterChanged($event.checked)"
-            onLabel="extant items only"
-            offLabel="non-extant items only"
-          ></p-toggleButton>
+
+          <p-toolbar>
+            <div class="p-toolbar-group-right">
+              <div class="pi">
+                <div class="p-button-raised p-button-rounded">
+                  Metrics Retention Surface
+                </div>
+                {{ curentStorageAccount.name }}
+              </div>
+              <div class="pi" style="padding-left: 10px">
+                <button
+                  class="p-button-text p-button-raised"
+                  pButton
+                  type="button"
+                  label="Edit Policy"
+                ></button>
+              </div>
+              <p-toggleButton
+                class="p-button-raised"
+                style="padding-left: 10px"
+                #filterItemsBtn
+                [(ngModel)]="showOnlyExistingItems"
+                (onChange)="filterChanged($event.checked)"
+                onLabel="extant items only"
+                offLabel="non-extant items only"
+              ></p-toggleButton>
+            </div>
+          </p-toolbar>
+
         </div>
       </ng-template>
 
