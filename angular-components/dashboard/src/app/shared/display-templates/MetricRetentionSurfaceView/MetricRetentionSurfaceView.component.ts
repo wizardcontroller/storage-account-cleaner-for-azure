@@ -8,12 +8,12 @@ import {
   RetentionEntitiesService,
   StorageAccountDTO,
   TableStorageEntityRetentionPolicy,
-  TableStorageEntityRetentionPolicyEnforcementResult
+  TableStorageEntityRetentionPolicyEnforcementResult,
 } from '@wizardcontroller/sac-appliance-lib';
 import {
   ApplianceJobOutput,
   MetricsRetentionSurfaceItemEntity,
-  TableStorageRetentionPolicy
+  TableStorageRetentionPolicy,
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { PrimeIcons } from 'primeng/api';
@@ -30,7 +30,7 @@ import { ApplianceApiService } from '../../services/appliance-api.service';
 @Component({
   selector: 'app-MetricsRetentionSurfaceView',
   templateUrl: './MetricRetentionSurfaceView.component.html',
-  styleUrls: ['./MetricRetentionSurfaceView.component.css']
+  styleUrls: ['./MetricRetentionSurfaceView.component.css'],
 })
 @AutoUnsubscribe()
 export class MetricRetentionSurfaceViewComponent
@@ -43,20 +43,21 @@ export class MetricRetentionSurfaceViewComponent
   options!: any;
   showOnlyExistingItems = false;
 
-  private acctSubject = new ReplaySubject<string>();
-  selectedAccountChanges$ = this.acctSubject.asObservable();
 
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
 
-
-  metricsItemDependencies$ = this.pageModelChanges$.pipe(
-    withLatestFrom(
-      this.applianceAPiSvc.selectedStorageAccountAction$
-      // this.selectedAccountChanges$
-    )
-  );
-
+  curentStorageAccount!: StorageAccountDTO;
+  currentStorageAccount$ =
+    this.applianceAPiSvc.selectedStorageAccount$.subscribe((data) => {
+      const newData = data.pop();
+      if (newData) {
+        this.curentStorageAccount = newData;
+        console.log(
+          `diagnosticentities$ updated with storage account ${this.curentStorageAccount.name}`
+        );
+      }
+    });
 
   metricEntitiesPipe$ = combineLatest([
     this.pageModelChanges$,
@@ -88,43 +89,12 @@ export class MetricRetentionSurfaceViewComponent
     )
     .subscribe();
 
-  metricEntities$ = this.pageModelChanges$
-    .pipe(
-      concatMap((dependencyData) => this.metricsItemDependencies$)
-    )
-    .subscribe((dependencyData) => {
-      const pageModel = dependencyData[0];
-      const storageAccountId = dependencyData[1];
-
-      console.log('getting metric entities');
-      this.applianceAPiSvc.entityService
-        .getRetentionPolicyForStorageAccount(
-          pageModel.tenantid as string,
-          pageModel.oid as string,
-          pageModel.selectedSubscriptionId as string,
-          storageAccountId as string
-        )
-        .subscribe((data: TableStorageRetentionPolicy) => {
-          console.log('retention policy ' + JSON.stringify(data));
-          this.metricsRetentionSurfaceEntitiesSource.next(
-            data?.tableStorageTableRetentionPolicy?.metricRetentionSurface
-              ?.metricsRetentionSurfaceItemEntities as Array<MetricsRetentionSurfaceItemEntity>
-          );
-        });
-    });
-
 
   private entityRetentionPolicySource =
     new ReplaySubject<TableStorageEntityRetentionPolicy>();
   entityRetentionPolicyChanges$ =
     this.entityRetentionPolicySource.asObservable();
 
-  selectedStorageAccount!: StorageAccountDTO;
-  operatorPageModel!: OperatorPageModel;
-
-  currentJobOutput: Array<ApplianceJobOutput> | undefined;
-  private currentJobOutputSource = new ReplaySubject<Array<ApplianceJobOutput>>();
-  currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
 
   metricsRetentionSurfaceEntities!: Array<MetricsRetentionSurfaceItemEntity>;
   private metricsRetentionSurfaceEntitiesSource = new ReplaySubject<
@@ -133,13 +103,13 @@ export class MetricRetentionSurfaceViewComponent
   metricsRetentionSurfaceEntityChanges$ =
     this.metricsRetentionSurfaceEntitiesSource.asObservable();
 
-    pageModelPipe = this.apiConfigSvc.operatorPageModelChanges$.pipe(
-      map((pageModel) => {
-        console.log('diagnostics retention view has updated page model');
-        // metrics retention component has operator page model
-        this.pageModelSubuject.next(pageModel);
-      })
-    );
+  pageModelPipe = this.apiConfigSvc.operatorPageModelChanges$.pipe(
+    map((pageModel) => {
+      console.log('diagnostics retention view has updated page model');
+      // metrics retention component has operator page model
+      this.pageModelSubuject.next(pageModel);
+    })
+  );
 
   constructor(
     private apiConfigSvc: ApiConfigService,
@@ -157,6 +127,8 @@ export class MetricRetentionSurfaceViewComponent
 
   ngOnInit() {
 
+    this.pageModelPipe.subscribe();
+
     this.options = {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
 
@@ -169,17 +141,7 @@ export class MetricRetentionSurfaceViewComponent
       dayMaxEvents: true
     };
 
-    this.applianceAPiSvc.selectedStorageAccountAction$.subscribe((data) => {
-      console.log('metrics retention surface has new selected storage account');
 
-      this.acctSubject.next(data);
-
-    });
-
-    this.apiConfigSvc.operatorPageModelChanges$.subscribe((pageModel) => {
-      // metrics retention component has operator page model
-      this.pageModelSubuject.next(pageModel);
-    });
   }
 
   filterChanged(e: boolean) {
