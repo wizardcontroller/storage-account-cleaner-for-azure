@@ -30,7 +30,9 @@
         <ng-container *ngIf="operatorPageModelChanges$ | async as operatorPageModel; else noPageModelheader">
           <p-card>
             <ng-template  pTemplate="header">
-
+              <div>
+                auth token expiry {{authExpiryTime}}
+              </div>
             </ng-template>
 
             <ng-template  pTemplate="content">

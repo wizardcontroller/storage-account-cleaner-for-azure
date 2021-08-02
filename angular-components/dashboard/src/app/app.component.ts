@@ -16,7 +16,8 @@ import { MessageService } from 'primeng/api';
 import { ToastMessage } from './models/ToastMessage';
 import { PrimeNGConfig } from 'primeng/api';
 import { IToggleToolChooser } from './shared/interfaces/IToggleToolChooser';
-
+import jwt_decode from "jwt-decode";
+import { Jwt } from 'jsonwebtoken';
 export enum ToggleEnum {
   workbench,
   report
@@ -33,6 +34,8 @@ export class AppComponent
 
   toggleEnum = ToggleEnum;
   selectedState = ToggleEnum.workbench;
+
+  authExpiryTime! : Date;
 
   isAutoRefreshWorkflowCheckpoint =
     this.applianceSvc.isAutoRefreshWorkflowCheckpoint;
@@ -66,6 +69,15 @@ export class AppComponent
     this.isShow = false;
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
       console.log('app component has operator page model');
+
+      try{
+        const decodedJwt = jwt_decode(data.easyAuthAccessToken as string) as Jwt;
+        const newDate = decodedJwt.payload.exp;
+
+        this.authExpiryTime = new Date(newDate as number);
+      }
+      catch(e){}
+
       this.baseUri = data.applianceUrl?.toString();
       this.currentPageModelSource.next(data);
       return (this.operatorPageModel = data);
