@@ -135,10 +135,12 @@ export class DiagnosticsRetentionSurfaceViewComponent
       header: {
         left: 'prev,next',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
       editable: true,
       dayMaxEvents: true,
+      height: 310,
+      contentHeight: 300
     };
   }
 

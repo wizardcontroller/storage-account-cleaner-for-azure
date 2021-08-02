@@ -67,6 +67,17 @@
                           <td><span>will be deleted?: </span></td>
                           <td>{{ job.itemWillBeDeleted }}</td>
                         </tr>
+
+                        <tr>
+                          <td><span>retention period </span></td>
+                          <td>{{ job.retentionPeriodInDays }} days</td>
+                          <p-knob
+                            [(ngModel)]="job.retentionPeriodInDays"
+                            [min]="1"
+                            [max]="1000"
+                            [size]="90"
+                          ></p-knob>
+                        </tr>
                       </table>
                     </div>
                   </div>

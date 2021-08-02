@@ -4,13 +4,9 @@
     else noAccount
   "
 >
-
   <p-card>
-
-
     <p-dataView
       #dv
-
       [value]="jobs"
       layout="grid"
       [paginator]="true"
@@ -20,7 +16,9 @@
       <ng-template pTemplate="header">
         <div class="p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
-          <div>Diagnostics Retention Surface: {{curentStorageAccount.name}} </div>
+          <div>
+            Diagnostics Retention Surface: {{ curentStorageAccount.name }}
+          </div>
 
           <p-toggleButton
             #filterItemsBtn
@@ -39,9 +37,8 @@
       </ng-template>
 
       <ng-template let-job pTemplate="gridItem">
-
         <div class="p-col-12">
-          {{job.id}}
+          {{ job.id }}
           <mat-tab-group>
             <mat-tab label="Timeline">
               <p-card class="card">
@@ -77,13 +74,14 @@
                         </tr>
 
                         <tr>
-                          <td><span>retention period</span></td>
-                          <td>
-                            <div class="p-field p-col-12 p-md-4">
-                              <label for="range">Range</label>
-                              <p-calendar [(ngModel)]="rangeDates" selectionMode="range" inputId="range"></p-calendar>
-                          </div>
-                          </td>
+                          <td><span>retention period </span></td>
+                          <td>{{ job.retentionPeriodInDays }} days</td>
+                          <p-knob
+                            [(ngModel)]="job.retentionPeriodInDays"
+                            [min]="1"
+                            [max]="1000"
+                            [size]="90"
+                          ></p-knob>
                         </tr>
                       </table>
                     </div>
@@ -114,7 +112,6 @@
             </mat-tab>
           </mat-tab-group>
         </div>
-
       </ng-template>
 
       <ng-template pTemplate="footer">
@@ -122,7 +119,6 @@
       </ng-template>
     </p-dataView>
   </p-card>
-
 </ng-container>
 
 <ng-template #noAccount>

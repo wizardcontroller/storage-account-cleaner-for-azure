@@ -141,7 +141,9 @@ export class MetricRetentionSurfaceViewComponent
         right: 'dayGridMonth,timeGridWeek,timeGridDay',
       },
       editable: true,
-      dayMaxEvents: true
+      dayMaxEvents: true,
+      height: 310,
+      contentHeight: 300
     };
 
 

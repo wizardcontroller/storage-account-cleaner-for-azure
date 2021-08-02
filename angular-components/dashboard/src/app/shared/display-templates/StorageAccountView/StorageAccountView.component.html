@@ -26,13 +26,13 @@
     </ng-template>
     <ng-template pTemplate="body" let-storageAccount let-columns="columns">
 
-        <tr>
+        <tr  >
 
           <td style="overflow:auto; " *ngFor="let col of columns">
             {{ storageAccount[col.field] }}
           </td>
           <td >
-            <mat-radio-button
+            <mat-radio-button id="{{storageAccount.name}}"
             (click)="selectStorageAccount(storageAccount)"
             name="storageAccountBtn" value="stoageAccount"
             checked>selected</mat-radio-button>

@@ -46,7 +46,8 @@ import { FullCalendarModule } from 'primeng/fullcalendar';
 import { RetentionPeriodForFullCalendarPipe } from './pipes/retention-Period-For-FullCalendar.pipe';
 import {MatRadioModule} from '@angular/material/radio';
 import { JobOutputViewComponent } from './display-templates/JobOutputView/JobOutputView.component';
-
+import {KnobModule} from 'primeng/knob';
+import {SliderModule} from 'primeng/slider';
 @NgModule({
   imports: [
     CommonModule,
@@ -71,7 +72,9 @@ import { JobOutputViewComponent } from './display-templates/JobOutputView/JobOut
     CarouselModule,
     MatTabsModule,
     FullCalendarModule,
-    MatRadioModule
+    MatRadioModule,
+    KnobModule,
+    SliderModule
   ],
   exports: [
     SharedComponent,
