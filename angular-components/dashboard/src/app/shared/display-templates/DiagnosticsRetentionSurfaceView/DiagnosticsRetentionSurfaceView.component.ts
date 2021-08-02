@@ -59,7 +59,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
       }
     });
 
-  diagnosticEntities$ = combineLatest([
+  diagnosticEntitiesPipe$ = combineLatest([
     this.pageModelChanges$,
     this.applianceAPiSvc.selectedStorageAccountAction$,
   ])

@@ -20,7 +20,7 @@ import { PrimeIcons } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
 import { FullCalendarModule } from 'primeng/fullcalendar';
 import { combineLatest, ReplaySubject } from 'rxjs';
-import { concatMap, map, withLatestFrom } from 'rxjs/operators';
+import { concatMap, map, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
@@ -57,7 +57,37 @@ export class MetricRetentionSurfaceViewComponent
     )
   );
 
-  // metricEntities$ = this.metricsItemDependencies$.subscribe(
+
+  metricEntitiesPipe$ = combineLatest([
+    this.pageModelChanges$,
+    this.applianceAPiSvc.selectedStorageAccountAction$,
+  ])
+    .pipe(
+      tap((t) => {
+        console.log('metric$ updated with dependencies');
+      }),
+      map((dependencyData) => {
+        var pageModel = dependencyData[0];
+        var storageAccountId = dependencyData[1];
+
+        this.applianceAPiSvc.entityService
+          .getRetentionPolicyForStorageAccount(
+            pageModel.tenantid as string,
+            pageModel.oid as string,
+            pageModel.selectedSubscriptionId as string,
+            storageAccountId as string
+          )
+          .pipe(tap((t) => {}))
+          .subscribe((data: TableStorageRetentionPolicy) => {
+            this.metricsRetentionSurfaceEntitiesSource.next(
+              data?.tableStorageTableRetentionPolicy?.metricRetentionSurface
+                ?.metricsRetentionSurfaceItemEntities as Array<MetricsRetentionSurfaceItemEntity>
+            );
+          });
+      })
+    )
+    .subscribe();
+
   metricEntities$ = this.pageModelChanges$
     .pipe(
       concatMap((dependencyData) => this.metricsItemDependencies$)
@@ -102,6 +132,14 @@ export class MetricRetentionSurfaceViewComponent
   >();
   metricsRetentionSurfaceEntityChanges$ =
     this.metricsRetentionSurfaceEntitiesSource.asObservable();
+
+    pageModelPipe = this.apiConfigSvc.operatorPageModelChanges$.pipe(
+      map((pageModel) => {
+        console.log('diagnostics retention view has updated page model');
+        // metrics retention component has operator page model
+        this.pageModelSubuject.next(pageModel);
+      })
+    );
 
   constructor(
     private apiConfigSvc: ApiConfigService,
