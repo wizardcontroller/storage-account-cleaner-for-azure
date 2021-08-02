@@ -156,4 +156,16 @@ export class MetricRetentionSurfaceViewComponent
     console.log(`filter expression ${filterExpression}`);
     // this.filterItemsBtn.checked = e.returnValue;
   }
+
+
+
+  public setEditMode(e: boolean) : void{
+    this.isShow = e;
+  }
+
+  public updateRetentionPolicy(e: Event) : void{
+    this.isShow = false;
+    console.log("policy submitted");
+  }
+
 }

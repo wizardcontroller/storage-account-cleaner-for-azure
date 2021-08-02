@@ -25,17 +25,19 @@
                 </div>
                 {{ curentStorageAccount.name }}
               </div>
-              <div class="pi" style="padding-left: 10px">
-                <button
+              <div class="pi" style="">
+                <p-toggleButton
+                  (onChange)="setEditMode($event.checked)"
+                  [(ngModel)]="isShow"
                   class="p-button-text p-button-raised"
-                  pButton
                   type="button"
-                  label="Edit Policy"
-                ></button>
+                  onLabel="Editing Policy"
+                  offLabel="Edit Policy"
+                ></p-toggleButton>
               </div>
               <p-toggleButton
                 class="p-button-raised"
-                style="padding-left: 10px"
+                style=""
                 #filterItemsBtn
                 [(ngModel)]="showOnlyExistingItems"
                 (onChange)="filterChanged($event.checked)"
@@ -91,14 +93,32 @@
                         </tr>
 
                         <tr>
-                          <td><span>retention period </span></td>
-                          <td>{{ job.retentionPeriodInDays }} days</td>
-                          <p-knob
-                            [(ngModel)]="job.retentionPeriodInDays"
-                            [min]="1"
-                            [max]="1000"
-                            [size]="90"
-                          ></p-knob>
+
+                          <ng-container *ngIf="!isShow">
+                            <td><span>retention period </span></td>
+                            <td>{{ job.retentionPeriodInDays }} days</td>
+                          </ng-container>
+                          <ng-container *ngIf="isShow">
+                            <td><span>set retention period in days </span></td>
+                            <td style="align-self: center;">
+                            <p-knob
+                              [(ngModel)]="job.retentionPeriodInDays"
+                              [min]="1"
+                              [max]="1000"
+                              [size]="90"
+                              [showValue]="true"
+                            ></p-knob>
+                            <div style="align-self: center;">
+                              <p-button
+                              type="button"
+                              (onClick)="updateRetentionPolicy($event)"
+                              label="commit"
+                              class="p-button-text"
+                            ></p-button>
+                            </div>
+
+                          </td>
+                          </ng-container>
                         </tr>
                       </table>
                     </div>

@@ -24,6 +24,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { RetentionPeriodForFullCalendarPipe } from '../../pipes/retention-Period-For-FullCalendar.pipe';
+import { RetentionSurfaceToolBase } from '../RetentionSurfaceToolBase';
 @Component({
   selector: 'app-DiagnosticsRetentionSurfaceView',
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
@@ -31,7 +32,7 @@ import { RetentionPeriodForFullCalendarPipe } from '../../pipes/retention-Period
 })
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent
-  implements OnDestroy, OnInit, ICanBeHiddenFromDisplay
+  implements OnDestroy, OnInit
 {
   @ViewChild('dv') dv!: DataView;
   @ViewChild('filterItemsBtn') filterItemsBtn!: ToggleButton;
@@ -39,7 +40,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
   showOnlyExistingItems = false;
   isSideNavOpen = false;
   rangeDates!: Array<Date>;
-
+  isShow!: boolean;
   events!: any[];
   header!: any;
   options!: any;
@@ -122,8 +123,6 @@ export class DiagnosticsRetentionSurfaceViewComponent
     // nothing yet
   }
 
-  isShow: boolean;
-  toggleDisplay(): void {}
 
   ngOnInit() {
     this.pageModelPipe.subscribe();
@@ -149,11 +148,23 @@ export class DiagnosticsRetentionSurfaceViewComponent
     this.isSideNavOpen = !this.isSideNavOpen;
   }
 
-  filterChanged(e: boolean) {
+  filterChanged(e: boolean) : void{
     const filterExpression = e ? 'true' : 'false';
 
     this.dv.filter(filterExpression);
     console.log(`filter expression ${filterExpression}`);
     // this.filterItemsBtn.checked = e.returnValue;
   }
+
+  public setEditMode(e: boolean) : void{
+    this.isShow = e;
+  }
+
+  public updateRetentionPolicy(e: Event) : void{
+    this.isShow = false;
+    console.log("policy submitted");
+  }
+
+
+
 }
