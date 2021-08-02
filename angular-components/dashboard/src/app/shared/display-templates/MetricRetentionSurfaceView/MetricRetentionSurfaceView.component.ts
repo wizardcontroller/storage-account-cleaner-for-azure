@@ -61,7 +61,8 @@ export class MetricRetentionSurfaceViewComponent
 
   metricEntitiesPipe$ = combineLatest([
     this.pageModelChanges$,
-    this.applianceAPiSvc.currentStorageAccountChanges$
+    this.applianceAPiSvc.currentStorageAccountChanges$,
+    this.applianceAPiSvc.workflowCheckpointTimer$
   ])
     .pipe(
       tap((t) => {
