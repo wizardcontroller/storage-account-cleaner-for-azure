@@ -108,7 +108,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
             pageModel.selectedSubscriptionId as string,
             storageAccountId as string
           )
-          .pipe(tap((t) => {}))
+          //.pipe(tap((t) => {}))
           .subscribe((data: TableStorageRetentionPolicy) => {
             this.diagnosticsRetentionSurfaceEntitySource.next(
               data?.tableStorageEntityRetentionPolicy

@@ -64,9 +64,8 @@ export class ApplianceApiService implements OnDestroy {
     this.apiConfigService.operatorPageModelChanges$]
   )
     .pipe(
-      distinctUntilChanged(),
       tap(t => {
-
+          console.log("workflow checkpoint timer elapsed");
       }),
       map(([elapsedEvent, pageModel]) => {
 
