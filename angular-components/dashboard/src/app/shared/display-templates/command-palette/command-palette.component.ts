@@ -290,7 +290,7 @@ export class CommandPaletteComponent implements OnInit, OnDestroy {
       map((workflowCheckpoint) => {
         // let difference = this.workflowCheckpoint.availableCommands?.filter(f => !workflowCheckpoint.availableCommands?.includes(f));
         console.log(
-          `command null workflow checkpoijnt ${
+          `null workflow checkpoint? ${
             this.workflowCheckpoint === null
           }`
         );

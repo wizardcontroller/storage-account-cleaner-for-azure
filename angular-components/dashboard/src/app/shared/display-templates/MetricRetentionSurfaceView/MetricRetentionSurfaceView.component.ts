@@ -46,8 +46,12 @@ export class MetricRetentionSurfaceViewComponent
 
   isShow: boolean;
 
-  enforcementMode = [PolicyEnforcementMode.applyPolicy, PolicyEnforcementMode.whatIf];
-  currentRetentionPolicy! : TableStorageRetentionPolicy;
+  enforcementMode = [
+    PolicyEnforcementMode.applyPolicy,
+    PolicyEnforcementMode.whatIf
+  ];
+
+  currentRetentionPolicy!: TableStorageRetentionPolicy;
   private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
   pageModelChanges$ = this.pageModelSubuject.asObservable();
 
@@ -66,7 +70,7 @@ export class MetricRetentionSurfaceViewComponent
   metricEntitiesPipe$ = combineLatest([
     this.pageModelChanges$,
     this.applianceAPiSvc.currentStorageAccountChanges$,
-    this.applianceAPiSvc.workflowCheckpointTimer$
+    this.applianceAPiSvc.workflowCheckpointTimer$,
   ])
     .pipe(
       tap((t) => {
@@ -83,27 +87,29 @@ export class MetricRetentionSurfaceViewComponent
             pageModel.selectedSubscriptionId as string,
             storageAccountId.id as string
           )
-          .pipe(tap((t) => {
-            console.log(`metrics has updated retention surface for ${storageAccountId.id}`);
-          }))
+          .pipe(
+            tap((t) => {
+              console.log(
+                `metrics has updated retention surface for ${storageAccountId.id}`
+              );
+            })
+          )
           .subscribe((data: TableStorageRetentionPolicy) => {
             this.metricsRetentionSurfaceEntitiesSource.next(
               data?.tableStorageTableRetentionPolicy?.metricRetentionSurface
                 ?.metricsRetentionSurfaceItemEntities as Array<MetricsRetentionSurfaceItemEntity>
             );
 
-            this.currentRetentionPolicy = data
+            this.currentRetentionPolicy = data;
           });
       })
     )
     .subscribe();
 
-
   private entityRetentionPolicySource =
     new ReplaySubject<TableStorageEntityRetentionPolicy>();
   entityRetentionPolicyChanges$ =
     this.entityRetentionPolicySource.asObservable();
-
 
   metricsRetentionSurfaceEntities!: Array<MetricsRetentionSurfaceItemEntity>;
   private metricsRetentionSurfaceEntitiesSource = new ReplaySubject<
@@ -134,7 +140,6 @@ export class MetricRetentionSurfaceViewComponent
   toggleDisplay(): void {}
 
   ngOnInit() {
-
     this.pageModelPipe.subscribe();
 
     this.options = {
@@ -150,8 +155,6 @@ export class MetricRetentionSurfaceViewComponent
       height: 310,
       contentHeight: 300
     };
-
-
   }
 
   filterChanged(e: boolean) {
@@ -162,15 +165,38 @@ export class MetricRetentionSurfaceViewComponent
     // this.filterItemsBtn.checked = e.returnValue;
   }
 
-
-
-  public setEditMode(e: boolean) : void{
+  public setEditMode(e: boolean): void {
     this.isShow = e;
   }
 
-  public updateRetentionPolicy(e: Event) : void{
+  updateRetentionPolicy(e: MetricsRetentionSurfaceItemEntity): void {
     this.isShow = false;
+
+    const id = e.id as string;
+    console.log(`sent ${id}`);
+
+    const submitPipe = combineLatest([
+      this.pageModelChanges$,
+      this.applianceAPiSvc.currentStorageAccountChanges$
+    ])
+    .pipe(
+      tap(t =>{
+        console.log("submitting metrics retention policy");
+      }),
+      map(dependencies => {
+        const pageModel = dependencies[0] as OperatorPageModel;
+        const currentStorageAccount = dependencies[1] as StorageAccountDTO;
+
+        this.applianceAPiSvc.entityService
+        .setEntityRetentionPolicyForStorageAccount(
+          pageModel.tenantid as string,
+          pageModel.oid as string,
+          pageModel.selectedSubscriptionId as string,
+          this.curentStorageAccount.id as string)
+
+      })
+    );
+
     console.log("policy submitted");
   }
-
 }
