@@ -28,30 +28,30 @@ import { OperationStatus } from '../models/OperationStatus';
 export class ApplianceApiService implements OnDestroy {
   operatorPageModel!: OperatorPageModel | null;
 
-  isRefreshingSource = new ReplaySubject<boolean>();
+  isRefreshingSource = new ReplaySubject<boolean>(1);
   isRefreshingChanges$ = this.isRefreshingSource.asObservable();
 
-  statusFeedSource = new ReplaySubject<OperationStatus>();
+  statusFeedSource = new ReplaySubject<OperationStatus>(1);
   statusFeedChanges$ = this.statusFeedSource.asObservable();
 
   // this is the ApplianceSessionContext source of truth
   applianceContext!: ApplianceSessionContext | null;
-  private currentApplianceSessionContextSource = new ReplaySubject<ApplianceSessionContext>();
+  private currentApplianceSessionContextSource = new ReplaySubject<ApplianceSessionContext>(1);
   applianceSessionContextChanges$ = this.currentApplianceSessionContextSource.asObservable();
 
   currentJobOutput!: ApplianceJobOutput | null;
-  private currentJobOutputSource = new ReplaySubject<ApplianceJobOutput>();
+  private currentJobOutputSource = new ReplaySubject<ApplianceJobOutput>(1);
   currentJobOutputChanges$ = this.currentJobOutputSource.asObservable();
 
   workflowCheckPoint!: WorkflowCheckpointDTO | null;
-  private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>();
+  private currentWorkflowCheckpointSource = new ReplaySubject<WorkflowCheckpointDTO>(1);
   workflowCheckpointChanges$ = this.currentWorkflowCheckpointSource.asObservable();
 
   isAutoRefreshWorkflowCheckpoint = true;
   workflowCheckpointPollingStartDelay = 0; //1.5 seconds
   workflowCheckpointPollingInterval = (1000 * 1) * ( 1 * 60); // seconds * minutes
   storageAccounts: StorageAccountDTO[] = [];
-  private storageAccountsSource = new ReplaySubject<StorageAccountDTO[] | undefined | null>();
+  private storageAccountsSource = new ReplaySubject<StorageAccountDTO[] | undefined | null>(1);
   storageAccountChanges$ = this.storageAccountsSource.asObservable();
 
 
@@ -87,7 +87,7 @@ export class ApplianceApiService implements OnDestroy {
 
   public selectedStorageAccountSource = new BehaviorSubject<string>("");
   selectedStorageAccountAction$ = this.selectedStorageAccountSource.asObservable();
-  currentStorageAccountSource = new ReplaySubject<StorageAccountDTO>();
+  currentStorageAccountSource = new ReplaySubject<StorageAccountDTO>(1);
   currentStorageAccountChanges$ = this.currentStorageAccountSource.asObservable();
 
   selectedStorageAccount$ = combineLatest(
@@ -112,7 +112,7 @@ export class ApplianceApiService implements OnDestroy {
     ).subscribe();
 
 
-  private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>();
+  private entityRetentionPolicySource = new ReplaySubject<TableStorageEntityRetentionPolicy>(1);
   entityRetentionPolicyChanges$ = this.entityRetentionPolicySource.asObservable();
 
   baseUri: string | undefined;
@@ -184,7 +184,7 @@ export class ApplianceApiService implements OnDestroy {
 
     }
     else {
-
+      console.log("updates paused");
     }
     }
 

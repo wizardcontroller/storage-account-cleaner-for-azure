@@ -14,7 +14,7 @@ import { ToastMessage } from '../models/ToastMessage';
 export class ApiConfigService implements OnDestroy{
   operatorPageModel!: OperatorPageModel;
   // operator page model change notification support
-  private currentPageModelSource = new ReplaySubject<OperatorPageModel>();
+  private currentPageModelSource = new ReplaySubject<OperatorPageModel>(1);
   operatorPageModelChanges$ = this.currentPageModelSource.asObservable();
   configService!: ConfigService;
 

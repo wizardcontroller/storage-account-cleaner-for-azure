@@ -36,7 +36,16 @@ export class ApplianceJobLogViewComponent implements OnInit {
 
   logChanges$ = this.applianceLogChangesTimer$.pipe(
     withLatestFrom(this.apiConfigSvc.operatorPageModelChanges$),
-    filter(([pageModel$, elapsedEvent$]) => this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint),
+    filter(([pageModel$, elapsedEvent$]) => {
+      if( this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint){
+        console.log("timer updates active");
+      }
+      else{
+        console.log("timer updates paused");
+      }
+
+      return this.applianceApiSvc.isAutoRefreshWorkflowCheckpoint
+    }),
     tap(() => console.log("withlatestFrom() autorefresh filtered applianceLog changes firing")),
     map(([ elapsedEvent, pageModel ]) => {
 

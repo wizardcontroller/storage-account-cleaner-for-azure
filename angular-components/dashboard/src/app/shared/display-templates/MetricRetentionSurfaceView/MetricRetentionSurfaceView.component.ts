@@ -9,6 +9,7 @@ import {
   StorageAccountDTO,
   TableStorageEntityRetentionPolicy,
   TableStorageEntityRetentionPolicyEnforcementResult,
+  TableStorageTableRetentionPolicy,
 } from '@wizardcontroller/sac-appliance-lib';
 import { PolicyEnforcementMode } from '@wizardcontroller/sac-appliance-lib';
 import {
@@ -20,8 +21,9 @@ import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { PrimeIcons } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
 import { FullCalendarModule } from 'primeng/fullcalendar';
+import { of } from 'rxjs';
 import { combineLatest, ReplaySubject } from 'rxjs';
-import { concatMap, map, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, concatMap, map, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
@@ -52,7 +54,7 @@ export class MetricRetentionSurfaceViewComponent
   ];
 
   currentRetentionPolicy!: TableStorageRetentionPolicy;
-  private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
+  private pageModelSubuject = new ReplaySubject<OperatorPageModel>(1);
   pageModelChanges$ = this.pageModelSubuject.asObservable();
 
   curentStorageAccount!: StorageAccountDTO;
@@ -107,7 +109,7 @@ export class MetricRetentionSurfaceViewComponent
     .subscribe();
 
   private entityRetentionPolicySource =
-    new ReplaySubject<TableStorageEntityRetentionPolicy>();
+    new ReplaySubject<TableStorageEntityRetentionPolicy>(1);
   entityRetentionPolicyChanges$ =
     this.entityRetentionPolicySource.asObservable();
 
@@ -148,7 +150,7 @@ export class MetricRetentionSurfaceViewComponent
       header: {
         left: 'prev,next',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
       editable: true,
       dayMaxEvents: true,
@@ -171,9 +173,11 @@ export class MetricRetentionSurfaceViewComponent
 
   updateRetentionPolicy(e: MetricsRetentionSurfaceItemEntity): void {
     this.isShow = false;
+    this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = false;
 
     const id = e.id as string;
     console.log(`sent ${id}`);
+    const metricPolicy = this.currentRetentionPolicy.tableStorageTableRetentionPolicy as TableStorageTableRetentionPolicy;
 
     const submitPipe = combineLatest([
       this.pageModelChanges$,
@@ -188,14 +192,34 @@ export class MetricRetentionSurfaceViewComponent
         const currentStorageAccount = dependencies[1] as StorageAccountDTO;
 
         this.applianceAPiSvc.entityService
-        .setEntityRetentionPolicyForStorageAccount(
+        .setTableRetentionPolicyForStorageAccount(
           pageModel.tenantid as string,
           pageModel.oid as string,
           pageModel.selectedSubscriptionId as string,
-          this.curentStorageAccount.id as string)
+          this.curentStorageAccount.id as string,
+          metricPolicy.id as string,
+          e.id as string, e)
+          .pipe(
+            map(result => {
+              this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = true;
 
+              return result;
+            }),
+            catchError(err=> {
+              console.log("error submitting metric retention policy");
+              return of([]);
+            })
+          ).subscribe();
+
+          return dependencies;
+      }),
+      catchError(err=> {
+        console.log("error submitting metric retention policy");
+        this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = true;
+
+        return of([]);
       })
-    );
+    ).subscribe();
 
     console.log("policy submitted");
   }
