@@ -60,10 +60,20 @@ namespace com.ataxlab.azure.table.retention.models.control
         /// </summary>
         public const string GetCurrentApplianceContextActivityEndpoint = "GetCurrentApplianceContextActivityEndpoint";
 
+        public const string SetEntityRetentionPolicyForStorageAccountEndpoint = "SetEntityRetentionPolicyForStorageAccount";
+        public const string SetEntityRetentionPolicyForStorageAccountRouteFormatTemplate = "/{0}/{1}/{2}/{3}";
+        public const string SetEntityRetentionPolicyForStorageAccountRouteTemplate = "/{tenantId}/{oid}/{tableStorageEntityRetentionPolicyEntityId}/{diagnosticsRetentionSurfaceEntityId}";
+
+        public const string SetTableRetentionPolicyForStorageAccountEndpoint = "SetTableRetentionPolicyForStorageAccount";
+        public const string SetTableRetentionPolicyForStorageAccountRouteFormatTemplate = "/{0}/{1}/{2}/{3}";
+        public const string SetTableRetentionPolicyForStorageAccountRouteTemplate = "/{tenantId}/{oid}/{tableStorageEntityRetentionPolicyEntityId}/{diagnosticsRetentionSurfaceEntityId}";
+
+        #region obsolete
         public const string RetentionPolicyPostEndpoint = "PostRetentionPolicyEndpoint";
         public const string RetentionPolicyEndpoint = "RetentionPolicyEndpoint";
         public const string RetentionPolicyRouteFormatTemplate = "/{0}/{1}/{2}/{3}";
         public const string RetentionPolicyRouteTemplate = "/{tenantId}/{subscriptionId}/{storageAccountId}/{oid}";
+        #endregion obsolete
 
         public const string ApplianceContextEndpoint = "ApplianceContextEndpoint";
         public const string ApplianceContextRouteFormatTemplate = "/{0}/{1}";

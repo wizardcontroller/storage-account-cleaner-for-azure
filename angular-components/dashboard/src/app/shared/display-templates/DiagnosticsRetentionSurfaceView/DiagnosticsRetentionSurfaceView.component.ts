@@ -29,7 +29,7 @@ import { RetentionSurfaceToolBase } from '../RetentionSurfaceToolBase';
 @Component({
   selector: 'app-DiagnosticsRetentionSurfaceView',
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
-  styleUrls: ['./DiagnosticsRetentionSurfaceView.component.css'],
+  styleUrls: ['./DiagnosticsRetentionSurfaceView.component.css']
 })
 @AutoUnsubscribe()
 export class DiagnosticsRetentionSurfaceViewComponent
@@ -46,12 +46,14 @@ export class DiagnosticsRetentionSurfaceViewComponent
   header!: any;
   options!: any;
 
-  enforcementMode = [PolicyEnforcementMode.applyPolicy, PolicyEnforcementMode.whatIf];
-  currentRetentionPolicy! : TableStorageRetentionPolicy;
+  enforcementMode = [
+    PolicyEnforcementMode.applyPolicy,
+    PolicyEnforcementMode.whatIf,
+  ];
+  currentRetentionPolicy!: TableStorageRetentionPolicy;
 
-  private pageModelSubuject = new ReplaySubject<OperatorPageModel>();
+  private pageModelSubuject = new ReplaySubject<OperatorPageModel>(1);
   pageModelChanges$ = this.pageModelSubuject.asObservable();
-
 
   curentStorageAccount!: StorageAccountDTO;
   currentStorageAccount$ =
@@ -65,11 +67,10 @@ export class DiagnosticsRetentionSurfaceViewComponent
       }
     });
 
-
   diagnosticEntitiesPipe$ = combineLatest([
     this.pageModelChanges$,
     this.applianceAPiSvc.currentStorageAccountChanges$,
-    this.applianceAPiSvc.workflowCheckpointTimer$
+    this.applianceAPiSvc.workflowCheckpointTimer$,
   ])
     .pipe(
       tap((t) => {
@@ -86,9 +87,13 @@ export class DiagnosticsRetentionSurfaceViewComponent
             pageModel.selectedSubscriptionId as string,
             storageAccountId.id as string
           )
-          .pipe(tap((t) => {
-            console.log(`diagnostics has updated retention surface for ${storageAccountId.id}`);
-          }))
+          .pipe(
+            tap((t) => {
+              console.log(
+                `diagnostics has updated retention surface for ${storageAccountId.id}`
+              );
+            })
+          )
           .subscribe((data: TableStorageRetentionPolicy) => {
             this.diagnosticsRetentionSurfaceEntitySource.next(
               data?.tableStorageEntityRetentionPolicy
@@ -105,7 +110,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
 
   private diagnosticsRetentionSurfaceEntitySource = new ReplaySubject<
     DiagnosticsRetentionSurfaceItemEntity[]
-  >();
+  >(1);
 
   diagnosticsRetentionSurfaceEntityChanges$ =
     this.diagnosticsRetentionSurfaceEntitySource.asObservable();
@@ -129,10 +134,8 @@ export class DiagnosticsRetentionSurfaceViewComponent
     // nothing yet
   }
 
-
   ngOnInit() {
     this.pageModelPipe.subscribe();
-
 
     this.options = {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -140,12 +143,12 @@ export class DiagnosticsRetentionSurfaceViewComponent
       header: {
         left: 'prev,next',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        right: 'dayGridMonth,timeGridWeek,timeGridDay',
       },
       editable: true,
       dayMaxEvents: true,
       height: 310,
-      contentHeight: 300
+      contentHeight: 300,
     };
   }
 
@@ -154,7 +157,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
     this.isSideNavOpen = !this.isSideNavOpen;
   }
 
-  filterChanged(e: boolean) : void{
+  filterChanged(e: boolean): void {
     const filterExpression = e ? 'true' : 'false';
 
     this.dv.filter(filterExpression);
@@ -162,15 +165,15 @@ export class DiagnosticsRetentionSurfaceViewComponent
     // this.filterItemsBtn.checked = e.returnValue;
   }
 
-  public setEditMode(e: boolean) : void{
+  public setEditMode(e: boolean): void {
     this.isShow = e;
   }
 
-  public updateRetentionPolicy(e: Event) : void{
+  public updateRetentionPolicy(e: DiagnosticsRetentionSurfaceItemEntity): void {
     this.isShow = false;
-    console.log("policy submitted");
+    this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = false;
+    console.log('policy submitted');
   }
 
   toggleDisplay(): void {}
-
 }

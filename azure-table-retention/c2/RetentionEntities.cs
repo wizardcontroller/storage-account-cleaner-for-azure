@@ -64,7 +64,7 @@ namespace com.ataxlab.functions.table.retention.c2
         //[OpenApiParameter(name: "storageAccountId", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **storageAccountId** parameter is necessary")]
         //[OpenApiRequestBody(contentType: CONTENT_TYPE_APPLICATION_JSON, bodyType: typeof(TableStorageRetentionPolicyEntity))]
         //[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: CONTENT_TYPE_APPLICATION_JSON, bodyType: typeof(TableStorageRetentionPolicyEntity), Description = "The OK response")]
-
+        [Obsolete]
         public async Task<TableStorageRetentionPolicyEntity> PostRetentionPolicyEndpoint(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post" , Route = ControlChannelConstants.RetentionPolicyPostEndpoint
                                                             + ControlChannelConstants.RetentionPolicyRouteTemplate)]
@@ -279,24 +279,34 @@ namespace com.ataxlab.functions.table.retention.c2
         }
 
         [FunctionName("SetEntityRetentionPolicyForStorageAccount")]
-        public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
-                     [FromBody] TableStorageEntityRetentionPolicy policy)
+        public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "RetentionEntities/SetEntityRetentionPolicyForStorageAccount"
+                                                                     + ControlChannelConstants.SetEntityRetentionPolicyForStorageAccountRouteTemplate)]
+             HttpRequestMessage req,
+            [DurableClient] IDurableClient durableClient,
+            [DurableClient] IDurableEntityClient durableEntityClient,
+            ClaimsPrincipal claimsPrincipal,
+                    string tenantId, string oid, string tableStorageEntityRetentionPolicyEntityId, string diagnosticsRetentionSurfaceEntityId)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
+        }
+
+        [FunctionName("SetTableRetentionPolicyForStorageAccount")]
+        public async Task<TableStorageTableRetentionPolicy> SetTableRetentionPolicyForStorageAccount(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "RetentionEntities/SetTableRetentionPolicyForStorageAccount"
+                                                                     + ControlChannelConstants.SetTableRetentionPolicyForStorageAccountRouteTemplate)]
+             HttpRequestMessage req,
+            [DurableClient] IDurableClient durableClient,
+            [DurableClient] IDurableEntityClient durableEntityClient,
+            ClaimsPrincipal claimsPrincipal,
+            string tenantId, string oid, string tableStorageTableRetentionPolicyEntityId, string metricRetentionSurfaceEntityId)
+        {
+            return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
 
         [FunctionName("GetTableRetentionPolicyForStorageAccount")]
         public async Task<TableStorageTableRetentionPolicy> GetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
              [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
-        {
-            return await Task.FromResult(new TableStorageTableRetentionPolicy());
-        }
-
-        [FunctionName("SetTableRetentionPolicyForStorageAccount")]
-        public async Task<TableStorageTableRetentionPolicy> SetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
-                    [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
-                     [FromBody] TableStorageTableRetentionPolicy policy)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
@@ -455,7 +465,7 @@ namespace com.ataxlab.functions.table.retention.c2
         string oid,
         int offset, int pageSize, int pageCount,
         ILogger log)
-                {
+        {
 
             var ret = new HttpResponseMessage(HttpStatusCode.OK);
             bool isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
@@ -463,25 +473,26 @@ namespace com.ataxlab.functions.table.retention.c2
 
             var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
             var currentState = await durableClient.ReadEntityStateAsync<JobOutputLogEntity>(entityId);
-            if(currentState.EntityExists)
+            if (currentState.EntityExists)
             {
                 // filter the entities to be returned
                 var retContent = new List<JobOutputLogEntry>();
-                
+
                 var logs = await currentState.EntityState.getLogEntries(new LogEntryQuery()
-                { pageCount = pageCount, pageSize = pageSize, startoffset = offset});
-                
+                { pageCount = pageCount, pageSize = pageSize, startoffset = offset });
+
                 retContent.AddRange(logs);
 
                 var returnedEntity = new JobOutputLogEntity()
                 {
-                    userOid = oid, userTenantId = tenantId, 
+                    userOid = oid,
+                    userTenantId = tenantId,
                     logEntries = retContent,
                     rowCount = currentState.EntityState.logEntries.Count()
                 }; //  currentState.EntityState;
 
                 ret.Content = new StringContent(JsonConvert.SerializeObject(returnedEntity), Encoding.UTF8,
-                                    "application/json");   
+                                    "application/json");
             }
             else
             {

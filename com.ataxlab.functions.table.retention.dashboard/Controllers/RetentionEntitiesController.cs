@@ -47,10 +47,10 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         /// <param name="metricRetentionSurfaceEntityId"></param>
         /// <param name="policy"></param>
         /// <returns></returns>
-        [HttpPost(Name = "SetTableRetentionPolicyForStorageAccount")]
+        [HttpPost("{tableStorageTableRetentionPolicyEntityId},{metricRetentionSurfaceEntityId}", Name = "SetTableRetentionPolicyForStorageAccount")]
         public async Task<TableStorageTableRetentionPolicy> SetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                     [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
-                    string tableStorageTableRetentionPolicyEntityId, string metricRetentionSurfaceEntityId,
+                    string tenantId, string oid, string tableStorageTableRetentionPolicyEntityId, string metricRetentionSurfaceEntityId,
                      [FromBody] MetricsRetentionSurfaceItemEntity policy)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
@@ -65,10 +65,10 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         /// <param name="diagnosticsRetentionSurfaceEntityId"></param>
         /// <param name="policy"></param>
         /// <returns></returns>
-        [HttpPost(Name = "SetEntityRetentionPolicyForStorageAccount")]
+        [HttpPost("{tableStorageEntityRetentionPolicyEntityId},{diagnosticsRetentionSurfaceEntityId}", Name = "SetEntityRetentionPolicyForStorageAccount")]
         public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
             [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
-             string tableStorageEntityRetentionPolicyEntityId, string diagnosticsRetentionSurfaceEntityId,
+             string tenantId, string oid, string tableStorageEntityRetentionPolicyEntityId, string diagnosticsRetentionSurfaceEntityId,
              [FromBody] DiagnosticsRetentionSurfaceItemEntity policy)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
