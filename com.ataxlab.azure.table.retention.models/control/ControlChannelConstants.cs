@@ -62,11 +62,11 @@ namespace com.ataxlab.azure.table.retention.models.control
 
         public const string SetEntityRetentionPolicyForStorageAccountEndpoint = "SetEntityRetentionPolicyForStorageAccount";
         public const string SetEntityRetentionPolicyForStorageAccountRouteFormatTemplate = "/{0}/{1}/{2}/{3}";
-        public const string SetEntityRetentionPolicyForStorageAccountRouteTemplate = "/{tenantId}/{oid}/{tableStorageEntityRetentionPolicyEntityId}/{diagnosticsRetentionSurfaceEntityId}";
+        public const string SetEntityRetentionPolicyForStorageAccountRouteTemplate = "/{tenantId}/{oid}/{policyEntityId}/{surfaceEntityId}";
 
         public const string SetTableRetentionPolicyForStorageAccountEndpoint = "SetTableRetentionPolicyForStorageAccount";
         public const string SetTableRetentionPolicyForStorageAccountRouteFormatTemplate = "/{0}/{1}/{2}/{3}";
-        public const string SetTableRetentionPolicyForStorageAccountRouteTemplate = "/{tenantId}/{oid}/{tableStorageEntityRetentionPolicyEntityId}/{diagnosticsRetentionSurfaceEntityId}";
+        public const string SetTableRetentionPolicyForStorageAccountRouteTemplate = "/{tenantId}/{oid}/{policyEntityId}/{surfaceEntityId}";
 
         #region obsolete
         public const string RetentionPolicyPostEndpoint = "PostRetentionPolicyEndpoint";
