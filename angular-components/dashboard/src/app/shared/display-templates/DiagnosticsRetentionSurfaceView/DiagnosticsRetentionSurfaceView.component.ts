@@ -6,11 +6,12 @@ import {
   OperatorPageModel,
   PolicyEnforcementMode,
   StorageAccountDTO,
+  TableStorageEntityRetentionPolicy,
   TableStorageRetentionPolicy,
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { combineLatest, ReplaySubject } from 'rxjs';
-import { concatMap, map, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, concatMap, map, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from '../../../core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -26,6 +27,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { RetentionPeriodForFullCalendarPipe } from '../../pipes/retention-Period-For-FullCalendar.pipe';
 import { RetentionSurfaceToolBase } from '../RetentionSurfaceToolBase';
+import { of } from 'rxjs/internal/observable/of';
 @Component({
   selector: 'app-DiagnosticsRetentionSurfaceView',
   templateUrl: './DiagnosticsRetentionSurfaceView.component.html',
@@ -172,7 +174,55 @@ export class DiagnosticsRetentionSurfaceViewComponent
   public updateRetentionPolicy(e: DiagnosticsRetentionSurfaceItemEntity): void {
     this.isShow = false;
     this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = false;
-    console.log('policy submitted');
+
+    const id = e.id as string;
+    console.log(`sent ${id}`);
+    const diagnosticPolicy = this.currentRetentionPolicy.tableStorageEntityRetentionPolicy as TableStorageEntityRetentionPolicy;
+
+    const submitPipe = combineLatest([
+      this.pageModelChanges$,
+      this.applianceAPiSvc.currentStorageAccountChanges$
+    ])
+    .pipe(
+      tap(t =>{
+        console.log("submitting metrics retention policy");
+      }),
+      map(dependencies => {
+        const pageModel = dependencies[0] as OperatorPageModel;
+        const currentStorageAccount = dependencies[1] as StorageAccountDTO;
+
+        this.applianceAPiSvc.entityService
+        .setEntityRetentionPolicyForStorageAccount(
+          pageModel.tenantid as string,
+          pageModel.oid as string,
+          diagnosticPolicy.id as string,
+          e.id as string,
+          pageModel.selectedSubscriptionId as string,
+          this.curentStorageAccount.id as string, e)
+          .pipe(
+            map(result => {
+              this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = true;
+
+              return result;
+            }),
+            catchError(err=> {
+              console.log("error submitting metric retention policy");
+              return of([]);
+            })
+          ).subscribe();
+
+          return dependencies;
+      }),
+      catchError(err=> {
+        console.log("error submitting metric retention policy");
+        this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = true;
+
+        return of([]);
+      })
+    ).subscribe();
+
+    console.log("policy submitted");
+
   }
 
   toggleDisplay(): void {}

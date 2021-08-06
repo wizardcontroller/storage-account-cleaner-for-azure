@@ -195,10 +195,10 @@ export class MetricRetentionSurfaceViewComponent
         .setTableRetentionPolicyForStorageAccount(
           pageModel.tenantid as string,
           pageModel.oid as string,
-          pageModel.selectedSubscriptionId as string,
-          this.curentStorageAccount.id as string,
           metricPolicy.id as string,
-          e.id as string, e)
+          e.id as string,
+          pageModel.selectedSubscriptionId as string,
+          this.curentStorageAccount.id as string, e)
           .pipe(
             map(result => {
               this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = true;

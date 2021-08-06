@@ -286,7 +286,7 @@ namespace com.ataxlab.functions.table.retention.c2
             [DurableClient] IDurableClient durableClient,
             [DurableClient] IDurableEntityClient durableEntityClient,
             ClaimsPrincipal claimsPrincipal,
-                    string tenantId, string oid, string tableStorageEntityRetentionPolicyEntityId, string diagnosticsRetentionSurfaceEntityId)
+                    string tenantId, string oid, string policyEntityId, string surfaceEntityId)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
         }
@@ -299,7 +299,7 @@ namespace com.ataxlab.functions.table.retention.c2
             [DurableClient] IDurableClient durableClient,
             [DurableClient] IDurableEntityClient durableEntityClient,
             ClaimsPrincipal claimsPrincipal,
-            string tenantId, string oid, string tableStorageTableRetentionPolicyEntityId, string metricRetentionSurfaceEntityId)
+            string tenantId, string oid, string policyEntityId, string surfaceEntityId)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
