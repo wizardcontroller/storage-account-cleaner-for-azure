@@ -1,34 +1,24 @@
-using System;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using com.ataxlab.azure.table.retention.models.control;
 using com.ataxlab.azure.table.retention.models;
+using com.ataxlab.azure.table.retention.models.control;
+using com.ataxlab.azure.table.retention.models.extensions;
+using com.ataxlab.azure.table.retention.state.entities;
+using com.ataxlab.functions.table.retention.entities;
 using com.ataxlab.functions.table.retention.services;
-using Microsoft.AspNetCore.Http;
+using com.ataxlab.functions.table.retention.utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using com.ataxlab.functions.table.retention.entities;
-
-using System.Linq;
-using System.Net.Http.Formatting;
-using Newtonsoft.Json.Serialization;
-using System.Security.Cryptography;
-using System.ComponentModel.DataAnnotations;
-using com.ataxlab.azure.table.retention.models.extensions;
-using com.ataxlab.azure.table.retention.state.entities;
-
-using System.Text;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace com.ataxlab.functions.table.retention.c2
 {
@@ -279,7 +269,7 @@ namespace com.ataxlab.functions.table.retention.c2
         }
 
         [FunctionName("SetEntityRetentionPolicyForStorageAccount")]
-        public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount(
+        public async Task<TableStorageEntityRetentionPolicyEntity> SetEntityRetentionPolicyForStorageAccount(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "RetentionEntities/SetEntityRetentionPolicyForStorageAccount"
                                                                      + ControlChannelConstants.SetEntityRetentionPolicyForStorageAccountRouteTemplate)]
              HttpRequestMessage req,
@@ -288,11 +278,37 @@ namespace com.ataxlab.functions.table.retention.c2
             ClaimsPrincipal claimsPrincipal,
                     string tenantId, string oid, string policyEntityId, string surfaceEntityId)
         {
-            return await Task.FromResult(new TableStorageEntityRetentionPolicy());
+            TableStorageEntityRetentionPolicyEntity ret = new TableStorageEntityRetentionPolicyEntity();
+            try
+            {
+                var commandJson = await req.Content.ReadAsStringAsync();
+                var item = await commandJson.FromJSONStringAsync<MetricsRetentionSurfaceItemEntity>(); 
+                var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+                var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
+                var tuple = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First();
+                
+                var policy = tuple.TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy;
+                policy.NumberOfDays = item.RetentionPeriodInDays;
+                if(policy.DiagnosticsRetentionSurface.Id.Equals(surfaceEntityId))
+                {
+                    var update = policy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First();
+                    update.RetentionPeriodInDays = item.RetentionPeriodInDays;
+
+                    var updated = this.TableRetentionApplianceEngine.SetApplianceContextForUser(tenantId, oid, applianceCtx, durableClient);
+                }
+
+                ret = policy;
+            }
+            catch(Exception e)
+            {
+                int i = 0;
+            }
+
+            return ret;
         }
 
         [FunctionName("SetTableRetentionPolicyForStorageAccount")]
-        public async Task<TableStorageTableRetentionPolicy> SetTableRetentionPolicyForStorageAccount(
+        public async Task<TableStorageTableRetentionPolicyEntity> SetTableRetentionPolicyForStorageAccount(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "RetentionEntities/SetTableRetentionPolicyForStorageAccount"
                                                                      + ControlChannelConstants.SetTableRetentionPolicyForStorageAccountRouteTemplate)]
              HttpRequestMessage req,
@@ -301,13 +317,41 @@ namespace com.ataxlab.functions.table.retention.c2
             ClaimsPrincipal claimsPrincipal,
             string tenantId, string oid, string policyEntityId, string surfaceEntityId)
         {
-            return await Task.FromResult(new TableStorageTableRetentionPolicy());
+
+            TableStorageTableRetentionPolicyEntity ret = new TableStorageTableRetentionPolicyEntity();
+            try
+            {
+                var commandJson = await req.Content.ReadAsStringAsync();
+                var item = await commandJson.FromJSONStringAsync<DiagnosticsRetentionSurfaceItemEntity>();
+                var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+                var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
+                var tuple = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First();
+
+                var policy = tuple.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy;
+  
+                if (policy.MetricRetentionSurface.Id.Equals(surfaceEntityId))
+                {
+                    var update = policy.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.Where(w => w.Id == item.Id).First();
+                    update.RetentionPeriodInDays = item.RetentionPeriodInDays;
+
+                    var updated = this.TableRetentionApplianceEngine.SetApplianceContextForUser(tenantId, oid, applianceCtx, durableClient);
+                }
+
+                ret = policy;
+            }
+            catch (Exception e)
+            {
+                int i = 0;
+            }
+
+            return ret;
         }
 
         [FunctionName("GetTableRetentionPolicyForStorageAccount")]
         public async Task<TableStorageTableRetentionPolicy> GetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
              [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId)
         {
+
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
 

@@ -1,40 +1,21 @@
 ﻿using com.ataxlab.azure.table.retention.models.control;
-using com.ataxlab.azure.table.retention.models;
 using com.ataxlab.azure.table.retention.models.extensions;
+using com.ataxlab.azure.table.retention.models.models;
+using com.ataxlab.azure.table.retention.state.entities;
 using com.ataxlab.functions.table.retention.services;
 using com.ataxlab.functions.table.retention.utility;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using com.ataxlab.azure.table.retention.state.entities;
 using System.Linq;
-using System.Threading;
-using com.ataxlab.azure.table.retention.services.authorization;
-using System.Diagnostics;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
-using com.ataxlab.azure.table.retention.models.models;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask.Options;
-using Microsoft.Rest;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Azure.Management.Graph.RBAC.Fluent.Models;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Mvc;
-using System.IO;
-using static com.ataxlab.functions.table.retention.services.TableRetentionApplianceEngine;
-using com.ataxlab.functions.table.retention.entities;
-using WorkflowOperation = com.ataxlab.functions.table.retention.entities.WorkflowOperation;
+using System.Threading.Tasks;
 
 namespace com.ataxlab.functions.table.retention.c2
 {
