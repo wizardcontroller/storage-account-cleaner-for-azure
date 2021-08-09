@@ -278,18 +278,25 @@ namespace com.ataxlab.functions.table.retention.c2
             ClaimsPrincipal claimsPrincipal,
                     string tenantId, string oid, string policyEntityId, string surfaceEntityId)
         {
+            TableStorageEntityRetentionPolicyEntity ret = await GetResponseForSetEntityReentionPolicy(req, durableClient, tenantId, oid, surfaceEntityId);
+
+            return ret;
+        }
+
+        private async Task<TableStorageEntityRetentionPolicyEntity> GetResponseForSetEntityReentionPolicyOrig(HttpRequestMessage req, IDurableClient durableClient, string tenantId, string oid, string surfaceEntityId)
+        {
             TableStorageEntityRetentionPolicyEntity ret = new TableStorageEntityRetentionPolicyEntity();
             try
             {
                 var commandJson = await req.Content.ReadAsStringAsync();
-                var item = await commandJson.FromJSONStringAsync<MetricsRetentionSurfaceItemEntity>(); 
+                var item = await commandJson.FromJSONStringAsync<MetricsRetentionSurfaceItemEntity>();
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
                 var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
                 var tuple = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First();
-                
+
                 var policy = tuple.TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy;
                 policy.NumberOfDays = item.RetentionPeriodInDays;
-                if(policy.DiagnosticsRetentionSurface.Id.Equals(surfaceEntityId))
+                if (policy.DiagnosticsRetentionSurface.Id.Equals(surfaceEntityId))
                 {
                     var update = policy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First();
                     update.RetentionPeriodInDays = item.RetentionPeriodInDays;
@@ -299,7 +306,39 @@ namespace com.ataxlab.functions.table.retention.c2
 
                 ret = policy;
             }
-            catch(Exception e)
+            catch (Exception e)
+            {
+                int i = 0;
+            }
+
+            return ret;
+        }
+        private async Task<TableStorageEntityRetentionPolicyEntity> GetResponseForSetEntityReentionPolicy(HttpRequestMessage req, IDurableClient durableClient, string tenantId, string oid, string surfaceEntityId)
+        {
+            TableStorageEntityRetentionPolicyEntity ret = new TableStorageEntityRetentionPolicyEntity();
+            try
+            {
+                var commandJson = await req.Content.ReadAsStringAsync();
+                var item = await commandJson.FromJSONStringAsync<MetricsRetentionSurfaceItemEntity>();
+                var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+                var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
+                
+                applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
+                    .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First().RetentionPeriodInDays = item.RetentionPeriodInDays;
+
+
+                var newRetentionPeriod = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
+                    .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First().RetentionPeriodInDays;
+
+                var updated = await this.TableRetentionApplianceEngine.SetCurrentJobOutput(tenantId, oid, applianceCtx, durableClient);
+                applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
+
+                var newerRetentionPeriod = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
+                    .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First().RetentionPeriodInDays;
+
+                ret = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First().TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy;
+            }
+            catch (Exception e)
             {
                 int i = 0;
             }
@@ -334,7 +373,7 @@ namespace com.ataxlab.functions.table.retention.c2
                     var update = policy.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.Where(w => w.Id == item.Id).First();
                     update.RetentionPeriodInDays = item.RetentionPeriodInDays;
 
-                    var updated = this.TableRetentionApplianceEngine.SetApplianceContextForUser(tenantId, oid, applianceCtx, durableClient);
+                    var updated = await this.TableRetentionApplianceEngine.SetCurrentJobOutput(tenantId, oid, applianceCtx, durableClient);
                 }
 
                 ret = policy;

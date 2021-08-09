@@ -86,6 +86,7 @@ namespace com.ataxlab.functions.table.retention.services
         Task<HttpResponseMessage> GetResponseForWorkflowOperator(IDurableOrchestrationClient starter, IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string commandJson, string impersonationToken);
         Task<EntityStateResponse<WorkflowCheckpoint>> GetStateForUpdateWorkflowCheckpoints(IDurableEntityClient durableEntityClient, string tenantid, string subscriptionid, string userOid, WorkflowOperation operation);
         Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient);
+        Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient);
         #endregion durable entity operations
     }
 
@@ -1923,6 +1924,25 @@ namespace com.ataxlab.functions.table.retention.services
                                     "application/json")
             };
             return httpResponseMessage;
+        }
+
+        public async Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient)
+        {
+            try
+            {
+                var ctxId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
+                await durableClient.SignalEntityAsync<IApplianceSessionContextEntity>(ctxId, proxy =>
+                {
+                // clear the current job output
+                proxy.SetCurrentJobOutput(ctx.CurrentJobOutput);
+                });
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public async Task<bool> SetWorkflowState(IDurableClient durableEntityClient,

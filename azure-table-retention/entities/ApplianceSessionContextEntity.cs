@@ -80,6 +80,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
             return ctx.DispatchAsync<ApplianceSessionContextEntity>();
         }
 
+
         public Task<List<StorageAccountEntity>> GetSelectedStorageAccounts()
         {
             return Task.FromResult(SelectedStorageAccounts);
