@@ -18,7 +18,7 @@ namespace com.ataxlab.functions.table.retention.parameters
         {
             Policies = new List<Tuple<TableStorageRetentionPolicy, StorageAccountModel>>();
             EntityRetentionAgeInDays = 999;
-            PolicyEnforcementMode = PolicyEnforcementMode.whatIf;
+            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
         }
 
         /// <summary>

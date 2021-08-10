@@ -54,7 +54,7 @@ namespace com.ataxlab.functions.table.retention.entities
     }
 
     // [JsonConverter(typeof(StringEnumConverter))]
-    public enum PolicyEnforcementMode { whatIf = 0, applyPolicy = 1 }
+    public enum PolicyEnforcementMode { WhatIf = 0, ApplyPolicy = 1 }
 
     /// <summary>
     /// 
@@ -68,7 +68,7 @@ namespace com.ataxlab.functions.table.retention.entities
 
             // means months of history
             DeleteOlderTablesThanCurrentMonthMinusThis = 12;
-            PolicyEnforcementMode = PolicyEnforcementMode.whatIf;
+            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
             MetricRetentionSurface = new MetricRetentionSurfaceEntity();
             this.WADMetricsTableNamePrefix = "WADMetrics";
@@ -208,7 +208,7 @@ namespace com.ataxlab.functions.table.retention.entities
             {
                 TableNames.Add(item.TableName);
             }
-            PolicyEnforcementMode = PolicyEnforcementMode.whatIf;
+            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
         }
 
