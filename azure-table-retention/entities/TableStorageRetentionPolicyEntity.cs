@@ -53,7 +53,7 @@ namespace com.ataxlab.functions.table.retention.entities
         public int PolicyTriggerCount { get; set; }
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    // [JsonConverter(typeof(StringEnumConverter))]
     public enum PolicyEnforcementMode { whatIf = 0, applyPolicy = 1 }
 
     /// <summary>

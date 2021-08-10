@@ -11,7 +11,7 @@ using System.Text;
 namespace com.ataxlab.azure.table.retention.models
 {
     ///todo enumerate these numerically wherever they appear
-    [JsonConverter(typeof(StringEnumConverter))]
+    /// [JsonConverter(typeof(StringEnumConverter))]
     public enum PolicyEnforcementMode { whatIf, applyPolicy}
 
     public class TableStorageTableRetentionPolicy
