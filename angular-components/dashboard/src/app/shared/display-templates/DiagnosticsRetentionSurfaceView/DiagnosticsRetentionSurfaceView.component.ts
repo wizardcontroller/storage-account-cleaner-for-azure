@@ -49,8 +49,8 @@ export class DiagnosticsRetentionSurfaceViewComponent
   options!: any;
 
   enforcementMode = [
-    PolicyEnforcementMode.applyPolicy,
     PolicyEnforcementMode.whatIf,
+    PolicyEnforcementMode.applyPolicy
   ];
   currentRetentionPolicy!: TableStorageRetentionPolicy;
 

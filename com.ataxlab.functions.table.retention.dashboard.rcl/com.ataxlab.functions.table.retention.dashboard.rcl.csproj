@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <Authors>devops wizard</Authors>
+    <Company>axtaxlab</Company>
+    <Product>storage account cleaner</Product>
   </PropertyGroup>
 
   <ItemGroup>
