@@ -148,7 +148,7 @@ namespace com.ataxlab.functions.table.retention
             ApplyWADDDefaultPolicyParameter defaultParam = new ApplyWADDDefaultPolicyParameter()
             {
                 EntityRetentionAgeInDays = this.entityDeletionAgeInDays,
-                PolicyEnforcementMode = PolicyEnforcementMode.WhatIf,
+                PolicyEnforcementMode = PolicyEnforcementMode.whatIf,
                 
             };
         }

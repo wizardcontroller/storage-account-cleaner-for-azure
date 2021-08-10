@@ -12,7 +12,7 @@ namespace com.ataxlab.azure.table.retention.models
 {
     ///todo enumerate these numerically wherever they appear
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum PolicyEnforcementMode { WhatIf, ApplyPolicy}
+    public enum PolicyEnforcementMode { whatIf, applyPolicy}
 
     public class TableStorageTableRetentionPolicy
     {
@@ -20,7 +20,7 @@ namespace com.ataxlab.azure.table.retention.models
         {
 
             DeleteOlderTablesThanCurrentMonthMinusThis = 2;
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            PolicyEnforcementMode = PolicyEnforcementMode.whatIf;
             Id = Guid.NewGuid();
 
             MetricRetentionSurface = new MetricRetentionSurfaceEntity();
@@ -118,7 +118,7 @@ namespace com.ataxlab.azure.table.retention.models
             {
                 TableNames.Add(item.TableName);
             }
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            PolicyEnforcementMode = PolicyEnforcementMode.whatIf;
             Id = Guid.NewGuid();
         }
 
