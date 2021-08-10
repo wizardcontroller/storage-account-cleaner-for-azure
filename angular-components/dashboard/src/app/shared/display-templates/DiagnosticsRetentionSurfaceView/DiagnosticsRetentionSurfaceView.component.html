@@ -117,7 +117,7 @@
                         <tr>
                           <ng-container *ngIf="!isShow">
                               <td>enforcement mode</td>
-                              <td>{{job.policyEnforcementMode}}</td>
+                              <td>{{job.policyEnforcementMode | lowercase}}</td>
                           </ng-container>
                           <ng-container *ngIf="isShow">
                             <td>enforcement mode</td>

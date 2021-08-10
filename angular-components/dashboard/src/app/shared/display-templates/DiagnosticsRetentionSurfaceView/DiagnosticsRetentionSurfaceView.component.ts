@@ -130,6 +130,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
     private applianceAPiSvc: ApplianceApiService
   ) {
     this.isShow = false;
+
   }
 
   ngOnDestroy(): void {

@@ -11,8 +11,8 @@ using System.Text;
 namespace com.ataxlab.azure.table.retention.models
 {
     ///todo enumerate these numerically wherever they appear
-    /// [JsonConverter(typeof(StringEnumConverter))]
-    public enum PolicyEnforcementMode { WhatIf, ApplyPolicy}
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum policyEnforcementMode { WhatIf, ApplyPolicy}
 
     public class TableStorageTableRetentionPolicy
     {
@@ -20,7 +20,7 @@ namespace com.ataxlab.azure.table.retention.models
         {
 
             DeleteOlderTablesThanCurrentMonthMinusThis = 2;
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            policyEnforcementMode = policyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
 
             MetricRetentionSurface = new MetricRetentionSurfaceEntity();
@@ -34,7 +34,7 @@ namespace com.ataxlab.azure.table.retention.models
         public MetricRetentionSurfaceEntity MetricRetentionSurface { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
+        public policyEnforcementMode policyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case man
@@ -118,7 +118,7 @@ namespace com.ataxlab.azure.table.retention.models
             {
                 TableNames.Add(item.TableName);
             }
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            PolicyEnforcementMode = policyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
         }
 
@@ -130,7 +130,7 @@ namespace com.ataxlab.azure.table.retention.models
 
         public DiagnosticsRetentionSurfaceEntity DiagnosticsRetentionSurface { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
+        public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case woman

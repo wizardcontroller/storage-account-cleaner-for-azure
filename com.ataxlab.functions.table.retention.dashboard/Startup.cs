@@ -53,8 +53,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
     {
         public void Apply(OpenApiSchema model, SchemaFilterContext context)
         {
-            model.Properties =
-                model.Properties.ToDictionary(d => d.Key.Substring(0, 1).ToLower() + d.Key.Substring(1), d => d.Value);
+
             if (context.Type.IsEnum)
             {
                 model.Enum.Clear();
@@ -63,6 +62,9 @@ namespace com.ataxlab.functions.table.retention.dashboard
                     .ToList()
                     .ForEach(n => model.Enum.Add(new OpenApiString(n)));
             }
+
+            model.Properties =
+                model.Properties.ToDictionary(d => d.Key.Substring(0, 1).ToLower() + d.Key.Substring(1), d => d.Value);
 
         }
     }

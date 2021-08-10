@@ -18,13 +18,13 @@ namespace com.ataxlab.functions.table.retention.parameters
         {
             Policies = new List<Tuple<TableStorageRetentionPolicy, StorageAccountModel>>();
             EntityRetentionAgeInDays = 999;
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            PolicyEnforcementMode = policyEnforcementMode.WhatIf;
         }
 
         /// <summary>
         /// defaults to WHATIF, nothing should be deleted
         /// </summary>
-        public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
+        public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// absurd default value to give you a chance
