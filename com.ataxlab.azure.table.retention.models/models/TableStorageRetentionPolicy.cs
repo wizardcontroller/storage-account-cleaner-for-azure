@@ -20,7 +20,7 @@ namespace com.ataxlab.azure.table.retention.models
         {
 
             DeleteOlderTablesThanCurrentMonthMinusThis = 2;
-            policyEnforcementMode = policyEnforcementMode.WhatIf;
+            PolicyEnforcementMode = policyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
 
             MetricRetentionSurface = new MetricRetentionSurfaceEntity();
@@ -34,7 +34,7 @@ namespace com.ataxlab.azure.table.retention.models
         public MetricRetentionSurfaceEntity MetricRetentionSurface { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public policyEnforcementMode policyEnforcementMode { get; set; }
+        public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case man
