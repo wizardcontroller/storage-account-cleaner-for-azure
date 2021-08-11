@@ -51,7 +51,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         public async Task<TableStorageTableRetentionPolicy> SetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                     [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
                     string tenantId, string oid, string policyEntityId, string surfaceEntityId,
-                     [FromBody] MetricsRetentionSurfaceItemEntity policy)
+                     [FromBody] TableStorageTableRetentionPolicy policy)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
@@ -69,7 +69,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
             [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
              string tenantId, string oid, string policyEntityId, string surfaceEntityId,
-             [FromBody] DiagnosticsRetentionSurfaceItemEntity policy)
+             [FromBody] TableStorageEntityRetentionPolicy policy)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
         }

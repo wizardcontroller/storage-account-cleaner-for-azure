@@ -54,7 +54,7 @@ namespace com.ataxlab.functions.table.retention.entities
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum policyEnforcementMode { WhatIf = 0, ApplyPolicy = 1 }
+    public enum policyEnforcementMode { WhatIf, ApplyPolicy }
 
     /// <summary>
     /// 
