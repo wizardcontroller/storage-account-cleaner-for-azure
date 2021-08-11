@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
 import {
+  DiagnosticsRetentionSurfaceEntity,
   DiagnosticsRetentionSurfaceItemEntity,
   OperatorPageModel,
   PolicyEnforcementMode,
@@ -176,6 +177,14 @@ export class DiagnosticsRetentionSurfaceViewComponent
     this.isShow = false;
     this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = false;
 
+    let policy = this.currentRetentionPolicy.tableStorageEntityRetentionPolicy as TableStorageEntityRetentionPolicy;
+    let surface = policy.diagnosticsRetentionSurface as DiagnosticsRetentionSurfaceEntity;
+    let entities = surface.diagnosticsRetentionSurfaceEntities;
+    entities = [];
+    entities.push(e);
+    surface.diagnosticsRetentionSurfaceEntities = entities;
+    policy.diagnosticsRetentionSurface = surface;
+
     const id = e.id as string;
     console.log(`sent ${id}`);
     const diagnosticPolicy = this.currentRetentionPolicy.tableStorageEntityRetentionPolicy as TableStorageEntityRetentionPolicy;
@@ -192,6 +201,8 @@ export class DiagnosticsRetentionSurfaceViewComponent
         const pageModel = dependencies[0] as OperatorPageModel;
         const currentStorageAccount = dependencies[1] as StorageAccountDTO;
 
+
+
         this.applianceAPiSvc.entityService
         .setEntityRetentionPolicyForStorageAccount(
           pageModel.tenantid as string,
@@ -199,7 +210,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
           diagnosticPolicy.id as string,
           e.id as string,
           pageModel.selectedSubscriptionId as string,
-          this.curentStorageAccount.id as string, e)
+          this.curentStorageAccount.id as string, policy)
           .pipe(
             map(result => {
               this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = true;
