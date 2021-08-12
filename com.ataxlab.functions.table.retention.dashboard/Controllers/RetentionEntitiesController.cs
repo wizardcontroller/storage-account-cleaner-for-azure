@@ -14,6 +14,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 {
     [Route("api/[controller]/[Action]/{tenantId}/{oid}")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     [ApiController]
     public class RetentionEntitiesController : ControllerBase
     {
@@ -51,7 +52,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         public async Task<TableStorageTableRetentionPolicy> SetTableRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
                     [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
                     string tenantId, string oid, string policyEntityId, string surfaceEntityId,
-                     [FromBody] TableStorageTableRetentionPolicy policy)
+                     TableStorageTableRetentionPolicy policy)
         {
             return await Task.FromResult(new TableStorageTableRetentionPolicy());
         }
@@ -63,13 +64,15 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         /// <param name="storageAccountId"></param>
         /// <param name="tableStorageEntityRetentionPolicyEntityId"></param>
         /// <param name="diagnosticsRetentionSurfaceEntityId"></param>
-        /// <param name="policy"></param>
+        /// <para
+        /// 
+        /// name="policy"></param>
         /// <returns></returns>
         [HttpPost("{policyEntityId}/{surfaceEntityId}", Name = "SetEntityRetentionPolicyForStorageAccount")]
         public async Task<TableStorageEntityRetentionPolicy> SetEntityRetentionPolicyForStorageAccount([FromHeader(Name = ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION)] string subscriptionId,
             [FromHeader(Name = ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)] string storageAccountId,
              string tenantId, string oid, string policyEntityId, string surfaceEntityId,
-             [FromBody] TableStorageEntityRetentionPolicy policy)
+             TableStorageEntityRetentionPolicy policy)
         {
             return await Task.FromResult(new TableStorageEntityRetentionPolicy());
         }

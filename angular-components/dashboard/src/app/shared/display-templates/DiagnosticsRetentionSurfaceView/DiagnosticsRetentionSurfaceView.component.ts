@@ -12,7 +12,7 @@ import {
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { combineLatest, ReplaySubject } from 'rxjs';
-import { catchError, concatMap, map, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, concatMap, map, mergeMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from '../../../core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -197,10 +197,9 @@ export class DiagnosticsRetentionSurfaceViewComponent
       tap(t =>{
         console.log("submitting metrics retention policy");
       }),
-      map(dependencies => {
+      switchMap(dependencies => {
         const pageModel = dependencies[0] as OperatorPageModel;
         const currentStorageAccount = dependencies[1] as StorageAccountDTO;
-
 
 
         this.applianceAPiSvc.entityService

@@ -1,6 +1,6 @@
 {
   "name": "dashboard",
-  "version": "0.8.12",
+  "version": "0.8.14",
   "scripts": {
     "ng": "ng",
     "start": "ng serve && npm run-script postBuild",
@@ -9,7 +9,7 @@
     "postBuild": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./postBuild.ps1",
     "test": "ng test",
     "lint": "ng lint",
-    "refreshVSToken" : "vsts-npm-auth -config .npmrc"
+    "refreshVSToken": "vsts-npm-auth -config .npmrc"
   },
   "private": true,
   "dependencies": {
@@ -54,7 +54,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/eslint-plugin-tslint": "^4.28.3",
     "@typescript-eslint/parser": "^4.28.2",
-    "@wizardcontroller/sac-appliance-lib": "^0.8.80",
+    "@wizardcontroller/sac-appliance-lib": "^0.8.87",
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.4",

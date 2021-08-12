@@ -289,7 +289,9 @@ namespace com.ataxlab.functions.table.retention.c2
             try
             {
                 var commandJson = await req.Content.ReadAsStringAsync();
-                var item = await commandJson.FromJSONStringAsync<MetricsRetentionSurfaceItemEntity>();
+                var command = await commandJson.FromJSONStringAsync<TableStorageEntityRetentionPolicyEntity>();
+                var item = command.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.First();
+
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
                 var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
                 var tuple = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First();
@@ -319,7 +321,8 @@ namespace com.ataxlab.functions.table.retention.c2
             try
             {
                 var commandJson = await req.Content.ReadAsStringAsync();
-                var item = await commandJson.FromJSONStringAsync<MetricsRetentionSurfaceItemEntity>();
+                var command = await commandJson.FromJSONStringAsync<TableStorageEntityRetentionPolicyEntity>();
+                var item = command.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.First();
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
                 var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
                 
@@ -361,7 +364,8 @@ namespace com.ataxlab.functions.table.retention.c2
             try
             {
                 var commandJson = await req.Content.ReadAsStringAsync();
-                var item = await commandJson.FromJSONStringAsync<DiagnosticsRetentionSurfaceItemEntity>();
+                var command = await commandJson.FromJSONStringAsync<TableStorageTableRetentionPolicyEntity>();
+                var item = command.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.First();
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
                 var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
                 var tuple = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First();
