@@ -226,7 +226,7 @@ export class MetricRetentionSurfaceViewComponent
 
         return of([]);
       })
-    ).subscribe();
+    ).subscribe().unsubscribe();
 
     console.log("policy submitted");
   }

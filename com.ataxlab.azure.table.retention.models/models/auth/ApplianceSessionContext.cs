@@ -37,17 +37,17 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
 
         public string TenantId { get; set; }
 
-        [JsonProperty("SelectedSubscriptionId")]
+        [JsonProperty("selectedSubscriptionId")]
         public string SelectedSubscriptionId { get; set; }
 
         public SubscriptionDTO SelectedSubscription { get; set; }
 
         public string SelectedStorageAccountId { get; set; }
 
-        [JsonProperty("SelectedStorageAccounts")]
+        [JsonProperty("selectedStorageAccounts")]
         public List<StorageAccountDTO> SelectedStorageAccounts { get; set; }
 
-        [JsonProperty("UserOid")]
+        [JsonProperty("userOid")]
         public string UserOid { get; set; }
 
         public List<SubscriptionDTO> AvailableSubscriptions { get; set; }
@@ -55,7 +55,7 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
 
         public List<ApplianceJobOutput> JobOutput { get; set; }
 
-        [JsonProperty("CurrentJobOutput")]
+        [JsonProperty("currentJobOutput")]
         public ApplianceJobOutput CurrentJobOutput { get; set; }
     }
 

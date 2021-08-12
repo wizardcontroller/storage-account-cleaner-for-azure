@@ -215,13 +215,13 @@ namespace com.ataxlab.functions.table.retention.entities
         public Guid Id { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty("PolicyEnforcementMode")]
+        [JsonProperty("policyEnforcementMode")]
         public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case woman
         /// </summary>
-        [JsonProperty("NumberOfDays")]
+        [JsonProperty("numberOfDays")]
         public int NumberOfDays { get; set; }
 
         
@@ -252,7 +252,7 @@ namespace com.ataxlab.functions.table.retention.entities
         /// <summary>
         /// you'd be better off supplying these
         /// </summary>
-        [JsonProperty("TableNames")]
+        [JsonProperty("tableNames")]
         public List<String> TableNames
         {
             get

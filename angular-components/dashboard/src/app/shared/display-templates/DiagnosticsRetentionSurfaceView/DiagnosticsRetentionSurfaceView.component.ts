@@ -230,7 +230,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
 
         return of([]);
       })
-    ).subscribe();
+    ).subscribe().unsubscribe();
 
     console.log("policy submitted");
 
