@@ -341,24 +341,32 @@ namespace com.ataxlab.functions.table.retention.c2
                 var item = command.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.First();
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
                 var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
-                var tuple = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First();
+  
+                applianceCtx.CurrentJobOutput.retentionPolicyJobs
+                    .Where(w => w.StorageAccount.Id.Equals(storageAccountId))
+                    .First()
+                    .TableStorageRetentionPolicy.TableStorageTableRetentionPolicy.policyEnforcementMode = command.policyEnforcementMode; ;
 
-                var policy = tuple.TableStorageRetentionPolicy.TableStorageTableRetentionPolicy;
-                policy.policyEnforcementMode = command.policyEnforcementMode;
-
-                if (policy.MetricRetentionSurface.Id.Equals(surfaceEntityId))
-                {
-                    var update = policy.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.Where(w => w.Id == item.Id).First();
-                    update.RetentionPeriodInDays = item.RetentionPeriodInDays;
+                    applianceCtx.CurrentJobOutput.retentionPolicyJobs
+                   .Where(w => w.StorageAccount.Id.Equals(storageAccountId))
+                   .First()
+                   .TableStorageRetentionPolicy.TableStorageTableRetentionPolicy
+                   .MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.Where(w => w.Id == item.Id)
+                   .First()
+                   .RetentionPeriodInDays = item.RetentionPeriodInDays;
 
                     var updated = await this.TableRetentionApplianceEngine.SetCurrentJobOutput(tenantId, oid, applianceCtx, durableClient);
-                }
 
-                ret = policy;
+
+                ret = applianceCtx.CurrentJobOutput.retentionPolicyJobs
+                   .Where(w => w.StorageAccount.Id.Equals(storageAccountId))
+                   .First()
+                   .TableStorageRetentionPolicy.TableStorageTableRetentionPolicy;
             }
             catch (Exception e)
             {
                 int i = 0;
+
             }
 
             return ret;
