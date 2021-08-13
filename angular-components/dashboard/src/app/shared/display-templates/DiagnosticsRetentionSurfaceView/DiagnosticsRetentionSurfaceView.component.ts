@@ -184,7 +184,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
     entities.push(e);
     surface.diagnosticsRetentionSurfaceEntities = entities;
     policy.diagnosticsRetentionSurface = surface;
-    policy.policyEnforcementMode = this.currentRetentionPolicy.tableStorageEntityRetentionPolicy?.policyEnforcementMode;
+    policy.policyEnforcementMode = this.currentRetentionPolicy.tableStorageEntityRetentionPolicy.policyEnforcementMode;
 
     const id = e.id as string;
     console.log(`sent ${id}`);

@@ -181,7 +181,7 @@ export class MetricRetentionSurfaceViewComponent
     let metricPolicy = this.currentRetentionPolicy.tableStorageTableRetentionPolicy as TableStorageTableRetentionPolicy;
     let surface = metricPolicy.metricRetentionSurface as MetricRetentionSurfaceEntity;
     let entities = surface.metricsRetentionSurfaceItemEntities;
-    metricPolicy.policyEnforcementMode = this.currentRetentionPolicy.tableStorageTableRetentionPolicy?.policyEnforcementMode;
+    metricPolicy.policyEnforcementMode = this.currentRetentionPolicy.tableStorageTableRetentionPolicy.policyEnforcementMode;
     entities = [];
     entities.push(e);
     surface.metricsRetentionSurfaceItemEntities = entities;

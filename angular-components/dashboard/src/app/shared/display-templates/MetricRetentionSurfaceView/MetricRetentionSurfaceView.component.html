@@ -121,7 +121,7 @@
                           <ng-container *ngIf="isShow">
                             <td>enforcement mode</td>
                             <td>
-                              <p-dropdown [options]="enforcementMode" [ngModel]="currentRetentionPolicy.tableStorageTableRetentionPolicy?.policyEnforcementMode"></p-dropdown>
+                              <p-dropdown [options]="enforcementMode" [(ngModel)]="currentRetentionPolicy.tableStorageTableRetentionPolicy.policyEnforcementMode"></p-dropdown>
                             </td>
 
                           </ng-container>
