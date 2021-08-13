@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>devopswizard@wizardcontroller.com</Authors>
+    <Company>ataxlab ltd</Company>
+    <Product>storage account cleaner for azure</Product>
+    <Description>implements retention policy for Azure Virtual Machine logs stored in Azure Table Storage</Description>
+    <Copyright>2021</Copyright>
+    <PackageLicenseExpression />
 
   </PropertyGroup>
 

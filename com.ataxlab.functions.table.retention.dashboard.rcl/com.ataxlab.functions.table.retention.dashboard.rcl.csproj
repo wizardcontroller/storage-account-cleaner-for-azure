@@ -4,8 +4,11 @@
     <TargetFramework>net5.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <Authors>devops wizard</Authors>
-    <Company>axtaxlab</Company>
+    <Company>axtaxlab ltd</Company>
     <Product>storage account cleaner</Product>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>implements retention policy for Azure Virtual Machine logs stored in Azure Table Storage</Description>
+    <Copyright>2021</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
