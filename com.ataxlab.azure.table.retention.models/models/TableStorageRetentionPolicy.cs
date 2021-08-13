@@ -28,20 +28,29 @@ namespace com.ataxlab.azure.table.retention.models
         }
 
 
-        [JsonIgnore]
         public Guid Id { get; set; }
 
+        [Required]
         public MetricRetentionSurfaceEntity MetricRetentionSurface { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
+        [JsonRequired]
+        [Required]
         public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case man
         /// </summary>
+        [Required]
         public int DeleteOlderTablesThanCurrentMonthMinusThis { get; set; }
 
+        [JsonRequired]
+        [Required]
+
         public DateTime OldestRetainedTable {get; set;}
+
+        [JsonRequired]
+        [Required]
 
         public DateTime MostRecentRetainedTable {get; set;}
 
@@ -123,22 +132,30 @@ namespace com.ataxlab.azure.table.retention.models
         }
 
 
-        [JsonIgnore]
         [Key]
         
         public Guid Id { get; set; }
 
+        [Required]
+
         public DiagnosticsRetentionSurfaceEntity DiagnosticsRetentionSurface { get; set; }
+        
         [JsonConverter(typeof(StringEnumConverter))]
+        [JsonRequired]
+        [Required]
         public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case woman
         /// </summary>
+        [JsonRequired]
+        [Required]
         public int NumberOfDays { get; set; }
 
+        [Required]
         public DateTime OldestRetainedEntity {get; set;}
 
+        [Required]
         public DateTime MostRecentRetainedEntity {get; set;}
 
         public String GetTicks(Func<String> tickProvider = null)
@@ -182,11 +199,15 @@ namespace com.ataxlab.azure.table.retention.models
             Id = Guid.NewGuid();
         }
 
-        [JsonIgnore]
         public Guid Id { get; set; }
+
+        [Required]
+        [JsonRequired]
 
         public TableStorageEntityRetentionPolicy TableStorageEntityRetentionPolicy { get; set; }
 
+        [Required]
+        [JsonRequired]
         public TableStorageTableRetentionPolicy TableStorageTableRetentionPolicy { get; set; }
     }
 }

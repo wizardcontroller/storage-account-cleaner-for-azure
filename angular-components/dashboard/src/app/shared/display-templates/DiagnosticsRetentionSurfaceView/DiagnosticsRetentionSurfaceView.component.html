@@ -117,12 +117,12 @@
                         <tr>
                           <ng-container *ngIf="!isShow">
                               <td>enforcement mode</td>
-                              <td>{{job.PolicyEnforcementMode}}</td>
+                              <td>{{currentRetentionPolicy.tableStorageEntityRetentionPolicy?.policyEnforcementMode}}</td>
                           </ng-container>
                           <ng-container *ngIf="isShow">
                             <td>enforcement mode</td>
                             <td>
-                              <p-dropdown [options]="enforcementMode" [(ngModel)]="job.PolicyEnforcementMode"></p-dropdown>
+                              <p-dropdown [options]="enforcementMode"  [(ngModel)]="currentRetentionPolicy.tableStorageEntityRetentionPolicy.policyEnforcementMode"></p-dropdown>
                             </td>
 
                           </ng-container>

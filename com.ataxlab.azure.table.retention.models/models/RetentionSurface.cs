@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
@@ -22,6 +24,8 @@ namespace com.ataxlab.azure.table.retention.models.models
 
         [NotMapped]
         public string[] AggregationPrefixes { get; set; }
+
+        [Required]
         public List<MetricsRetentionSurfaceItemEntity> MetricsRetentionSurfaceItemEntities { get; set; }
     }
 
@@ -44,6 +48,9 @@ namespace com.ataxlab.azure.table.retention.models.models
         }
 
         public Guid Id { get; set; }
+
+        [Required]
+        [JsonProperty(Required = Newtonsoft.Json.Required.DisallowNull)]
         public List<DiagnosticsRetentionSurfaceItemEntity> DiagnosticsRetentionSurfaceEntities { get; set; }
 
         /// <summary>
@@ -148,7 +155,12 @@ namespace com.ataxlab.azure.table.retention.models.models
             Timestamp = DateTime.UtcNow;
         }
 
+        [JsonProperty(Required = Newtonsoft.Json.Required.DisallowNull)]
+        [Required]
         public DateTime Timestamp { get; set; }
+
+        [Required]
+        [JsonProperty(Required = Newtonsoft.Json.Required.DisallowNull)]
 
         public int RetentionPeriodInDays { get; set; }
 
@@ -158,12 +170,19 @@ namespace com.ataxlab.azure.table.retention.models.models
         /// </summary>
         public int RetainedEntitySampleSize { get; set; }
 
+        [Required]
+        [JsonRequired]
+        [JsonProperty(Required = Newtonsoft.Json.Required.DisallowNull)]
         public int PolicyTriggerCount { get; set; }
 
         public virtual RetentionSurfaceItemDescriptor ItemType { get; set; }
 
         public string ItemDescription { get; set; }
         public bool ItemExists { get; set; }
+
+        [Required]
+        [JsonRequired]
+        [JsonProperty(Required = Newtonsoft.Json.Required.DisallowNull)]
         public bool ItemWillBeDeleted { get; set; }
         public Guid Id { get; set; }
         public string StorageAccountId { get; set; }
@@ -221,6 +240,9 @@ namespace com.ataxlab.azure.table.retention.models.models
     {
 
         public MetricsRetentionSurfaceItemEntity() : base() { }
+
+        [Required]
+        [JsonRequired]
 
         public int PolicyAgeTriggerInMonths { get; set; }
         public override RetentionSurfaceItemDescriptor ItemType { get { return RetentionSurfaceItemDescriptor.IsMetricsTableItem; } }

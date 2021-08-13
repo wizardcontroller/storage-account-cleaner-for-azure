@@ -300,6 +300,9 @@ namespace com.ataxlab.functions.table.retention.c2
                 applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
                     .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.PolicyEnforcementMode = command.PolicyEnforcementMode;
 
+                var newMode = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
+                    .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.PolicyEnforcementMode;
+
                 var newRetentionPeriod = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
                     .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First().RetentionPeriodInDays;
 
