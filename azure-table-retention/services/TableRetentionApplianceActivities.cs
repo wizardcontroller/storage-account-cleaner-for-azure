@@ -519,7 +519,7 @@ namespace com.ataxlab.functions.table.retention.services
                 var tokenCredentials = new TokenCredential(authToken);
                 var storageCreds = new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(acct.Name, acct.Key);
                 var storageTableClient = new CloudTableClient(acct.PrimaryTableStorageEndpoint, storageCreds);
-                if (policy.PolicyEnforcementMode == PolicyEnforcementMode.ApplyPolicy)
+                if (policy.policyEnforcementMode == policyEnforcementMode.ApplyPolicy)
                 {
                     var retentionSurface = await this.AuditMetricsRetentionSurface(authToken, acct, policy);
 
@@ -563,13 +563,13 @@ namespace com.ataxlab.functions.table.retention.services
                         var storageTable = this.GetStorageTableReference(storageTableClient, tableName);
 
                         // support WHATIF
-                        if (policy.PolicyEnforcementMode == entities.PolicyEnforcementMode.ApplyPolicy)
+                        if (policy.PolicyEnforcementMode == entities.policyEnforcementMode.ApplyPolicy)
                         {
                             log.LogWarning("applying policy to delete data");
                             ret.PolicyTriggerCount += await this.DeleteOldDiagnosticsEntitiesForTable(policy.GetTicks(tickProvider), storageTable);
                             log.LogInformation("policy has deleted old data");
                         }
-                        else if (policy.PolicyEnforcementMode == entities.PolicyEnforcementMode.WhatIf)
+                        else if (policy.PolicyEnforcementMode == entities.policyEnforcementMode.WhatIf)
                         {
                             log.LogInformation("running policy in WHATIF mode");
                             ret.PolicyTriggerCount += await this.AuditEntitiesForTable(policy.GetTicks(tickProvider), storageTable);
@@ -767,7 +767,7 @@ namespace com.ataxlab.functions.table.retention.services
 
 
 
-                            if (policy.PolicyEnforcementMode == PolicyEnforcementMode.ApplyPolicy)
+                            if (policy.policyEnforcementMode == policyEnforcementMode.ApplyPolicy)
                             {
                                 try
                                 {
@@ -1078,7 +1078,7 @@ namespace com.ataxlab.functions.table.retention.services
 
                                 foreach (CloudTable table in allTablesResult.Results)
                                 {
-                                    if (policy.PolicyEnforcementMode == PolicyEnforcementMode.ApplyPolicy)
+                                    if (policy.policyEnforcementMode == policyEnforcementMode.ApplyPolicy)
                                     {
                                         log.LogInformation("Deleting table: " + table.Name);
                                         ret.Add(table.Name);

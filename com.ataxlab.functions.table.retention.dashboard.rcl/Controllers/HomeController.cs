@@ -377,12 +377,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 {
                     // update failed
                     OperatorPageModel.IsMustRenderApplianceConfig = true;
-                    return RedirectToAction(nameof(HomeController.Index), OperatorPageModel);
+                    return View(nameof(HomeController.Index), OperatorPageModel);
                 }
 
             }
 
-            return RedirectToAction(nameof(HomeController.Operator), OperatorPageModel);
+            return View(nameof(HomeController.Operator), OperatorPageModel);
         }
 
         [HttpGet(Name = "SelectSubscription")]

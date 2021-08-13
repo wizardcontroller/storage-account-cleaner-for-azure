@@ -4,6 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import {
+  MetricRetentionSurfaceEntity,
   OperatorPageModel,
   RetentionEntitiesService,
   StorageAccountDTO,
@@ -23,7 +24,7 @@ import { DataView } from 'primeng/dataview';
 import { FullCalendarModule } from 'primeng/fullcalendar';
 import { of } from 'rxjs';
 import { combineLatest, ReplaySubject } from 'rxjs';
-import { catchError, concatMap, map, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, concatMap, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from 'src/app/core/ApiConfig.service';
 import { GlobalOhNoConstants } from '../../GlobalOhNoConstants';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
@@ -177,8 +178,15 @@ export class MetricRetentionSurfaceViewComponent
 
     const id = e.id as string;
     console.log(`sent ${id}`);
-    const metricPolicy = this.currentRetentionPolicy.tableStorageTableRetentionPolicy as TableStorageTableRetentionPolicy;
-
+    let metricPolicy = this.currentRetentionPolicy.tableStorageTableRetentionPolicy as TableStorageTableRetentionPolicy;
+    let surface = metricPolicy.metricRetentionSurface as MetricRetentionSurfaceEntity;
+    let entities = surface.metricsRetentionSurfaceItemEntities;
+    metricPolicy.policyEnforcementMode = this.currentRetentionPolicy.tableStorageTableRetentionPolicy.policyEnforcementMode;
+    entities = [];
+    entities.push(e);
+    surface.metricsRetentionSurfaceItemEntities = entities;
+    metricPolicy.metricRetentionSurface = surface;
+    // metricPolicy.policyEnforcementMode =
     const submitPipe = combineLatest([
       this.pageModelChanges$,
       this.applianceAPiSvc.currentStorageAccountChanges$
@@ -187,7 +195,7 @@ export class MetricRetentionSurfaceViewComponent
       tap(t =>{
         console.log("submitting metrics retention policy");
       }),
-      map(dependencies => {
+      switchMap(dependencies => {
         const pageModel = dependencies[0] as OperatorPageModel;
         const currentStorageAccount = dependencies[1] as StorageAccountDTO;
 
@@ -198,7 +206,7 @@ export class MetricRetentionSurfaceViewComponent
           metricPolicy.id as string,
           e.id as string,
           pageModel.selectedSubscriptionId as string,
-          this.curentStorageAccount.id as string, e)
+          this.curentStorageAccount.id as string, metricPolicy)
           .pipe(
             map(result => {
               this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = true;
@@ -219,7 +227,7 @@ export class MetricRetentionSurfaceViewComponent
 
         return of([]);
       })
-    ).subscribe();
+    ).subscribe().unsubscribe();
 
     console.log("policy submitted");
   }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations;
 
 namespace com.ataxlab.functions.table.retention.entities
 {
@@ -53,7 +54,8 @@ namespace com.ataxlab.functions.table.retention.entities
         public int PolicyTriggerCount { get; set; }
     }
 
-    public enum PolicyEnforcementMode { WhatIf = 0, ApplyPolicy = 1 }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum policyEnforcementMode { WhatIf, ApplyPolicy }
 
     /// <summary>
     /// 
@@ -67,7 +69,7 @@ namespace com.ataxlab.functions.table.retention.entities
 
             // means months of history
             DeleteOlderTablesThanCurrentMonthMinusThis = 12;
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            policyEnforcementMode = policyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
             MetricRetentionSurface = new MetricRetentionSurfaceEntity();
             this.WADMetricsTableNamePrefix = "WADMetrics";
@@ -120,7 +122,9 @@ namespace com.ataxlab.functions.table.retention.entities
 
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty("policyEnforcementMode")]
-        public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
+        [JsonRequired]
+        [Required]
+        public policyEnforcementMode policyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case man
@@ -207,20 +211,24 @@ namespace com.ataxlab.functions.table.retention.entities
             {
                 TableNames.Add(item.TableName);
             }
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            PolicyEnforcementMode = policyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
         }
 
         public Guid Id { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty("PolicyEnforcementMode")]
-        public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
+        [JsonProperty("policyEnforcementMode", Required = Newtonsoft.Json.Required.DisallowNull)]
+        [JsonRequired]
+        [Required]
+        public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case woman
         /// </summary>
-        [JsonProperty("NumberOfDays")]
+        [JsonProperty("numberOfDays", Required = Newtonsoft.Json.Required.DisallowNull)]
+        [JsonRequired]
+        [Required]
         public int NumberOfDays { get; set; }
 
         
@@ -229,6 +237,9 @@ namespace com.ataxlab.functions.table.retention.entities
         public DateTime MostRecentRetainedEntity {get; set;}
 
 
+        [Required]
+        [JsonRequired]
+        [JsonProperty(Required = Newtonsoft.Json.Required.DisallowNull)]
         public DiagnosticsRetentionSurfaceEntity DiagnosticsRetentionSurface { get; set; }
 
         public String GetTicks(Func<String> tickProvider = null)
@@ -251,7 +262,7 @@ namespace com.ataxlab.functions.table.retention.entities
         /// <summary>
         /// you'd be better off supplying these
         /// </summary>
-        [JsonProperty("TableNames")]
+        [JsonProperty("tableNames")]
         public List<String> TableNames
         {
             get
@@ -294,13 +305,18 @@ namespace com.ataxlab.functions.table.retention.entities
             Id = Guid.NewGuid();
         }
 
-        [JsonProperty("id")]
+        [JsonRequired]
+        [JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull)]
         public Guid Id { get; set; }
 
-        [JsonProperty("tableStorageEntityRetentionPolicy")]
+        [JsonRequired]
+        [Required]
+        [JsonProperty("tableStorageEntityRetentionPolicy", Required = Newtonsoft.Json.Required.DisallowNull)]
         public TableStorageEntityRetentionPolicyEntity TableStorageEntityRetentionPolicy { get; set; }
 
-        [JsonProperty("tableStorageTableRetentionPolicy")]
+        [JsonRequired]
+        [Required]
+        [JsonProperty("tableStorageTableRetentionPolicy", Required = Newtonsoft.Json.Required.DisallowNull)]
         public TableStorageTableRetentionPolicyEntity TableStorageTableRetentionPolicy { get; set; }
     }
 }

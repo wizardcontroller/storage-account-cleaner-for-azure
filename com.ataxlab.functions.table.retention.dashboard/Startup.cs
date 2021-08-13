@@ -53,8 +53,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
     {
         public void Apply(OpenApiSchema model, SchemaFilterContext context)
         {
-            model.Properties =
-                model.Properties.ToDictionary(d => d.Key.Substring(0, 1).ToLower() + d.Key.Substring(1), d => d.Value);
+
             if (context.Type.IsEnum)
             {
                 model.Enum.Clear();
@@ -63,6 +62,9 @@ namespace com.ataxlab.functions.table.retention.dashboard
                     .ToList()
                     .ForEach(n => model.Enum.Add(new OpenApiString(n)));
             }
+
+            model.Properties =
+                model.Properties.ToDictionary(d => d.Key.Substring(0, 1).ToLower() + d.Key.Substring(1), d => d.Value);
 
         }
     }
@@ -301,7 +303,9 @@ namespace com.ataxlab.functions.table.retention.dashboard
                     // https://gist.github.com/regisdiogo/27f62ef83a804668eb0d9d0f63989e3e
                     // https://medium.com/@jrhodes.home/exposing-enums-through-swagger-in-net-core-api-616d3727a02c
                     opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+ 
                     opts.JsonSerializerOptions.IgnoreNullValues = true;
+                    
                 })
                 .AddMicrosoftIdentityUI();
             // as per https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/tree/master/3-WebApp-multi-APIs

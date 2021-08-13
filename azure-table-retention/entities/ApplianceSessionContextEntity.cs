@@ -166,7 +166,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
 
             if (tuples == null) return;
-
+            CurrentJobOutput.id = Guid.NewGuid();
             CurrentJobOutput.retentionPolicyJobs.Clear();
             try
             {

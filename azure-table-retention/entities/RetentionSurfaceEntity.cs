@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace com.ataxlab.functions.table.retention.entities
 {
@@ -47,6 +48,8 @@ namespace com.ataxlab.functions.table.retention.entities
         }
 
         public Guid Id { get; set; }
+
+        [Required]
         public List<DiagnosticsRetentionSurfaceItemEntity> DiagnosticsRetentionSurfaceEntities { get; set; }
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace com.ataxlab.azure.table.retention.models
 {
     ///todo enumerate these numerically wherever they appear
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum PolicyEnforcementMode { WhatIf, ApplyPolicy}
+    public enum policyEnforcementMode { WhatIf, ApplyPolicy}
 
     public class TableStorageTableRetentionPolicy
     {
@@ -20,7 +20,7 @@ namespace com.ataxlab.azure.table.retention.models
         {
 
             DeleteOlderTablesThanCurrentMonthMinusThis = 2;
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            PolicyEnforcementMode = policyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
 
             MetricRetentionSurface = new MetricRetentionSurfaceEntity();
@@ -28,20 +28,29 @@ namespace com.ataxlab.azure.table.retention.models
         }
 
 
-        [JsonIgnore]
         public Guid Id { get; set; }
 
+        [Required]
         public MetricRetentionSurfaceEntity MetricRetentionSurface { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
+        [JsonRequired]
+        [Required]
+        public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case man
         /// </summary>
+        [Required]
         public int DeleteOlderTablesThanCurrentMonthMinusThis { get; set; }
 
+        [JsonRequired]
+        [Required]
+
         public DateTime OldestRetainedTable {get; set;}
+
+        [JsonRequired]
+        [Required]
 
         public DateTime MostRecentRetainedTable {get; set;}
 
@@ -118,27 +127,35 @@ namespace com.ataxlab.azure.table.retention.models
             {
                 TableNames.Add(item.TableName);
             }
-            PolicyEnforcementMode = PolicyEnforcementMode.WhatIf;
+            PolicyEnforcementMode = policyEnforcementMode.WhatIf;
             Id = Guid.NewGuid();
         }
 
 
-        [JsonIgnore]
         [Key]
         
         public Guid Id { get; set; }
 
+        [Required]
+
         public DiagnosticsRetentionSurfaceEntity DiagnosticsRetentionSurface { get; set; }
+        
         [JsonConverter(typeof(StringEnumConverter))]
-        public PolicyEnforcementMode PolicyEnforcementMode { get; set; }
+        [JsonRequired]
+        [Required]
+        public policyEnforcementMode PolicyEnforcementMode { get; set; }
 
         /// <summary>
         /// defaults to 65536 just in case woman
         /// </summary>
+        [JsonRequired]
+        [Required]
         public int NumberOfDays { get; set; }
 
+        [Required]
         public DateTime OldestRetainedEntity {get; set;}
 
+        [Required]
         public DateTime MostRecentRetainedEntity {get; set;}
 
         public String GetTicks(Func<String> tickProvider = null)
@@ -182,11 +199,15 @@ namespace com.ataxlab.azure.table.retention.models
             Id = Guid.NewGuid();
         }
 
-        [JsonIgnore]
         public Guid Id { get; set; }
+
+        [Required]
+        [JsonRequired]
 
         public TableStorageEntityRetentionPolicy TableStorageEntityRetentionPolicy { get; set; }
 
+        [Required]
+        [JsonRequired]
         public TableStorageTableRetentionPolicy TableStorageTableRetentionPolicy { get; set; }
     }
 }

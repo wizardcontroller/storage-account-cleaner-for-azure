@@ -41,17 +41,17 @@ namespace com.ataxlab.azure.table.retention.models.models
     {
         public int WorkflowCheckpointDTOId { get; set; }
 
-        [JsonProperty("TimeStamp")]
+        [JsonProperty("timeStamp")]
         public DateTime TimeStamp { get; set; }
 
-        [JsonProperty("CurrentCheckpoint")]
+        [JsonProperty("currentCheckpoint")]
         public WorkflowCheckpointIdentifier CurrentCheckpoint { get; set; }
 
 
-        [JsonProperty("Messsage")]
+        [JsonProperty("messsage")]
         public string Message { get; internal set; }
 
-        [JsonProperty("AvailableCommands")]
+        [JsonProperty("availableCommands")]
         public List<AvailableCommand> AvailableCommands { get; set; }
 
         public void SetCurrentCheckpoint(WorkflowCheckpointIdentifier checkpoint) => this.CurrentCheckpoint = checkpoint;

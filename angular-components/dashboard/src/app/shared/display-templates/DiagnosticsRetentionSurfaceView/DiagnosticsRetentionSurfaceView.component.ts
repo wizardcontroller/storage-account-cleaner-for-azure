@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
 import {
+  DiagnosticsRetentionSurfaceEntity,
   DiagnosticsRetentionSurfaceItemEntity,
   OperatorPageModel,
   PolicyEnforcementMode,
@@ -11,7 +12,7 @@ import {
 } from '@wizardcontroller/sac-appliance-lib';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe';
 import { combineLatest, ReplaySubject } from 'rxjs';
-import { catchError, concatMap, map, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, concatMap, map, mergeMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ApiConfigService } from '../../../core/ApiConfig.service';
 import { ICanBeHiddenFromDisplay } from '../../interfaces/ICanBeHiddenFromDisplay';
 import { ApplianceApiService } from '../../services/appliance-api.service';
@@ -130,6 +131,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
     private applianceAPiSvc: ApplianceApiService
   ) {
     this.isShow = false;
+
   }
 
   ngOnDestroy(): void {
@@ -175,6 +177,15 @@ export class DiagnosticsRetentionSurfaceViewComponent
     this.isShow = false;
     this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = false;
 
+    let policy = this.currentRetentionPolicy.tableStorageEntityRetentionPolicy as TableStorageEntityRetentionPolicy;
+    let surface = policy.diagnosticsRetentionSurface as DiagnosticsRetentionSurfaceEntity;
+    let entities = surface.diagnosticsRetentionSurfaceEntities;
+    entities = [];
+    entities.push(e);
+    surface.diagnosticsRetentionSurfaceEntities = entities;
+    policy.diagnosticsRetentionSurface = surface;
+    policy.policyEnforcementMode = this.currentRetentionPolicy.tableStorageEntityRetentionPolicy.policyEnforcementMode;
+
     const id = e.id as string;
     console.log(`sent ${id}`);
     const diagnosticPolicy = this.currentRetentionPolicy.tableStorageEntityRetentionPolicy as TableStorageEntityRetentionPolicy;
@@ -187,9 +198,10 @@ export class DiagnosticsRetentionSurfaceViewComponent
       tap(t =>{
         console.log("submitting metrics retention policy");
       }),
-      map(dependencies => {
+      switchMap(dependencies => {
         const pageModel = dependencies[0] as OperatorPageModel;
         const currentStorageAccount = dependencies[1] as StorageAccountDTO;
+
 
         this.applianceAPiSvc.entityService
         .setEntityRetentionPolicyForStorageAccount(
@@ -198,7 +210,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
           diagnosticPolicy.id as string,
           e.id as string,
           pageModel.selectedSubscriptionId as string,
-          this.curentStorageAccount.id as string, e)
+          this.curentStorageAccount.id as string, policy)
           .pipe(
             map(result => {
               this.applianceAPiSvc.isAutoRefreshWorkflowCheckpoint = true;
@@ -219,7 +231,7 @@ export class DiagnosticsRetentionSurfaceViewComponent
 
         return of([]);
       })
-    ).subscribe();
+    ).subscribe().unsubscribe();
 
     console.log("policy submitted");
 

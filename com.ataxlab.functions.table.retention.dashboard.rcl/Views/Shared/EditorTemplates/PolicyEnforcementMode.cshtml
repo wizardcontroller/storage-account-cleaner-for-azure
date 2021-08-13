@@ -1,6 +1,6 @@
-﻿@model com.ataxlab.azure.table.retention.models.PolicyEnforcementMode 
+﻿@model com.ataxlab.azure.table.retention.models.policyEnforcementMode 
 @using com.ataxlab.azure.table.retention.models;
 
 @Html.DropDownListFor(m => m,
-            new SelectList(Enum.GetValues(typeof(PolicyEnforcementMode))),
+            new SelectList(Enum.GetValues(typeof(policyEnforcementMode))),
             "Select Policy Enforcement Mode")
