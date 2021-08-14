@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Management.Network.Fluent.Models;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
@@ -41,7 +42,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
     public class HomeController : Controller
     {
 
-
+        public IConfiguration Configuration { get; }
         private const string VIEWBAGKEY_ORCHESTRATION_STATUS = "OrchestrationStatus";
         private readonly ILogger<HomeController> log;
 
@@ -50,12 +51,13 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         public ITableRetentionDashboardAPI ApplianceClient { get; set; }
         public IAzureManagementAPIClient AzureManagementClient { get; set; }
         public HomeController(ITableRetentionDashboardAPI dashboardClient,
-                              IAzureManagementAPIClient azureMgmtClient,
+                              IAzureManagementAPIClient azureMgmtClient, IConfiguration config,
                               TableRetentionApplianceScopes requiredScopes,
                                 ILogger<HomeController> logger)
         {
             ApplianceClient = dashboardClient;
             log = logger;
+            Configuration = config;
             this.AzureManagementClient = azureMgmtClient;
             TableRetentionApplianceScopes = requiredScopes;
         }
@@ -71,15 +73,36 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             var idToken = await HttpContext.GetTokenAsync("id_token");
 
 
+            //if (User.Identity.IsAuthenticated)
+            //{
+            //    try
+            //    {
+            //        // ensure subscriptions
+            //        var subscriptions = await this.AzureManagementClient.GetSubscriptionsForLoggedInUser();
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        var clientId = Configuration["AzureAd:clientId"];
+            //        var tenantId = this.AzureManagementClient.GetTenantId();
+
+            //        var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
+            //        return Redirect(consentUrl);
+            //    }
+
+            //}
 
             OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
 
             if (User.Identity.IsAuthenticated)
             {
-                if (OperatorPageModel.ImpersonationToken == null)
-                {
-                    return Redirect("/MicrosoftIdentity/Account/SignIn");
-                }
+                //if (OperatorPageModel.ImpersonationToken == null)
+                //{
+                //    var clientId = Configuration["AzureAd:clientId"];
+                //    var tenantId = this.AzureManagementClient.GetTenantId(false);
+
+                //    var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
+                //    return Redirect(consentUrl);
+                //}
 
                 var exp = User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("exp")).FirstOrDefault()?.Value;
                 if(exp != null)
@@ -110,11 +133,8 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                 log.LogInformation("building operator page model");
 
+
                 OperatorPageModel = await this.ApplianceClient.GetOperatorPageModel();
-
-                // ensure subscriptions
-                OperatorPageModel.Subscriptions = await this.AzureManagementClient.GetSubscriptionsForLoggedInUser();
-
 
 
                 OperatorPageModel.ApplianceSessionContext.AvailableSubscriptions = OperatorPageModel.Subscriptions;
@@ -545,7 +565,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             {
                 if (OperatorPageModel.ImpersonationToken == null)
                 {
-                    return Redirect("/MicrosoftIdentity/Account/SignIn");
+                    return Redirect("/MicrosoftIdentity/Account/SignIn?prompt=consent");
                 }
 
 
