@@ -244,9 +244,9 @@ namespace com.ataxlab.functions.table.retention.dashboard
                     // ValidAudiences = new List<string> { Configuration.GetValue < string>("AzureAD:Audience")}
                 };
             }).AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"), subscribeToOpenIdConnectMiddlewareDiagnosticsEvents: true)
-            .EnableTokenAcquisitionToCallDownstreamApi() //(scopes.AllScopes)
+            .EnableTokenAcquisitionToCallDownstreamApi(new List<string>() { "https://management.azure.com/user_impersonation" }) //(scopes.AllScopes)
             // .EnableTokenAcquisitionToCallDownstreamApi(new List<string>() { scopes.DefaultApplianceScope[0]}) //(scopes.AllScopes)
-            //.EnableTokenAcquisitionToCallDownstreamApi(new List<string>() { "https://management.azure.com/user_impersonation" }) //(scopes.AllScopes)
+            // .EnableTokenAcquisitionToCallDownstreamApi(new List<string>() { "https://management.azure.com" }) //(scopes.AllScopes)
 
             .AddDownstreamWebApi("azuretableretentionappliance", (o) =>
              {
