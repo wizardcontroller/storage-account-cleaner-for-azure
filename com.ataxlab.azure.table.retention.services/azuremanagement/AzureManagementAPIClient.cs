@@ -228,7 +228,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 // never had a token
                 impersonationResult = await TokenAcquisitionHelper
                     .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                     {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
+                    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
                     //{ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
                 token = impersonationResult.AccessToken;
 
