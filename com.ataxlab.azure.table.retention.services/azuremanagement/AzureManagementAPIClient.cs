@@ -228,7 +228,8 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 // never had a token
                 impersonationResult = await TokenAcquisitionHelper
                     .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
+                     {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
+                    //{ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
                 token = impersonationResult.AccessToken;
 
                 CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
@@ -238,7 +239,8 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 // token is nearing expiration 
                 impersonationResult = await TokenAcquisitionHelper
                                     .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                                {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
+                    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
+                    //{ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
                 token = impersonationResult.AccessToken;
 
                 CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
@@ -322,6 +324,38 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 log.LogError(e.Message);
             }
             return ret;
+        }
+
+        /// <summary>
+        /// support single tenant and multi tenant callers
+        /// 
+        /// single tenant - tenant id returned from app config
+        /// multi tenant - app config tenant id is set to organizations, return tenant 
+        /// from issuer sts url
+        /// </summary>
+        /// <returns></returns>
+        public string GetTenantId()
+        {
+            var tenantId = String.Empty;
+            log.LogInformation("getting tenant id from user claims");
+            var configuredTenantId = Configuration["AzureAd:TenantId"];
+
+            if(configuredTenantId.Contains("organizations"))
+            {
+                // return tenant id from claims
+                // var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
+                var stsUrl = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("identityprovider")).FirstOrDefault()?.Value;
+                var splitStsUrl = stsUrl.Split("https://sts.windows.net/");
+                tenantId = splitStsUrl.LastOrDefault().TrimEnd('/');
+            }
+            else
+            {
+                // single tenant return tenantid from configuration
+                tenantId = configuredTenantId;
+            }
+
+  
+            return tenantId;
         }
 
 

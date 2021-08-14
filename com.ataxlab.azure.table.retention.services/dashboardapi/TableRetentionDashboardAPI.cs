@@ -391,8 +391,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     foreach (var s in eachScope)
                     {
                         AuthenticationResult impersonationResult = await TokenAcquisitionHelper
+                                                    //.GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, GetTenantIdFromUserClaims());
                                                     .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, Configuration["AzureAd:TenantId"]);
-
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken);
                         OperatorPageModel.ImpersonationToken = impersonationResult.AccessToken;
@@ -599,7 +599,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 foreach (var s in eachScope)
                 {
                     impersonationResult = await TokenAcquisitionHelper
-                        .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: Configuration["AzureAd:TenantId"]);
+                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: Configuration["AzureAd:TenantId"]);
                 }
 
                 CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
