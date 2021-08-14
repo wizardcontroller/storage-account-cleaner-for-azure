@@ -228,7 +228,8 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 // never had a token
                 impersonationResult = await TokenAcquisitionHelper
                     .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
+                    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantIdFromUserClaims());
+                // {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
                 token = impersonationResult.AccessToken;
 
                 CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
@@ -238,7 +239,8 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 // token is nearing expiration 
                 impersonationResult = await TokenAcquisitionHelper
                                     .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                                {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
+                    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantIdFromUserClaims());
+                // {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
                 token = impersonationResult.AccessToken;
 
                 CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
@@ -322,6 +324,13 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 log.LogError(e.Message);
             }
             return ret;
+        }
+
+        public string GetTenantIdFromUserClaims()
+        {
+            log.LogInformation("getting tenant id from user claims");
+            var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
+            return tenantId;
         }
 
 

@@ -391,8 +391,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     foreach (var s in eachScope)
                     {
                         AuthenticationResult impersonationResult = await TokenAcquisitionHelper
-                                                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, Configuration["AzureAd:TenantId"]);
-
+                                                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, GetTenantIdFromUserClaims());
+                                                    //.GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, Configuration["AzureAd:TenantId"]);
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken);
                         OperatorPageModel.ImpersonationToken = impersonationResult.AccessToken;
@@ -554,7 +554,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN)))
             {
                 log.LogInformation(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN + " not found in session. getting current access token");
-                var tenantId = Configuration["AzureAd:TenantId"];
+                var tenantId = GetTenantIdFromUserClaims(); // Configuration["AzureAd:TenantId"];
                 // user.read is good for getting a graph token for the graph api audience, which is this 00000003-0000-0000-c000-000000000000"
                 log.LogInformation("tenant id " + tenantId);
 
@@ -599,7 +599,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 foreach (var s in eachScope)
                 {
                     impersonationResult = await TokenAcquisitionHelper
-                        .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: Configuration["AzureAd:TenantId"]);
+                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: GetTenantIdFromUserClaims());
+                    // .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: Configuration["AzureAd:TenantId"]);
                 }
 
                 CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
