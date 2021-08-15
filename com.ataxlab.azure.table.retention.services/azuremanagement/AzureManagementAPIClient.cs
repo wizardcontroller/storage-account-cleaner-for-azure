@@ -405,7 +405,15 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
             //    // single tenant return tenantid from configuration
             //    tenantId = configuredTenantId;
             //}
-            tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("tid")).FirstOrDefault()?.Value;
+
+            foreach(var c in this.CurrentHttpContext.User.Claims)
+            {
+                log.LogInformation($"claim type is {c.Type}");
+                log.LogInformation($"claim Value is {c.Value}");
+                log.LogInformation($"claim Issuer is {c.Issuer}");
+
+            }
+            tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Equals("tid")).FirstOrDefault()?.Value;
 
             return tenantId;
         }
