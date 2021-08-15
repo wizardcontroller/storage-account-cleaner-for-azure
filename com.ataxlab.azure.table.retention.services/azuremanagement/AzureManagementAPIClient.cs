@@ -378,7 +378,15 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
         public string GetTenantId(bool isMultitenantShim = false)
         {
             var tenantId = String.Empty;
-            log.LogInformation("getting tenant id from user claims");
+
+            foreach (var c in this.CurrentHttpContext.User.Claims)
+            {
+                log.LogInformation($"claim type is {c.Type}");
+                log.LogInformation($"claim Value is {c.Value}");
+                log.LogInformation($"claim Issuer is {c.Issuer}");
+
+            }
+
             var configuredTenantId = Configuration["AzureAd:TenantId"];
 
             //if(isMultitenantShim)
@@ -390,30 +398,33 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
             //    return tenantId;
             //}
 
-            //if(configuredTenantId.Contains("organizations"))
-            //{
-            //    // return tenant id from claims
-            //    // var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
-            //    var stsUrl = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("identityprovider")).FirstOrDefault()?.Value;
-            //    log.LogInformation($"sts url = {stsUrl}");
-            //    var splitStsUrl = stsUrl.Split("https://sts.windows.net/");
-            //    tenantId = splitStsUrl.LastOrDefault().TrimEnd('/');
-            //}
-            //else
-            //{
-            //    log.LogInformation($"using configured tenantid");
-            //    // single tenant return tenantid from configuration
-            //    tenantId = configuredTenantId;
-            //}
-
-            foreach(var c in this.CurrentHttpContext.User.Claims)
+            if (configuredTenantId.Contains("organizations"))
             {
-                log.LogInformation($"claim type is {c.Type}");
-                log.LogInformation($"claim Value is {c.Value}");
-                log.LogInformation($"claim Issuer is {c.Issuer}");
+                // return tenant id from claims
+                // var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
+                //var stsUrl = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("identityprovider")).FirstOrDefault()?.Value;
+                //log.LogInformation($"sts url = {stsUrl}");
+                //var splitStsUrl = stsUrl.Split("https://sts.windows.net/");
+                //tenantId = splitStsUrl.LastOrDefault().TrimEnd('/');
+                var tenantClaim = "http://schemas.microsoft.com/identity/claims/tenantid";
+                log.LogInformation($"getting tenant id from user claims {tenantClaim}");
+                tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(tenantClaim)).FirstOrDefault()?.Value;
+                if(tenantId == null || tenantId.Equals(string.Empty))
+                {
+                    log.LogWarning($"tenantid not found in claim {tenantClaim}");
+                    tenantClaim = "tid";
+                    log.LogInformation($"getting tenant id from user claims {tenantClaim}");
+                    tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(tenantClaim)).FirstOrDefault()?.Value;
 
+                }
             }
-            tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("tid")).FirstOrDefault()?.Value;
+            else
+            {
+                log.LogInformation($"using configured tenantid");
+                // single tenant return tenantid from configuration
+                tenantId = configuredTenantId;
+            }
+
 
             return tenantId;
         }

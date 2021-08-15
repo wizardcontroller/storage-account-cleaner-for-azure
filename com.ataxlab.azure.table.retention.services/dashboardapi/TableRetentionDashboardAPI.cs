@@ -438,8 +438,34 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
         public string GetTenantIdFromUserClaims()
         {
-            log.LogInformation("getting tenant id from user claims");
-            var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
+            var tenantId = string.Empty;
+            var configuredTenantId = Configuration["AzureAd:TenantId"];
+
+            if (configuredTenantId.Contains("organizations"))
+            {
+                // return tenant id from claims
+                // var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
+                //var stsUrl = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("identityprovider")).FirstOrDefault()?.Value;
+                //log.LogInformation($"sts url = {stsUrl}");
+                //var splitStsUrl = stsUrl.Split("https://sts.windows.net/");
+                //tenantId = splitStsUrl.LastOrDefault().TrimEnd('/');
+                var tenantClaim = "http://schemas.microsoft.com/identity/claims/tenantid";
+                log.LogInformation($"getting tenant id from user claims {tenantClaim}");
+                tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(tenantClaim)).FirstOrDefault()?.Value;
+                if (tenantId == null || tenantId.Equals(string.Empty))
+                {
+                    log.LogWarning($"tenantid not found in claim {tenantClaim}");
+                    tenantClaim = "tid";
+                    log.LogInformation($"getting tenant id from user claims {tenantClaim}");
+                    tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(tenantClaim)).FirstOrDefault()?.Value;
+
+                }
+            }
+            else
+            {
+                log.LogInformation($"getting tenant id from user claims {ControlChannelConstants.CLAIM_TENANT_UTID}");
+                tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
+            }
             return tenantId;
         }
 
