@@ -110,7 +110,8 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                     {
                         var clientId = Configuration["AzureAd:clientId"];
                         var tenantId = this.AzureManagementClient.GetTenantId();
-                        var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent&client_id={clientId}";
+                        // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
+                        var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
                         log.LogError($"no subscriptions: redirecting to consent url {consentUrl}");
                         return Redirect(consentUrl);
                     }
@@ -129,7 +130,8 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                 var clientId = Configuration["AzureAd:clientId"];
                 var tenantId = this.AzureManagementClient.GetTenantId();
-                var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent&client_id={clientId}";
+                // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
+                var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
                 log.LogError($"redirecting to consent url {consentUrl}");
                 return Redirect(consentUrl);
             }
