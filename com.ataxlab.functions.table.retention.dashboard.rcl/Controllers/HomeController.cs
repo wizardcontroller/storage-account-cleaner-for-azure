@@ -69,8 +69,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
-            var idToken = await HttpContext.GetTokenAsync("id_token");
+
 
 
             //if (User.Identity.IsAuthenticated)
@@ -91,33 +90,40 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
             //}
 
-            OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
+            OperatorPageModel OperatorPageModel = new OperatorPageModel();
 
-            if (User.Identity.IsAuthenticated)
+
+            try
             {
-                //if (OperatorPageModel.ImpersonationToken == null)
-                //{
-                //    var clientId = Configuration["AzureAd:clientId"];
-                //    var tenantId = this.AzureManagementClient.GetTenantId(false);
+                OperatorPageModel = await InitializeOperatorPageModel();
 
-                //    var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
-                //    return Redirect(consentUrl);
-                //}
-
-                var exp = User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("exp")).FirstOrDefault()?.Value;
-                if(exp != null)
+                if (User.Identity.IsAuthenticated)
                 {
-                    int i = 0;
+                    var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
+                    var idToken = await HttpContext.GetTokenAsync("id_token");
+                    log.LogInformation($"id token ={idToken}");
+                    log.LogInformation($"refreshToken token ={refreshToken}");
+
+
+
+                    //var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
+                    //if (expTime.DateTime < DateTime.UtcNow)
+                    //{
+                    //    return Redirect("/MicrosoftIdentity/Account/SignIn");
+                    //}
                 }
 
-                //var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
-                //if (expTime.DateTime < DateTime.UtcNow)
-                //{
-                //    return Redirect("/MicrosoftIdentity/Account/SignIn");
-                //}
+                log.LogInformation("home controller has easy auth token = " + OperatorPageModel.EasyAuthAccessToken);
             }
+            catch(Exception e)
+            {
+                var clientId = Configuration["AzureAd:clientId"];
+                var tenantId = this.AzureManagementClient.GetTenantId();
 
-            log.LogInformation("home controller has easy auth token = " + OperatorPageModel.EasyAuthAccessToken);
+                var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
+                log.LogError($"redirecting to consent url {consentUrl}");
+                return Redirect(consentUrl);
+            }
 
             return View(OperatorPageModel);
         }

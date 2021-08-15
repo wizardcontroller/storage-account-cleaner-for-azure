@@ -94,10 +94,10 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 log.LogInformation("testing USERTOKEN with subscription {0}", subscriptionid);
 
                 StorageManagementClient storage = new StorageManagementClient(new TokenCredentials(impersonationToken));
-                storage.SubscriptionId = subscriptionid; 
+                storage.SubscriptionId = subscriptionid;
 
                 log.LogInformation("testing USERTOKEN StorageManagementClient for subscription {0}", storage?.SubscriptionId);
-                
+
                 // TODO implement the continuation pattern here
                 var storageAccounts = await storage?.StorageAccounts?.ListAsync();
                 if (storageAccounts != null)
@@ -114,7 +114,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                             StorageAccountKind = act.Kind,
                             StorageAccountType = act.Type,
                             RequestingAzureAdUserOid = requestingOid,
-                            SubscriptionId = subscriptionid, 
+                            SubscriptionId = subscriptionid,
                             TenantId = GetTenantIdFromUserClaims()
                         });
                     }
@@ -139,26 +139,32 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             return ret;
         }
 
+        /// <summary>
+        /// throws MSAL UI related exceptions
+        /// </summary>
+        /// <returns></returns>
         public async Task<OperatorPageModel> GetOperatorPageModel()
         {
-            OperatorPageModel operatorPageModel = await EnsureAuthScopesforOperatorPageModel();
+            OperatorPageModel operatorPageModel = new OperatorPageModel();
             string oid = string.Empty;
             string tenantid = string.Empty;
 
             // populate the client side urls 
-            if(this.CurrentHttpContext.User.Identity.IsAuthenticated)
+            if (this.CurrentHttpContext.User.Identity.IsAuthenticated)
             {
-                oid = GetUserOidFromUserClaims();
-                tenantid = GetTenantIdFromUserClaims();
-
-                // may be null at this point
-                operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
-                
-                operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
-                operatorPageModel.Oid = oid;
-                operatorPageModel.Tenantid = tenantid;
                 try
                 {
+                    operatorPageModel = await EnsureAuthScopesforOperatorPageModel();
+                    oid = GetUserOidFromUserClaims();
+                    tenantid = GetTenantIdFromUserClaims();
+
+                    // may be null at this point
+                    operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+
+                    operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
+                    operatorPageModel.Oid = oid;
+                    operatorPageModel.Tenantid = tenantid;
+
                     var routeParam = new ControlChannelRouteParameter()
                     {
                         EndPoint = ControlChannelConstants.QueryWorkflowCheckpointStatusEndpoint,
@@ -184,7 +190,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 catch (Exception e)
                 {
                     log.LogError("error populationg operator pagemodel with workflow checkpoint status {0}", e.Message);
-
+                    throw;
                 }
 
             }
@@ -212,14 +218,14 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 var isValidCheckpoint = await this.GetCurrentWorkflowCheckpoint();
                 if (isValidCheckpoint == null)
                 {
-                   
+
                     operatorPageModel.IsMustRenderApplianceConfig = true;
                     operatorPageModel.ApplianceSessionContext = new ApplianceSessionContext();
                     operatorPageModel.ApplianceSessionContext.UserOid = this.GetUserOidFromUserClaims();
                     operatorPageModel.ApplianceSessionContext.AvailableSubscriptions = operatorPageModel.Subscriptions;
                     operatorPageModel.Tenantid = this.GetTenantIdFromUserClaims();
                     operatorPageModel.Oid = this.GetUserOidFromUserClaims();
-                    
+
                     log.LogWarning("null checkpoint. rendering config wizard");
                     return operatorPageModel;
                 }
@@ -291,7 +297,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 {
                     // found a context on the appliance
                     operatorPageModel.ApplianceSessionContext = applianceContext;
-                    
+
                     // use the subscription on appliance context
                     selectedSubscription = operatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
                     CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, selectedSubscription);
@@ -398,7 +404,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         OperatorPageModel.ImpersonationToken = impersonationResult.AccessToken;
 
                         eventualAccessToken = impersonationResult.AccessToken;
-                         // aud	
+                        // aud	
                         // iss	https://login.microsoftonline.com/{tenant}/v2.0
                         // scp	Manage.Appliance Storage.Account.List Storage.Account.Read Storage.Table.Delete Storage.Table.Entity.Delete Storage.Table.List user_impersonation
 
@@ -414,6 +420,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             catch (Exception e)
             {
                 log.LogError("problem building operator model {0}", e.Message);
+                throw;
             }
 
             return OperatorPageModel;
@@ -501,7 +508,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
         {
             List<AvailableCommand> ret = await EnsureWorkflowOperation(command);
 
-           
+
 
             return ret;
         }
@@ -574,7 +581,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                 log.LogInformation("got easyauth token from session = " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN));
                 ret = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
-              
+
             }
 
 
@@ -641,7 +648,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
         public async Task<ApplianceSessionContext> GetApplianceContext(string tenantId, string oid)
         {
-          
+
             var ret = new ApplianceSessionContext();
             try
             {
@@ -670,7 +677,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
         public async Task<ApplianceSessionContext> SetApplianceSessionContext(string tenantid, string oid, ApplianceSessionContext ctx)
         {
-             var url = await this.GetTemplateUrlForRoute(ControlChannelConstants.ApplianceContextEndpoint);
+            var url = await this.GetTemplateUrlForRoute(ControlChannelConstants.ApplianceContextEndpoint);
             log.LogTrace("getting appliance context from uri {0}", url);
 
             var json = JsonConvert.SerializeObject(ctx);
@@ -688,7 +695,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             log.LogInformation("Calling Appliance Auth Endpoint");
             try
             {
-               
+
                 HttpClient.DefaultRequestHeaders.Clear();
 
                 // TODO clean up the associated magic strings here there and everywhere
@@ -711,7 +718,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 log.LogInformation("calculated appliance auth url " + applianceUrl);
                 var request = new HttpRequestMessage(HttpMethod.Post, applianceUrl);
 
-              
+
 
                 var requestBody = @"{" +
                       @" ""id_token"" : """ +
@@ -870,68 +877,68 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
 
         private void ConfigureHttpClientHeaders()
-            {
-                var currentSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
-                var impersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
-                var token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
-                log.LogInformation("configuring dashboard rest client for call to appliance");
-                // var accessToken = await this.GetCurrentAccessToken();
-                log.LogInformation("got current access token X-ZUMO-AUTH =  " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN));
-                HttpClient.DefaultRequestHeaders.Clear();
-                // inject the azure ad app service easyauth token
-                // as per https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#validate-tokens-from-providers
-                HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_X_ZUMO_AUTH, new List<string>() { token });
-                HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION, currentSubscription);
-                HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_IMPERSONATION_TOKEN, impersonationToken);
+        {
+            var currentSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+            var impersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
+            var token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
+            log.LogInformation("configuring dashboard rest client for call to appliance");
+            // var accessToken = await this.GetCurrentAccessToken();
+            log.LogInformation("got current access token X-ZUMO-AUTH =  " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN));
+            HttpClient.DefaultRequestHeaders.Clear();
+            // inject the azure ad app service easyauth token
+            // as per https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#validate-tokens-from-providers
+            HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_X_ZUMO_AUTH, new List<string>() { token });
+            HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION, currentSubscription);
+            HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_IMPERSONATION_TOKEN, impersonationToken);
 
-            }
+        }
 
-            /// <summary>
-            /// enforce synchronous discoveries
-            /// therefore use the same ID every time for starting discoveries
-            /// </summary>
-            /// <param name="discoveryInstanceId"></param>
-            /// <returns></returns>
-            public EnvironmentDiscoveryResult StartEnvironmentDiscovery(string discoveryInstanceId = ControlChannelConstants.DefaultApplianceWorkflowInstanceId,
-                                                                        string startDiscoveryEndpoint = ControlChannelConstants.ApplicationControlChannelEndpoint)
-            {
-                return null;
-            }
+        /// <summary>
+        /// enforce synchronous discoveries
+        /// therefore use the same ID every time for starting discoveries
+        /// </summary>
+        /// <param name="discoveryInstanceId"></param>
+        /// <returns></returns>
+        public EnvironmentDiscoveryResult StartEnvironmentDiscovery(string discoveryInstanceId = ControlChannelConstants.DefaultApplianceWorkflowInstanceId,
+                                                                    string startDiscoveryEndpoint = ControlChannelConstants.ApplicationControlChannelEndpoint)
+        {
+            return null;
+        }
 
-            public EnvironmentDiscoveryResult GetEnvironmentDiscoveryResult(string discoveryInstanceId = ControlChannelConstants.DefaultApplianceWorkflowInstanceId)
-            {
-                return null;
-            }
+        public EnvironmentDiscoveryResult GetEnvironmentDiscoveryResult(string discoveryInstanceId = ControlChannelConstants.DefaultApplianceWorkflowInstanceId)
+        {
+            return null;
+        }
 
-            /// <summary>
-            /// apply the Storage Table retention policy 
-            /// computed during environment discovery by the appliance
-            /// </summary>
-            /// <returns></returns>
-            public TableStorageTableRetentionPolicyEnforcementResult ApplyComputedStorageTableRetentionPolicy()
-            {
-                return null;
-            }
+        /// <summary>
+        /// apply the Storage Table retention policy 
+        /// computed during environment discovery by the appliance
+        /// </summary>
+        /// <returns></returns>
+        public TableStorageTableRetentionPolicyEnforcementResult ApplyComputedStorageTableRetentionPolicy()
+        {
+            return null;
+        }
 
-            public TableStorageTableRetentionPolicyEnforcementResult GetApplyComputedStorageTableRetentionPolicyResult()
-            {
-                return null;
-            }
+        public TableStorageTableRetentionPolicyEnforcementResult GetApplyComputedStorageTableRetentionPolicyResult()
+        {
+            return null;
+        }
 
-            public TableStorageEntityRetentionPolicyEnforcementResult ApplyComputedStorageEntityRetentionPolicy()
-            {
-                return null;
-            }
+        public TableStorageEntityRetentionPolicyEnforcementResult ApplyComputedStorageEntityRetentionPolicy()
+        {
+            return null;
+        }
 
-            public TableStorageEntityRetentionPolicyEnforcementResult GetApplyComputedStorageEntityRetentionPolicyResult()
-            {
-                return null;
-            }
+        public TableStorageEntityRetentionPolicyEnforcementResult GetApplyComputedStorageEntityRetentionPolicyResult()
+        {
+            return null;
+        }
 
-            public async Task<List<AvailableCommand>> BeginWorkflow(AvailableCommand candidateCommand)
-            {
-                List<AvailableCommand> ret = await EnsureWorkflowOperation(candidateCommand);
-                return ret;
-            }
+        public async Task<List<AvailableCommand>> BeginWorkflow(AvailableCommand candidateCommand)
+        {
+            List<AvailableCommand> ret = await EnsureWorkflowOperation(candidateCommand);
+            return ret;
         }
     }
+}
