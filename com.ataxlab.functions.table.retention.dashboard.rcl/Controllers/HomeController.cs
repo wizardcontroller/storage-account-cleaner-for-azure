@@ -110,7 +110,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                     {
                         var clientId = Configuration["AzureAd:clientId"];
                         var tenantId = this.AzureManagementClient.GetTenantId();
-                        var consentUrl = $"https://login.microsoftonline.com/{tenantId}?prompt=adminconsent&client_id={clientId}";
+                        var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent&client_id={clientId}";
                         log.LogError($"no subscriptions: redirecting to consent url {consentUrl}");
                         return Redirect(consentUrl);
                     }
