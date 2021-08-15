@@ -413,7 +413,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 log.LogInformation($"claim Issuer is {c.Issuer}");
 
             }
-            tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Equals("tid")).FirstOrDefault()?.Value;
+            tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("tid")).FirstOrDefault()?.Value;
 
             return tenantId;
         }
