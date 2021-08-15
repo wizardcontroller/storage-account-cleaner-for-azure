@@ -211,6 +211,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 catch (Exception e)
                 {
                     log.LogError("error populating available subscriptions {0}", e.Message);
+                    // throw;
                 }
 
                 log.LogInformation("getting workflow checkpoint for user");
@@ -248,6 +249,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             catch (Exception e)
             {
                 operatorPageModel.IsMustRenderApplianceConfig = true;
+                
             }
 
             if (this.CurrentHttpContext.User.Identity.IsAuthenticated)

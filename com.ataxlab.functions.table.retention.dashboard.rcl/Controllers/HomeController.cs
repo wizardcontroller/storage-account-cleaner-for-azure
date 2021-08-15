@@ -99,12 +99,21 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                 if (User.Identity.IsAuthenticated)
                 {
+
                     var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
                     var idToken = await HttpContext.GetTokenAsync("id_token");
                     log.LogInformation($"id token ={idToken}");
                     log.LogInformation($"refreshToken token ={refreshToken}");
 
 
+                    if(OperatorPageModel.Subscriptions == null || OperatorPageModel.Subscriptions.Count() == 0)
+                    {
+                        var clientId = Configuration["AzureAd:clientId"];
+                        var tenantId = this.AzureManagementClient.GetTenantId();
+                        var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
+                        log.LogError($"no subscriptions: redirecting to consent url {consentUrl}");
+                        return Redirect(consentUrl);
+                    }
 
                     //var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
                     //if (expTime.DateTime < DateTime.UtcNow)
@@ -117,9 +126,9 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             }
             catch(Exception e)
             {
+
                 var clientId = Configuration["AzureAd:clientId"];
                 var tenantId = this.AzureManagementClient.GetTenantId();
-
                 var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
                 log.LogError($"redirecting to consent url {consentUrl}");
                 return Redirect(consentUrl);

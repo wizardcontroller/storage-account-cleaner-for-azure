@@ -191,6 +191,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
 
 
                 log.LogError("problem deserializing subscriptions {0}", e.Message);
+                throw;
             }
 
             return ret;
@@ -225,40 +226,49 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
         {
             var isTokenExpiring = await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN));
             string token = string.Empty;
-            Microsoft.Identity.Client.AuthenticationResult impersonationResult = null;
-            if (String.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
+
+            try
             {
-                // never had a token
+                Microsoft.Identity.Client.AuthenticationResult impersonationResult = null;
+                if (String.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
+                {
+                    // never had a token
 
-                //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                //    new List<string>() { "user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
+                    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                    //    new List<string>() { "user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
 
-                impersonationResult = await TokenAcquisitionHelper
-                    .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
-                // {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
-                token = impersonationResult.AccessToken;
+                    impersonationResult = await TokenAcquisitionHelper
+                        .GetAuthenticationResultForUserAsync(scopes: new List<string>()
+                        {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
+                    // {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
+                    token = impersonationResult.AccessToken;
 
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
+                    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
+                }
+                else if (await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
+                {
+                    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                    //    new List<string>() { "user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
+
+                    // token is nearing expiration 
+                    impersonationResult = await TokenAcquisitionHelper
+                                        .GetAuthenticationResultForUserAsync(scopes: new List<string>()
+                        {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
+                    // {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
+                    token = impersonationResult.AccessToken;
+
+                    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
+                }
+                else
+                {
+                    token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
+
+                }
             }
-            else if (await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
+            catch(Exception ex)
             {
-                //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                //    new List<string>() { "user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
-
-                // token is nearing expiration 
-                impersonationResult = await TokenAcquisitionHelper
-                                    .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
-                // {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
-                token = impersonationResult.AccessToken;
-
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
-            }
-            else
-            {
-                token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
-
+                log.LogError(ex.Message);
+                throw;
             }
 
             return token;
@@ -273,7 +283,8 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
         public async Task<string> GetSubscriptions()
         {
             string ret = string.Empty;
-            var token = await EnsureImpersonationToken();
+            var token = string.Empty;
+            
 
             try
             {
@@ -293,7 +304,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 //    }
 
                 // this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, token);
-
+                token = await EnsureImpersonationToken();
                 var jwtHandler = new JwtSecurityTokenHandler();
                 var jwtToken = jwtHandler.ReadJwtToken(token);
                 //var appidClaim = jwtToken.Claims.Where(w => w.Type.Equals("appid")).FirstOrDefault()?.Value;
@@ -325,24 +336,34 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 catch(Exception e)
                 {
                     log.LogError($"exception getting subscriptions {e.Message}");
+                    throw;
                 }
 
                 return content;
             }
             catch (MicrosoftIdentityWebChallengeUserException ex)
             {
-                await TokenAcquisitionHelper.ReplyForbiddenWithWwwAuthenticateHeaderAsync(new string[] { ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION }, ex.MsalUiRequiredException);
+                // await TokenAcquisitionHelper.ReplyForbiddenWithWwwAuthenticateHeaderAsync(new string[] { ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION }, ex.MsalUiRequiredException);
                 // return string.Empty;
+
+                log.LogError(ex.Message);
+                throw;
             }
             catch (MsalUiRequiredException ex)
             {
-                await TokenAcquisitionHelper.ReplyForbiddenWithWwwAuthenticateHeaderAsync(new string[] { ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION }, ex);
+                // await TokenAcquisitionHelper.ReplyForbiddenWithWwwAuthenticateHeaderAsync(new string[] { ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION }, ex);
                 //return string.Empty;
+
+                log.LogError(ex.Message);
+                throw;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log.LogError(e.Message);
+                log.LogError(ex.Message);
+                throw;
+
             }
+
             return ret;
         }
 
