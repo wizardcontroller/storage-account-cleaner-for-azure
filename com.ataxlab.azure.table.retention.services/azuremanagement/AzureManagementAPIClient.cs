@@ -381,32 +381,32 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
             log.LogInformation("getting tenant id from user claims");
             var configuredTenantId = Configuration["AzureAd:TenantId"];
 
-            if(isMultitenantShim)
-            {
-                // return tenant id from claims
-                 var stsUrl = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("identityprovider")).FirstOrDefault()?.Value;
-                var splitStsUrl = stsUrl.Split("https://sts.windows.net/");
-                tenantId = splitStsUrl.LastOrDefault().TrimEnd('/');
-                return tenantId;
-            }
+            //if(isMultitenantShim)
+            //{
+            //    // return tenant id from claims
+            //     var stsUrl = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("identityprovider")).FirstOrDefault()?.Value;
+            //    var splitStsUrl = stsUrl.Split("https://sts.windows.net/");
+            //    tenantId = splitStsUrl.LastOrDefault().TrimEnd('/');
+            //    return tenantId;
+            //}
 
-            if(configuredTenantId.Contains("organizations"))
-            {
-                // return tenant id from claims
-                // var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
-                var stsUrl = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("identityprovider")).FirstOrDefault()?.Value;
-                log.LogInformation($"sts url = {stsUrl}");
-                var splitStsUrl = stsUrl.Split("https://sts.windows.net/");
-                tenantId = splitStsUrl.LastOrDefault().TrimEnd('/');
-            }
-            else
-            {
-                log.LogInformation($"using configured tenantid");
-                // single tenant return tenantid from configuration
-                tenantId = configuredTenantId;
-            }
+            //if(configuredTenantId.Contains("organizations"))
+            //{
+            //    // return tenant id from claims
+            //    // var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(ControlChannelConstants.CLAIM_TENANT_UTID)).FirstOrDefault()?.Value;
+            //    var stsUrl = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("identityprovider")).FirstOrDefault()?.Value;
+            //    log.LogInformation($"sts url = {stsUrl}");
+            //    var splitStsUrl = stsUrl.Split("https://sts.windows.net/");
+            //    tenantId = splitStsUrl.LastOrDefault().TrimEnd('/');
+            //}
+            //else
+            //{
+            //    log.LogInformation($"using configured tenantid");
+            //    // single tenant return tenantid from configuration
+            //    tenantId = configuredTenantId;
+            //}
+            tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains("tid")).FirstOrDefault()?.Value;
 
-  
             return tenantId;
         }
 
