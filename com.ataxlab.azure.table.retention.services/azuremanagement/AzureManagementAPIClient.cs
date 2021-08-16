@@ -34,8 +34,8 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
 {
     public interface IAzureManagementAPIClient
     {
-        public Task<string> GetSubscriptions();
-        public Task<List<SubscriptionDTO>> GetSubscriptionsForLoggedInUser();
+        public Task<string> GetSubscriptions(string token = "");
+        public Task<List<SubscriptionDTO>> GetSubscriptionsForLoggedInUser(string token = "");
 
         public Task<String> EnsureImpersonationToken();
         Task<List<FunctionEnvelope>> DiscoverAppliancesForSubscriptions(string subscriptionId);
@@ -160,7 +160,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
             return ret;
         }
 
-        public async Task<List<SubscriptionDTO>> GetSubscriptionsForLoggedInUser()
+        public async Task<List<SubscriptionDTO>> GetSubscriptionsForLoggedInUser(string token = "")
         {
             var ret = new List<SubscriptionDTO>();
             try
@@ -169,7 +169,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 var tenantResponse = await tenantJson.FromJSONStringAsync<TenantResponse>();
 
                 log.LogInformation("getting subscriptions for current user");
-                var subscriptions = await GetSubscriptions();
+                var subscriptions = await GetSubscriptions(token);
                 var response = await subscriptions.FromJSONStringAsync<SubscriptionResponse>();
                 // decorate the dto with the user who made the request
                 if (response != null)
@@ -240,7 +240,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                     // never had a token
 
                     token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: CurrentHttpContext.User);
+                        new List<string>() { mgmtScope });
 
 
                     //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
@@ -257,7 +257,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 else if (await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
                 {
                     token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { "user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
+                        new List<string>() { "/user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
 
                     // token is nearing expiration 
                     //impersonationResult = await TokenAcquisitionHelper
@@ -357,16 +357,17 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
             return ret;
         }
 
-        public async Task<string> GetSubscriptions()
+        public async Task<string> GetSubscriptions(string token = "")
         {
             string ret = string.Empty;
-            var token = string.Empty;
-
-
             try
             {
 
-                token = await EnsureImpersonationToken();
+                if (String.IsNullOrEmpty(token))
+                {
+                    token = await EnsureImpersonationToken();
+                }
+
                 var jwtHandler = new JwtSecurityTokenHandler();
                 var jwtToken = jwtHandler.ReadJwtToken(token);
 

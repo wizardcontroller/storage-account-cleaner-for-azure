@@ -26,7 +26,7 @@ namespace com.ataxlab.azure.table.retention.models.models.auth
                                         }
                                       }
 
-        public string[] DefaultApplianceScope { get { return new string[] { String.Format("{0}/.default", ApplianceAppUri), String.Format("{0}/offline_access", ApplianceAppUri) }; } }
+        public string[] DefaultApplianceScope { get { return new string[] { String.Format("{0}/user_impersonation", ApplianceAppUri), String.Format("{0}/offline_access", ApplianceAppUri) }; } }
         public string[] ApplianceUserImpersonationScope { get { return new string[] { String.Format("{0}/user_impersonation", ApplianceAppUri) }; } }
 
         public string StorageAccountRead { get { return String.Format("{0}/Storage.Account.Read", ApplianceAppUri); } } 

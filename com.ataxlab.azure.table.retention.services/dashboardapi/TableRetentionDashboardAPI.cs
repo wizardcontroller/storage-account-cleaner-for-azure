@@ -154,7 +154,16 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             {
                 try
                 {
-                    operatorPageModel = await EnsureAuthScopesforOperatorPageModel();
+                    try
+                    {
+                        operatorPageModel = await EnsureAuthScopesforOperatorPageModel();
+                    }
+                    catch(Exception e)
+                    {
+                        log.LogError($"problem ensuring access tokens for page model");
+                        throw;
+                    }
+
                     oid = GetUserOidFromUserClaims();
                     tenantid = GetTenantIdFromUserClaims();
 
@@ -203,7 +212,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 try
                 {
                     log.LogTrace("getting subscriptions for logged in user");
-                    var subscriptionsResult = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
+                    var token = await this.TokenAcquisitionHelper.GetAccessTokenForUserAsync(new string[] { "https://management.azure.com/user_impersonation"});
+
+                    var subscriptionsResult = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser(token);
                     operatorPageModel.Subscriptions = subscriptionsResult;
 
                     log.LogTrace("got subscriptions for logged in user");
@@ -401,6 +412,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
         {
             OperatorPageModel OperatorPageModel = new OperatorPageModel();
             var eventualAccessToken = string.Empty;
+            TokenAcquisitionOptions opts = new TokenAcquisitionOptions();
             try
             {
 
@@ -411,14 +423,22 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     var appUri = Configuration["ApplianceAppUri"];
                     var eachScope = new List<string>()
-                    { appUri + "/.default" };
+                    { appUri + "/user_impersonation" , "user.read", "openid",
+                        ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION};
+
+                    var id_token = await this.CurrentHttpContext.GetTokenAsync("id_token");
+                    var refresh_token = await this.CurrentHttpContext.GetTokenAsync("refresh_token");
+                    var token = await this.CurrentHttpContext.GetTokenAsync("access_token");
+ 
+
+
                     foreach (var s in eachScope)
                     {
                         //    AuthenticationResult impersonationResult = await TokenAcquisitionHelper
 
                         //                                .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, this.GetTenantIdFromUserClaims());
 
-                        var token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s });
+                        token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s });
 
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, token);
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, token); // NOT REALLY
@@ -430,6 +450,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         // scp	Manage.Appliance Storage.Account.List Storage.Account.Read Storage.Table.Delete Storage.Table.Entity.Delete Storage.Table.List user_impersonation
 
                     }
+
                 }
 
                 OperatorPageModel.EasyAuthAccessToken = await this.EnsureEasyAuth();
