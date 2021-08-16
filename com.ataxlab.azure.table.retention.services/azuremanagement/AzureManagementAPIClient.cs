@@ -241,7 +241,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
 
 
                     token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { mgmtScope }, tenantId : this.GetTenantId());
+                        new List<string>() { mgmtScope });
 
                     //impersonationResult = await TokenAcquisitionHelper
                     //    .GetAuthenticationResultForUserAsync(scopes: new List<string>()
@@ -265,7 +265,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
 
 
                     token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { mgmtScope }, tenantId: this.GetTenantId());
+                        new List<string>() { mgmtScope });
 
                     CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
                 }

@@ -396,9 +396,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     log.LogInformation("initializing Session.UserToken");
 
-                    var appUri = Configuration["Dashboard:AppUri"]; //  Configuration["ApplianceAppUri"]
+                    var appUri = Configuration["ApplianceAppUri"];
                     var eachScope = new List<string>()
-                    { appUri + "/user_impersonation" };
+                    { appUri + "/.default" };
                     foreach (var s in eachScope)
                     {
                         //    AuthenticationResult impersonationResult = await TokenAcquisitionHelper
