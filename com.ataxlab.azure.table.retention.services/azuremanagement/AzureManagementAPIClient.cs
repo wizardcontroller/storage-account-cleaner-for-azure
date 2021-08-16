@@ -165,6 +165,9 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
             var ret = new List<SubscriptionDTO>();
             try
             {
+                var tenantJson = await this.GetTenants();
+                var tenantResponse = await tenantJson.FromJSONStringAsync<TenantResponse>();
+
                 log.LogInformation("getting subscriptions for current user");
                 var subscriptions = await GetSubscriptions();
                 var response = await subscriptions.FromJSONStringAsync<SubscriptionResponse>();
@@ -236,12 +239,12 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 {
                     // never had a token
 
-                    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                    //    new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: CurrentHttpContext.User);
-
-
                     token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { mgmtScope });
+                        new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: CurrentHttpContext.User);
+
+
+                    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                    //    new List<string>() { mgmtScope });
 
                     //impersonationResult = await TokenAcquisitionHelper
                     //    .GetAuthenticationResultForUserAsync(scopes: new List<string>()
@@ -253,8 +256,8 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 }
                 else if (await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
                 {
-                    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                    //    new List<string>() { "user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
+                    token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                        new List<string>() { "user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
 
                     // token is nearing expiration 
                     //impersonationResult = await TokenAcquisitionHelper
@@ -264,8 +267,8 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                     //token = impersonationResult.AccessToken;
 
 
-                    token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { mgmtScope });
+                    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                    //    new List<string>() { mgmtScope });
 
                     CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
                 }
@@ -289,6 +292,70 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
             return new MediaTypeWithQualityHeaderValue("application/json");
         }
 
+        public async Task<string> GetTenants()
+        {
+            string ret = string.Empty;
+            var token = string.Empty;
+
+
+            try
+            {
+
+                token = await EnsureImpersonationToken();
+                var jwtHandler = new JwtSecurityTokenHandler();
+                var jwtToken = jwtHandler.ReadJwtToken(token);
+
+                this.CurrentHttpClient.DefaultRequestHeaders.Clear();
+
+                this.CurrentHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token); // .Add("Authorization", "Bearer " + token);
+                this.CurrentHttpClient.DefaultRequestHeaders.Add("Host", "management.azure.com");
+                this.CurrentHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var request = new HttpRequestMessage(HttpMethod.Get, "/tenants?api-version=2020-01-01");
+                log.LogInformation("request message configured for management rest {0}", this.CurrentHttpClient.BaseAddress.AbsoluteUri.ToString());
+
+                var content = string.Empty;
+                try
+                {
+                    var response = await this.CurrentHttpClient.SendAsync(request);
+
+                    response.EnsureSuccessStatusCode();
+
+                    content = await response.Content.ReadAsStringAsync();
+
+                }
+                catch (Exception e)
+                {
+                    log.LogError($"exception getting subscriptions {e.Message}");
+                    throw;
+                }
+
+                return content;
+            }
+            catch (MicrosoftIdentityWebChallengeUserException ex)
+            {
+                // await TokenAcquisitionHelper.ReplyForbiddenWithWwwAuthenticateHeaderAsync(new string[] { ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION }, ex.MsalUiRequiredException);
+                // return string.Empty;
+
+                log.LogError(ex.Message);
+                throw;
+            }
+            catch (MsalUiRequiredException ex)
+            {
+                // await TokenAcquisitionHelper.ReplyForbiddenWithWwwAuthenticateHeaderAsync(new string[] { ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION }, ex);
+                //return string.Empty;
+
+                log.LogError(ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex.Message);
+                throw;
+
+            }
+
+            return ret;
+        }
 
         public async Task<string> GetSubscriptions()
         {
@@ -298,32 +365,10 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
 
             try
             {
-                //    if(String.IsNullOrEmpty(HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
-                //    {
 
-                //        impersonationResult = await TokenAcquisitionHelper
-                //            .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                //        {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
-                //        token = impersonationResult.AccessToken;
-
-                //        HttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
-                //    }
-                //    else
-                //    {
-                //        token = HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
-                //    }
-
-                // this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, token);
                 token = await EnsureImpersonationToken();
                 var jwtHandler = new JwtSecurityTokenHandler();
                 var jwtToken = jwtHandler.ReadJwtToken(token);
-                //var appidClaim = jwtToken.Claims.Where(w => w.Type.Equals("appid")).FirstOrDefault()?.Value;
-                // var audClaim = jwtToken.Claims.Where(w => w.Type.Equals("aud")).FirstOrDefault()?.Value;
-                //string authorityUri = "https://login.windows.net/common/oauth2/authorize";
-                //AuthenticationContext authContext = new AuthenticationContext(authorityUri);
-                //var authenticationResult = 
-                //    await authContext.AcquireTokenAsync(ControlChannelConstants.USERIMPERSONATION,
-                //            new ClientAssertion(appidClaim, token)); 
 
                 this.CurrentHttpClient.DefaultRequestHeaders.Clear();
 

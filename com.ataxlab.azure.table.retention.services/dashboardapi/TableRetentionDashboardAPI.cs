@@ -300,8 +300,21 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     // found a context on the appliance
                     operatorPageModel.ApplianceSessionContext = applianceContext;
 
-                    // use the subscription on appliance context
-                    selectedSubscription = operatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
+                    // maybe don't use the subscription on appliance context
+                    // selectedSubscription = this.AzureManagementAPIClient.GetSubscriptions() // operatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
+                    var subscriptions = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
+                    if(subscriptions == null || subscriptions.Count() == 0)
+                    {
+                        operatorPageModel.ApplianceSessionContext.UserOid = oid;
+                        operatorPageModel.IsMustRenderApplianceConfig = true;
+                    }
+                    else
+                    {
+                        // todo - deploy user interface subscription chooser
+                        // for use prior to selection of an appliance context
+                        selectedSubscription = subscriptions.First().subscriptionId;
+                    }
+
                     CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, selectedSubscription);
                     operatorPageModel.SubscriptionId = selectedSubscription;
                     operatorPageModel.SelectedSubscriptionId = selectedSubscription;
@@ -595,7 +608,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN)))
             {
                 log.LogInformation(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN + " not found in session. getting current access token");
-                var tenantId = Configuration["AzureAd:TenantId"];
+                var tenantId = this.GetTenantIdFromUserClaims(); // Configuration["AzureAd:TenantId"];
                 // user.read is good for getting a graph token for the graph api audience, which is this 00000003-0000-0000-c000-000000000000"
                 log.LogInformation("tenant id " + tenantId);
 
@@ -629,6 +642,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             var result = string.Empty;
             Microsoft.Identity.Client.AuthenticationResult impersonationResult = null;
             var currentToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN);
+            var tenantId = this.GetTenantIdFromUserClaims();
             if (string.IsNullOrEmpty(currentToken))
             {
                 log.LogInformation("initializing Session.UserToken");
@@ -640,7 +654,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 foreach (var s in eachScope)
                 {
                     impersonationResult = await TokenAcquisitionHelper
-                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: Configuration["AzureAd:TenantId"]);
+                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: tenantId);
                 }
 
                 CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
