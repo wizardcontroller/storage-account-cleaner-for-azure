@@ -249,7 +249,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             catch (Exception e)
             {
                 operatorPageModel.IsMustRenderApplianceConfig = true;
-                
+
             }
 
             if (this.CurrentHttpContext.User.Identity.IsAuthenticated)
@@ -390,22 +390,28 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             var eventualAccessToken = string.Empty;
             try
             {
+
                 if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN)))
                 {
 
                     log.LogInformation("initializing Session.UserToken");
+
+                    var appUri = Configuration["Dashboard:AppUri"]; //  Configuration["ApplianceAppUri"]
                     var eachScope = new List<string>()
-                    {  Configuration["ApplianceAppUri"] + "/.default" };
+                    { appUri + "/user_impersonation" };
                     foreach (var s in eachScope)
                     {
-                        AuthenticationResult impersonationResult = await TokenAcquisitionHelper
-                                                    //.GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, GetTenantIdFromUserClaims());
-                                                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, Configuration["AzureAd:TenantId"]);
-                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
-                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken);
-                        OperatorPageModel.ImpersonationToken = impersonationResult.AccessToken;
+                        //    AuthenticationResult impersonationResult = await TokenAcquisitionHelper
 
-                        eventualAccessToken = impersonationResult.AccessToken;
+                        //                                .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, this.GetTenantIdFromUserClaims());
+
+                        var token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s });
+
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, token);
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, token); // NOT REALLY
+                        OperatorPageModel.ImpersonationToken = token;
+
+                        eventualAccessToken = token;
                         // aud	
                         // iss	https://login.microsoftonline.com/{tenant}/v2.0
                         // scp	Manage.Appliance Storage.Account.List Storage.Account.Read Storage.Table.Delete Storage.Table.Entity.Delete Storage.Table.List user_impersonation

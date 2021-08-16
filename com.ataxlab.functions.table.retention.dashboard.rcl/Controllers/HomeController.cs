@@ -16,9 +16,11 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Management.Network.Fluent.Models;
+using Microsoft.Azure.Management.ResourceManager.Fluent.Core.DAG;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
@@ -27,15 +29,22 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+using static System.Formats.Asn1.AsnWriter;
+using static System.Net.WebRequestMethods;
 
 namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 {
 
-    [AuthorizeForScopes(Scopes = new[] { "/.default" })]
+    [AuthorizeForScopes(Scopes = new[] { "https://management.azure.com/user_impersonation", "user.read" })]
     [Route("[controller]/[action]/{oid?}/{subscriptionId?}/{tenantid?}/{workflowoperation?}/{commandId?}")]
     [EnableCors("CorsPolicy")]
     [Authorize]
@@ -50,7 +59,9 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
         public ITableRetentionDashboardAPI ApplianceClient { get; set; }
         public IAzureManagementAPIClient AzureManagementClient { get; set; }
-        public HomeController(ITableRetentionDashboardAPI dashboardClient,
+        public ITokenAcquisition TokenAcquisition { get; }
+
+        public HomeController(ITableRetentionDashboardAPI dashboardClient, ITokenAcquisition tokenAcquisition,
                               IAzureManagementAPIClient azureMgmtClient, IConfiguration config,
                               TableRetentionApplianceScopes requiredScopes,
                                 ILogger<HomeController> logger)
@@ -59,7 +70,21 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             log = logger;
             Configuration = config;
             this.AzureManagementClient = azureMgmtClient;
+            this.TokenAcquisition = tokenAcquisition;
             TableRetentionApplianceScopes = requiredScopes;
+        }
+
+        [HttpGet(Name = "adminconsent")]
+        [Route("/adminconsent")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [AllowAnonymous]
+        public async Task<IActionResult> AdminConsent(string tenant, string state, bool admin_consent)
+        {
+            int i = 0;
+            var token = this.TokenAcquisition.GetAccessTokenForUserAsync(new[] { "https://management.azure.com/user_impersonation"});
+            string promptConsentUrl = GetDefaultScopeAdminConsentUrl(); // GetAzureManagementPromptConsentUrl();
+            return Redirect(promptConsentUrl);
+
         }
 
         [HttpGet(Name = "Index")]
@@ -106,14 +131,13 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                     log.LogInformation($"refreshToken token ={refreshToken}");
 
 
-                    if(OperatorPageModel.Subscriptions == null || OperatorPageModel.Subscriptions.Count() == 0)
+                    if (OperatorPageModel.Subscriptions == null || OperatorPageModel.Subscriptions.Count() == 0)
                     {
-                        var clientId = Configuration["AzureAd:clientId"];
-                        var tenantId = this.AzureManagementClient.GetTenantId();
-                        // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
-                        var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
-                        log.LogError($"no subscriptions: redirecting to consent url {consentUrl}");
-                        return Redirect(consentUrl);
+                        // if you got here the user is authorized to get subscriptions
+                        // and found none
+                        var token = this.TokenAcquisition.GetAccessTokenForUserAsync(new string[] { "https://management.azure.com/user_impersonation" });
+                        string promptConsentUrl = this.GetManagementAuthorizeUrl();
+                        return Redirect(promptConsentUrl);
                     }
 
                     //var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
@@ -125,19 +149,130 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                 log.LogInformation("home controller has easy auth token = " + OperatorPageModel.EasyAuthAccessToken);
             }
-            catch(Exception e)
+            catch(MicrosoftIdentityWebChallengeUserException e)
             {
-
-                var clientId = Configuration["AzureAd:clientId"];
-                var tenantId = this.AzureManagementClient.GetTenantId();
-                // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
-                var consentUrl = $"https://login.microsoftonline.com/{tenantId}/adminconsent?client_id={clientId}";
-                log.LogError($"redirecting to consent url {consentUrl}");
-                return Redirect(consentUrl);
+                if (e.InnerException.Message.Contains("AADSTS65001"))
+                {
+                    // show consent prompt
+                    // to deploy service principal for the app
+                    // to the target tenant
+                    string msalUiUrl = GetAdminConsentPrompt();
+                    return Redirect(msalUiUrl);
+                }
+            }
+            catch (Exception e)
+            {
+                string promptConsentUrl = GetManagementAuthorizeUrl();
+                return Redirect(promptConsentUrl);
             }
 
             return View(OperatorPageModel);
         }
+
+
+        [HttpGet(Name = "azuremgmtauth")]
+        [Route("/azuremgmtauth")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [AllowAnonymous]
+        public async Task<IActionResult> AzureManagementAuth(string code)
+        {
+            int i = 0;
+            var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
+            using (var client = new HttpClient())
+            {
+                var json = JsonConvert.SerializeObject("");
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+                var url = this.GetManagementCodeRedemptionUrl(code);
+                var response = await client.PostAsync(url, data);
+            }
+
+            return View("Index");
+
+        }
+
+        private string GetManagementCodeRedemptionUrl(string code)
+        {
+            var url = string.Empty;
+            var clientId  = "x";
+            var clientSecret = HttpUtility.UrlEncode("");
+            var scope = HttpUtility.UrlEncode("https://management.azure.com/user_impersonation");
+            var redirectUri = HttpUtility.UrlEncode("");
+            var tenantId = "";
+
+            url = $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token?client_id={clientId}&scope={scope}&code={code}&redirect_uri={redirectUri}&grant_type=authorization_code" +
+                $"& code_verifier=ThisIsntRandomButItNeedsToBe43CharactersLong&client_secret={clientSecret}";
+            return url;
+        }
+
+        private string GetManagementAuthorizeUrl()
+        {
+            using (SHA256 mySHA256 = SHA256.Create())
+            {
+                var clientId = Configuration["AzureAd:clientId"];
+                var tenantId = this.AzureManagementClient.GetTenantId();
+                var redirect = HttpUtility.UrlEncode($"https://{this.Request.Host}/azuremgmtauth");
+                var scope = HttpUtility.UrlEncode("https://management.azure.com/user_impersonation");
+                var state = new Random().Next();
+                var sha256 = mySHA256.ComputeHash(Encoding.ASCII.GetBytes(state.ToString())).ToString();
+                var urlTemplate = $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize?" +
+                    $"client_id={clientId}" +
+                    $"&response_type=code" +
+                    $"&redirect_uri={redirect}" +
+                    $"&scope={scope}" +
+                    $"&state={state}&code_challenge={sha256}" +
+                    $"&code_challenge_method=S256";
+                // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
+
+                // as per 
+                // https://stackoverflow.com/questions/39582510/azure-ad-prompt-user-admin-to-re-consent-after-changing-application-permissions
+                var promptConsentUrl = $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize?client_id={clientId}&redirect_uri={redirect}&scope={scope}&state={state}";
+
+                log.LogError($"no subscriptions: redirecting to consent url {promptConsentUrl}");
+                return promptConsentUrl;
+            }
+        }
+
+
+        private string GetAdminConsentPrompt()
+        {
+            var clientId = Configuration["AzureAd:clientId"];
+            var tenantId = this.AzureManagementClient.GetTenantId();
+            var redirect = $"https://{this.Request.Host}/adminconsent";
+            var scope = $"openid+profile";
+            var state = new Random().Next();
+            // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
+            var consentUrl = $"https://login.microsoftonline.com/{tenantId}/v2.0/adminconsent?client_id={clientId}&redirect_uri={redirect}&scope={scope}&state={state}";
+            var notpromptConsentUrl = $"https://login.microsoftonline.com/{tenantId}/v2.0?prompt=consent?client_id={clientId}&redirect_uri={redirect}&scope={scope}&state={state}";
+
+            // as per 
+            // https://stackoverflow.com/questions/39582510/azure-ad-prompt-user-admin-to-re-consent-after-changing-application-permissions
+            var promptConsentUrl = $"https://login.microsoftonline.com/{tenantId}/v2.0/adminconsent?client_id={clientId}&redirect_uri={redirect}&scope={scope}&state={state}";
+
+            log.LogError($"no subscriptions: redirecting to consent url {promptConsentUrl}");
+            return promptConsentUrl;
+        }
+
+        private string GetDefaultScopeAdminConsentUrl()
+        {
+            var dashboardAppUri = Configuration["Dashboard:AppUri"];
+            var clientId = Configuration["AzureAd:clientId"];
+            var tenantId = this.AzureManagementClient.GetTenantId();
+            var redirect = $"https://{this.Request.Host}";
+            var scope = HttpUtility.UrlEncode($"https://management.azure.com/user_impersonation");
+            var state = new Random().Next();
+            // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
+            var consentUrl = $"https://login.microsoftonline.com/{tenantId}/v2.0/adminconsent?client_id={clientId}&redirect_uri={redirect}&scope={scope}&state={state}";
+            var notpromptConsentUrl = $"https://login.microsoftonline.com/{tenantId}/v2.0?prompt=consent?client_id={clientId}&redirect_uri={redirect}&scope={scope}&state={state}";
+
+            // as per 
+            // https://stackoverflow.com/questions/39582510/azure-ad-prompt-user-admin-to-re-consent-after-changing-application-permissions
+            var promptConsentUrl = $"https://login.microsoftonline.com/{tenantId}/v2.0/adminconsent?client_id={clientId}&redirect_uri={redirect}&scope={scope}";
+
+            log.LogError($"no subscriptions: redirecting to consent url {promptConsentUrl}");
+            return promptConsentUrl;
+        }
+
+
 
         private async Task<OperatorPageModel> InitializeOperatorPageModel()
         {
@@ -577,16 +712,6 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         public async Task<IActionResult> Operator()
         {
             OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
-
-            if (User.Identity.IsAuthenticated)
-            {
-                if (OperatorPageModel.ImpersonationToken == null)
-                {
-                    return Redirect("/MicrosoftIdentity/Account/SignIn?prompt=consent");
-                }
-
-
-            }
 
             //ViewData["EasyAuthAccessToken"] = await this.ApplianceClient.EnsureEasyAuth(); //await ApplianceClient.GetCurrentAccessToken(HttpContext);
             return View(nameof(Operator), OperatorPageModel);
