@@ -212,7 +212,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 try
                 {
                     log.LogTrace("getting subscriptions for logged in user");
-                    var token = await this.TokenAcquisitionHelper.GetAccessTokenForUserAsync(new string[] { "https://management.azure.com/user_impersonation"});
+                    var token = await this.TokenAcquisitionHelper.GetAccessTokenForUserAsync(new string[] { "https://management.azure.com/user_impersonation"}, tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
 
                     var subscriptionsResult = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser(token);
                     operatorPageModel.Subscriptions = subscriptionsResult;
@@ -423,7 +423,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     var appUri = Configuration["ApplianceAppUri"];
                     var eachScope = new List<string>()
-                    { appUri + "/user_impersonation" , "user.read", "openid",
+                    { appUri + "/user_impersonation" , 
                         ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION};
 
                     var id_token = await this.CurrentHttpContext.GetTokenAsync("id_token");
@@ -438,7 +438,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                         //                                .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, this.GetTenantIdFromUserClaims());
 
-                        token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s });
+                        token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s } ,tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
 
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, token);
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, token); // NOT REALLY

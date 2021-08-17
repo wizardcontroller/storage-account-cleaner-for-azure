@@ -240,7 +240,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                     // never had a token
 
                     token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { mgmtScope });
+                        new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User) ;
 
 
                     //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
