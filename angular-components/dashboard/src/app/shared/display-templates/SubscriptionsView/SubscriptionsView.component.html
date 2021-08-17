@@ -4,8 +4,8 @@
     <fieldset style="float:initial" title="Appliance Summary">
     <ng-container *ngIf="subscriptions$ | async as availableSubscriptions else noSubscriptions">
       <ng-container  >
-        <span>Tenant: {{ operatorPageModel.applianceSessionContext?.tenantId }}</span>
-        <span>Operator OID: {{ operatorPageModel.applianceSessionContext?.userOid}}</span>
+        <span>Tenant: {{ operatorPageModel.tenantid }}</span>
+        <span>Operator OID: {{ operatorPageModel.oid}}</span>
         <hr/>
       </ng-container>
       <p-table

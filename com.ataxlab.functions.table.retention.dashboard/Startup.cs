@@ -282,7 +282,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
             services.AddSession(opts =>
             {
                 
-                opts.IdleTimeout = TimeSpan.FromSeconds(10);
+                //opts.IdleTimeout = TimeSpan.FromSeconds(10);
                 opts.Cookie.HttpOnly = false;
                 opts.Cookie.IsEssential = true;
 

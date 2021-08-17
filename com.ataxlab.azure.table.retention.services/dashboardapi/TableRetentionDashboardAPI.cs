@@ -451,6 +451,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                 }
 
+                OperatorPageModel.AccessToken = eventualAccessToken;
                 OperatorPageModel.EasyAuthAccessToken = await this.EnsureEasyAuth();
                 Debug.WriteLine("easyauth token is {0}", OperatorPageModel.EasyAuthAccessToken);
                 // iss	https://easyauthsite.azurewebsites.net/

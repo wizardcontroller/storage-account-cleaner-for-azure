@@ -34,6 +34,7 @@ namespace com.ataxlab.azure.table.retention.models.models.pagemodel
         public string ApplianceAPIEndPoint { get; set; }
         public string EasyAuthAccessToken { get; set; }
 
+        public string AccessToken { get; set; }
         /// <summary>
         /// populated route template for consumption
         /// by client side ajax
