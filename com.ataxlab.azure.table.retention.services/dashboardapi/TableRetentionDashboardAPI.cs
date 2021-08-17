@@ -423,11 +423,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     var appUri = Configuration["ApplianceAppUri"];
                     var eachScope = new List<string>()
-                    { appUri + "/user_impersonation" , 
-                        ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION};
+                    // { appUri + "/user_impersonation",  ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION};
+                    { appUri + "/user_impersonation"};
 
-                    var id_token = await this.CurrentHttpContext.GetTokenAsync("id_token");
-                    var refresh_token = await this.CurrentHttpContext.GetTokenAsync("refresh_token");
                     var token = await this.CurrentHttpContext.GetTokenAsync("access_token");
  
 
@@ -669,7 +667,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 log.LogInformation("initializing Session.UserToken");
                 var eachScope = new List<string>()
                     {
-                        Configuration["ApplianceAppUri"] + "/user_impersonation",
+                    Configuration["Dashboard:AppUri"] + "/user_impersonation",
+                        // Configuration["ApplianceAppUri"] + "/user_impersonation",
                         ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION
                     };
                 foreach (var s in eachScope)
