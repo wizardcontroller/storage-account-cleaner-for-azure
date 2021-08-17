@@ -230,7 +230,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
             url = $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token?client_id={clientId}&scope={scope}&code={code}&redirect_uri={redirectUri}&grant_type=authorization_code" +
                 $"& code_verifier={codeVerifier}&client_secret={clientSecret}";
-            //return url;
+            return url;
         }
 
         private string GetManagementAuthorizeUrl()
