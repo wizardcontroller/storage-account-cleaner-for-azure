@@ -72,7 +72,7 @@ export class AppComponent
 
       try{
 
-        const decodedJwt = jwt_decode(data.easyAuthAccessToken as string);
+        const decodedJwt = jwt_decode(data.accessToken as string);
         // console.log("jwt decoded as " + JSON.stringify(decodedJwt));
 
         const jsonToken = JSON.parse(JSON.stringify(decodedJwt as string));

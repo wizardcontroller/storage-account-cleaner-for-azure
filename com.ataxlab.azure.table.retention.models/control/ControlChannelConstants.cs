@@ -137,6 +137,7 @@ namespace com.ataxlab.azure.table.retention.models.control
         public const string HEADER_IMPERSONATION_TOKEN = "x-table-retention-mgmt-impersonation";
         public const string HEADER_AUTHORIZATION = "authorization";
         public const string HEADER_X_ZUMO_AUTH = "X-ZUMO-AUTH";
+        public const string HEADER_ACCESS_TOKEN = "x-table-retention-access-token";
         public const string HEADER_X_MS_TOKEN_AAD_ACCESS_TOKEN = "x-ms-token-aad-access-token";
 
         #endregion authorization

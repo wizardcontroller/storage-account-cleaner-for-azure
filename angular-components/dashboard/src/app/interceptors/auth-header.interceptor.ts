@@ -22,8 +22,8 @@ export class AuthHeaderInterceptor implements HttpInterceptor, OnDestroy {
   private HEADER_IMPERSONATION_TOKEN = 'x-table-retention-mgmt-impersonation';
   private HEADER_X_ZUMO_AUTH = 'X-ZUMO-AUTH';
   private HEADER_CURRENTSUBSCRIPTION = 'x-table-retention-current-subscription';
-  private HEADER_CURRENT_STORAGE_ACCOUNT =
-    'x-table-retention-current-storage-account';
+  private HEADER_CURRENT_STORAGE_ACCOUNT ='x-table-retention-current-storage-account';
+  private HEADER_ACCESS_TOKEN = 'x-table-retention-access-token';
   private interceptorIsReady: boolean = false;
   private selectedStorageAccount!: string;
 
@@ -32,7 +32,7 @@ export class AuthHeaderInterceptor implements HttpInterceptor, OnDestroy {
 
     this.apiConfigSvc.operatorPageModelChanges$.subscribe((data) => {
       console.log("auth interceptor has easyauth token: " + data.easyAuthAccessToken);
-      console.log("auth interceptor has impersonation token: " + data.impersonationToken);
+      console.log("auth interceptor has access token: " + data.accessToken);
       this.pageModel = data;
       this.applianceUrl = this.pageModel?.applianceUrl?.toString() as string;
       this.interceptorIsReady = true;
@@ -53,9 +53,11 @@ export class AuthHeaderInterceptor implements HttpInterceptor, OnDestroy {
       const requestClone = request.clone({
         headers: request.
           headers.set(this.HEADER_X_ZUMO_AUTH,
-            this.pageModel?.easyAuthAccessToken?.toString() as string).
-          set(this.HEADER_IMPERSONATION_TOKEN,
+            this.pageModel?.easyAuthAccessToken?.toString() as string)
+            .set(this.HEADER_IMPERSONATION_TOKEN,
             this.pageModel?.impersonationToken?.toString() as string)
+            .set(this.HEADER_ACCESS_TOKEN,
+              this.pageModel?.accessToken?.toString() as string)
       });
 
       return next.handle(requestClone);

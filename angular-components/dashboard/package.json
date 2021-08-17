@@ -1,6 +1,6 @@
 {
   "name": "dashboard",
-  "version": "0.8.21",
+  "version": "0.8.24",
   "scripts": {
     "ng": "ng",
     "start": "ng serve && npm run-script postBuild",
@@ -54,7 +54,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/eslint-plugin-tslint": "^4.28.3",
     "@typescript-eslint/parser": "^4.28.2",
-    "@wizardcontroller/sac-appliance-lib": "^0.8.94",
+    "@wizardcontroller/sac-appliance-lib": "^0.8.97",
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.4",
