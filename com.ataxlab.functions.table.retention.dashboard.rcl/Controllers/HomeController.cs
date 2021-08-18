@@ -220,12 +220,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
         }
 
-        private string GetManagementCodeRedemptionUrl(string code)
+        private string GetManagementCodeRedemptionUrl(string code, string scopeBase = "https://management.azure.com/user_impersonation")
         {
             var url = string.Empty;
             var clientId = Configuration["AzureAd:clientId"];
             var clientSecret = HttpUtility.UrlEncode(Configuration["AzureAd:ClientSecret"]);
-            var scope = HttpUtility.UrlEncode("https://management.azure.com/user_impersonation");
+            var scope = HttpUtility.UrlEncode("{scopeBase}");
             var redirectUri = HttpUtility.UrlEncode($"https://{this.Request.Host}/");
             var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims(); // "organizations";
 
@@ -234,7 +234,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return url;
         }
 
-        private string GetManagementAuthorizeUrl()
+        private string GetManagementAuthorizeUrl(string scopeBase = "https://management.azure.com/user_impersonation")
         {
             using (SHA256 mySHA256 = SHA256.Create())
             {
@@ -242,7 +242,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 var clientId = Configuration["AzureAd:clientId"];
                 var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims(); // "organizations"; 
                 var redirect = HttpUtility.UrlEncode($"https://{this.Request.Host}/azuremgmtauth");
-                var scope = HttpUtility.UrlEncode("https://management.azure.com/user_impersonation");
+                var scope = HttpUtility.UrlEncode("{scopeBase}");
                 var state = new Random().Next();
                 var sha256 = Base64UrlEncoder.Encode(mySHA256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)));
                 var urlTemplate = $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize?" +
@@ -265,12 +265,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         }
 
 
-        private string GetAdminConsentPrompt()
+        private string GetAdminConsentPrompt(string scopeBase = "https://management.azure.com/user_impersonation")
         {
             var clientId = Configuration["AzureAd:clientId"];
             var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims(); // "organizations";"organizations"; // this.AzureManagementClient.GetTenantId();
             var redirect = $"https://{this.Request.Host}/adminconsent";
-            var scope = HttpUtility.UrlEncode($"https://management.azure.com/user_impersonation"); // HttpUtility.UrlEncode($"openid profile https://management.azure.com/.default");
+            var scope = HttpUtility.UrlEncode($"{scopeBase}"); // HttpUtility.UrlEncode($"openid profile https://management.azure.com/.default");
             var state = new Random().Next();
             // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
             var consentUrl = $"https://login.microsoftonline.com/{tenantId}/v2.0/adminconsent?client_id={clientId}&redirect_uri={redirect}&scope={scope}&state={state}";
@@ -284,13 +284,13 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return promptConsentUrl;
         }
 
-        private string GetDefaultScopeAdminConsentUrl()
+        private string GetDefaultScopeAdminConsentUrl(string scopeBase = "https://managemnt.azure.com/user_impersonation")
         {
             var dashboardAppUri = Configuration["Dashboard:AppUri"];
             var clientId = Configuration["AzureAd:clientId"];
             var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims(); // "organizations";"organizations"; // this.AzureManagementClient.GetTenantId();
             var redirect = $"https://{this.Request.Host}";
-            var scope = HttpUtility.UrlEncode($"https://managemnt.azure.com/user_impersonation");
+            var scope = HttpUtility.UrlEncode($"{scopeBase}");
             var state = new Random().Next();
             // as per https://stackoverflow.com/questions/53309253/how-can-i-find-the-admin-consent-url-for-an-azure-ad-app-that-requires-microsoft
             var consentUrl = $"https://login.microsoftonline.com/{tenantId}/v2.0/adminconsent?client_id={clientId}&redirect_uri={redirect}&scope={scope}&state={state}";
@@ -317,9 +317,14 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                 log.LogInformation("building operator page model");
 
-
-                OperatorPageModel = await this.ApplianceClient.GetOperatorPageModel();
-
+                try
+                {
+                    OperatorPageModel = await this.ApplianceClient.GetOperatorPageModel();
+                }
+                catch(Exception e)
+                {
+                    int i = 0;
+                }
 
                 OperatorPageModel.ApplianceSessionContext.AvailableSubscriptions = OperatorPageModel.Subscriptions;
 

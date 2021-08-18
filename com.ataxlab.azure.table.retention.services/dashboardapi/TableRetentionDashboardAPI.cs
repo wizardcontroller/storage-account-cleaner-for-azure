@@ -421,7 +421,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     log.LogInformation("initializing Session.UserToken");
 
-                    var appUri = Configuration["ApplianceAppUri"];
+                    var appUri = Configuration["ApplianceAppUri"]; // Configuration["Dashboard:AppUri"]; // 
                     var eachScope = new List<string>()
                     // { appUri + "/user_impersonation",  ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION};
                     { appUri + "/user_impersonation"};
@@ -432,14 +432,15 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     foreach (var s in eachScope)
                     {
-                        //    AuthenticationResult impersonationResult = await TokenAcquisitionHelper
+                            AuthenticationResult impersonationResult = await TokenAcquisitionHelper
 
-                        //                                .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, this.GetTenantIdFromUserClaims());
+                                                        .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, this.GetTenantIdFromUserClaims());
+                        token = impersonationResult.AccessToken;
 
-                        token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s } ,tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
+                        // token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s } ,tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
 
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, token);
-                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, token); // NOT REALLY
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken); 
                         OperatorPageModel.ImpersonationToken = token;
 
                         eventualAccessToken = token;
@@ -449,6 +450,10 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     }
 
+                }
+                else
+                {
+                    OperatorPageModel.AccessToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN);
                 }
 
                 OperatorPageModel.AccessToken = eventualAccessToken;
