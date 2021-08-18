@@ -82,8 +82,8 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
 
   isShow = false;
 
-  ensureApplianceContext(tenantid: string, oid: string) {
-    this.retentionEntitiesSvc.getApplianceSessionContext(tenantid, oid).subscribe(data => {
+  ensureApplianceContext(tenantid: string, oid: string, subscriptionId: string) {
+    this.retentionEntitiesSvc.getApplianceSessionContext(tenantid, oid, subscriptionId).subscribe(data => {
       this.currentApplianceContextSource.next(data);
     });
   }
@@ -95,7 +95,7 @@ export class ApplianceContextViewComponent implements OnInit, OnDestroy, ICanBeH
       this.currentPageModelSource.next(data);
       // the component can show
       this.isShow = true;
-      this.ensureApplianceContext(data.tenantid as string, data.oid as string);
+      this.ensureApplianceContext(data.tenantid as string, data.oid as string, data.selectedSubscriptionId as string);
       return this.operatorPageModel = data;
     });
   }

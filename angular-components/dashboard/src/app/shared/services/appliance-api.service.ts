@@ -138,7 +138,7 @@ export class ApplianceApiService implements OnDestroy {
 
   public ensureApplianceSessionContextSubject(tenantId: string, subscriptionId: string, oid: string): void {
 
-    this.entityService.getApplianceSessionContext(tenantId, oid)
+    this.entityService.getApplianceSessionContext(tenantId,oid,subscriptionId)
       .pipe(
         distinctUntilChanged(),
         map(data => {
