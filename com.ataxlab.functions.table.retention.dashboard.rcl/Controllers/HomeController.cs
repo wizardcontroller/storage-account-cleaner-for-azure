@@ -220,12 +220,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
         }
 
-        private string GetManagementCodeRedemptionUrl(string code, string scopeBase = "https://management.azure.com/user_impersonation")
+        private string GetManagementCodeRedemptionUrl(string code, string scopeBase = "openid profile https://management.azure.com/user_impersonation")
         {
             var url = string.Empty;
             var clientId = Configuration["AzureAd:clientId"];
             var clientSecret = HttpUtility.UrlEncode(Configuration["AzureAd:ClientSecret"]);
-            var scope = HttpUtility.UrlEncode("{scopeBase}");
+            var scope = HttpUtility.UrlEncode($"{scopeBase}");
             var redirectUri = HttpUtility.UrlEncode($"https://{this.Request.Host}/");
             var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims(); // "organizations";
 
@@ -234,7 +234,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return url;
         }
 
-        private string GetManagementAuthorizeUrl(string scopeBase = "https://management.azure.com/user_impersonation")
+        private string GetManagementAuthorizeUrl(string scopeBase = "openid profile https://management.azure.com/user_impersonation")
         {
             using (SHA256 mySHA256 = SHA256.Create())
             {
@@ -242,7 +242,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 var clientId = Configuration["AzureAd:clientId"];
                 var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims(); // "organizations"; 
                 var redirect = HttpUtility.UrlEncode($"https://{this.Request.Host}/azuremgmtauth");
-                var scope = HttpUtility.UrlEncode("{scopeBase}");
+                var scope = HttpUtility.UrlEncode($"{scopeBase}");
                 var state = new Random().Next();
                 var sha256 = Base64UrlEncoder.Encode(mySHA256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)));
                 var urlTemplate = $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize?" +
@@ -265,7 +265,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         }
 
 
-        private string GetAdminConsentPrompt(string scopeBase = "https://management.azure.com/user_impersonation")
+        private string GetAdminConsentPrompt(string scopeBase = "openid profile https://management.azure.com/user_impersonation")
         {
             var clientId = Configuration["AzureAd:clientId"];
             var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims(); // "organizations";"organizations"; // this.AzureManagementClient.GetTenantId();
@@ -284,7 +284,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             return promptConsentUrl;
         }
 
-        private string GetDefaultScopeAdminConsentUrl(string scopeBase = "https://managemnt.azure.com/user_impersonation")
+        private string GetDefaultScopeAdminConsentUrl(string scopeBase = "openid profile https://managemnt.azure.com/user_impersonation")
         {
             var dashboardAppUri = Configuration["Dashboard:AppUri"];
             var clientId = Configuration["AzureAd:clientId"];

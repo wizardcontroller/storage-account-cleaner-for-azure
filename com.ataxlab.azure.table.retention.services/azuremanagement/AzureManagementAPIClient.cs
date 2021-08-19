@@ -473,6 +473,9 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                     tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(tenantClaim)).FirstOrDefault()?.Value;
 
                 }
+
+                // hardcode multitenant tenantid
+                tenantId = "organizations";
             }
             else
             {
