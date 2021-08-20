@@ -421,7 +421,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     log.LogInformation("initializing Session.UserToken");
 
-                    var appUri = Configuration["ApplianceAppUri"]; // Configuration["Dashboard:AppUri"]; // 
+                    var appUri = Configuration["ApplianceAppUri"]; // => incorrect Configuration["Dashboard:AppUri"]; // 
                     var eachScope = new List<string>()
                     // { appUri + "/user_impersonation",  ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION};
                     { appUri + "/user_impersonation"};
