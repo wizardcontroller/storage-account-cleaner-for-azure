@@ -91,7 +91,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             if(tokenResult != null &&
                 !String.IsNullOrEmpty(tokenResult))
 {
-                this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, tokenResult);
+                this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser()), tokenResult);
                 string redirectUrl = GetDefaultScopeAdminConsentUrl(); // GetAzureManagementPromptConsentUrl();
                 return Redirect(redirectUrl);
 
@@ -476,7 +476,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         /// <returns></returns>
         private async Task<string> ApplyConfigureApplianceSubscriptionIdStrategy(OperatorPageModel OperatorPageModel)
         {
-            var subscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+            var subscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser()));
             if (subscriptionId == null && OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId == string.Empty)
             {
                 subscriptionId = OperatorPageModel.Subscriptions.FirstOrDefault().subscriptionId;
@@ -508,10 +508,10 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         {
             OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
 
-            var subscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+            var subscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser()));
             OperatorPageModel.ApplianceSessionContext.AvailableStorageAccounts = await
                 this.ApplianceClient.GetStorageAccounts(subscriptionId,
-            HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN),
+            HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser())),
             OperatorPageModel.ApplianceSessionContext.UserOid);
 
             if (ModelState.IsValid && IsValidatePostedApplianceSessionContext(applianceSessionContext, OperatorPageModel) == true)
@@ -562,7 +562,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                     .AddRange(selectedAccounts);
 
                 // update the context with the selected subscription
-                applianceSessionContext.SelectedSubscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+                applianceSessionContext.SelectedSubscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser()));
                 var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims();
                 applianceSessionContext.TenantId = tenantId;
                 foreach (var acct in selectedAccounts)
@@ -610,7 +610,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                     OperatorPageModel.ApplianceSessionContext.AvailableStorageAccounts = await
                         this.ApplianceClient.GetStorageAccounts(subscriptionId,
-                                HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN),
+                                HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser())),
                     OperatorPageModel.ApplianceSessionContext.UserOid);
 
 
@@ -622,7 +622,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                     OperatorPageModel.ApplianceSessionContext.SelectedSubscription = validSubscription;
                     OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId = validSubscription.subscriptionId;
-                    this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, validSubscription.subscriptionId);
+                    this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser()), validSubscription.subscriptionId);
                 }
                 else
                 {
@@ -664,7 +664,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 }
                 else
                 {
-                    var subscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+                    var subscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser()));
                     Debug.WriteLine("using subscription id {0}", subscriptionId);
                     // the user posted a valid command
                     var result = await this.ApplianceClient.ProvisionAppliance(candidateCommand);
@@ -786,7 +786,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             // get the available commands from the session
             return JsonConvert.
                                 DeserializeObject<List<AvailableCommand>>
-                                    (this.HttpContext.Session.GetString(DashboardConstants.SESSIONKEY_AVAILABLECOMMANDS));
+                                    (this.HttpContext.Session.GetString(DashboardConstants.SESSIONKEY_AVAILABLECOMMANDS.GetSessionKeyForUser(this.ApplianceClient.GetUserOidFromUserClaims(), this.ApplianceClient.GetTenantGuidForUser())));
         }
 
     }

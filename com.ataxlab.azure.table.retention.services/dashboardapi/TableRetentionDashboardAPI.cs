@@ -168,9 +168,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     tenantid = GetTenantIdFromUserClaims();
 
                     // may be null at this point
-                    operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+                    operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
 
-                    operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
+                    operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
                     operatorPageModel.Oid = oid;
                     operatorPageModel.Tenantid = tenantid;
 
@@ -211,9 +211,17 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             {
                 try
                 {
-                    log.LogTrace("getting subscriptions for logged in user");
-                    var token = await this.TokenAcquisitionHelper.GetAccessTokenForUserAsync(new string[] { "https://management.azure.com/user_impersonation"}, tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
+                    var appUri = Configuration["ApplianceAppUri"]; // => incorrect Configuration["Dashboard:AppUri"]; // 
+                    var eachScope = new List<string>()
+                    // { appUri + "/user_impersonation",  ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION};
+                    { appUri + "/user_impersonation"};
 
+                    log.LogTrace("getting subscriptions for logged in user");
+                    // var token = await this.TokenAcquisitionHelper.GetAccessTokenForUserAsync(new string[] { "https://management.azure.com/user_impersonation"}, tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
+                    AuthenticationResult impersonationResult = await TokenAcquisitionHelper
+
+                                                .GetAuthenticationResultForUserAsync(scopes: eachScope, this.GetTenantIdFromUserClaims());
+                    var token = impersonationResult.AccessToken;
                     var subscriptionsResult = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser(token);
                     operatorPageModel.Subscriptions = subscriptionsResult;
 
@@ -265,7 +273,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
             if (this.CurrentHttpContext.User.Identity.IsAuthenticated)
             {
-                var selectedSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+                var selectedSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
 
                 ApplianceSessionContext applianceContext = new ApplianceSessionContext();
                 operatorPageModel.ApplianceSessionContext = applianceContext;
@@ -326,7 +334,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         selectedSubscription = subscriptions.First().subscriptionId;
                     }
 
-                    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, selectedSubscription);
+                    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), selectedSubscription);
                     operatorPageModel.SubscriptionId = selectedSubscription;
                     operatorPageModel.SelectedSubscriptionId = selectedSubscription;
 
@@ -337,7 +345,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         if (result != null)
                         {
                             var timestamp = result.TimeStamp;
-                            this.CurrentHttpContext.Session.SetString(DashboardConstants.SESSIONKEY_AVAILABLECOMMANDS, JsonConvert.SerializeObject(result.AvailableCommands));
+                            this.CurrentHttpContext.Session.SetString(DashboardConstants.SESSIONKEY_AVAILABLECOMMANDS.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), JsonConvert.SerializeObject(result.AvailableCommands));
                             log.LogInformation("applying aailable commands to operator page model");
                             operatorPageModel.AvailableCommands = result.AvailableCommands;
                         }
@@ -362,7 +370,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     operatorPageModel.IsMustRenderApplianceConfig = false;
                 }
 
-                var impersonationToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
+                var impersonationToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
                 if (!String.IsNullOrEmpty(selectedSubscription)
                     && !String.IsNullOrEmpty(impersonationToken)
                     && !String.IsNullOrEmpty(operatorPageModel.ApplianceSessionContext.UserOid))
@@ -416,7 +424,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             try
             {
 
-                if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN)))
+                if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()))))
                 {
 
                     log.LogInformation("initializing Session.UserToken");
@@ -439,8 +447,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                         // token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s } ,tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
 
-                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, token);
-                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken); 
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), token);
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), impersonationResult.IdToken); 
                         OperatorPageModel.ImpersonationToken = token;
 
                         eventualAccessToken = token;
@@ -453,7 +461,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 }
                 else
                 {
-                    OperatorPageModel.AccessToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN);
+                    OperatorPageModel.AccessToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
                 }
 
                 OperatorPageModel.AccessToken = eventualAccessToken;
@@ -634,7 +642,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             log.LogInformation("GetCurrentAccessToken");
             string ret = string.Empty;
 
-            if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN)))
+            if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()))))
             {
                 log.LogInformation(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN + " not found in session. getting current access token");
                 var tenantId = this.GetTenantIdFromUserClaims(); // Configuration["AzureAd:TenantId"];
@@ -643,9 +651,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
 
 
-                log.LogInformation("getting easyauth token with access token = " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
+                log.LogInformation("getting easyauth token with access token = " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())));
                 var appserviceEasyAuthToken = await GetEasyAuthTokenForCurrentUser();
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN, appserviceEasyAuthToken);
+                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), appserviceEasyAuthToken);
                 log.LogInformation("got easyauth token = " + appserviceEasyAuthToken);
                 this.CurrentEasyAuthToken = appserviceEasyAuthToken;
                 ret = appserviceEasyAuthToken;
@@ -655,8 +663,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                 log.LogInformation("GetCurrentAccessToken found a cached easyauth token");
 
-                log.LogInformation("got easyauth token from session = " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN));
-                ret = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
+                log.LogInformation("got easyauth token from session = " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())));
+                ret = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
 
             }
 
@@ -670,7 +678,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
             var result = string.Empty;
             Microsoft.Identity.Client.AuthenticationResult impersonationResult = null;
-            var currentToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN);
+            var currentToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
             var tenantId = this.GetTenantIdFromUserClaims();
             if (string.IsNullOrEmpty(currentToken))
             {
@@ -687,26 +695,26 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: tenantId);
                 }
 
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken);
+                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), impersonationResult.AccessToken);
+                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), impersonationResult.IdToken);
                 log.LogInformation("setting http client USERTOKEN = " + impersonationResult.AccessToken);
                 this.HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
             }
             else
             {
-                log.LogInformation("http USERTOKEN request header already set =" + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
-                this.HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.SESSION_ACCESS_TOKEN, CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
+                log.LogInformation("http USERTOKEN request header already set =" + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())));
+                this.HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.SESSION_ACCESS_TOKEN, CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())));
             }
 
 
 
             // cache the easy auth access token
-            if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN)))
+            if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()))))
             {
                 log.LogInformation("calling GetCurrentAccessToken");
                 // context.Session.SetString(SESSION_KEY_EASYAUTHTOKEN, await this.GetCurrentAccessToken());
                 result = await this.GetCurrentEasyAuthToken();
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN, result);
+                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), result);
                 log.LogInformation("setting http client x-zumo-auth var = " + result);
 
                 this.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(ControlChannelConstants.HEADER_X_ZUMO_AUTH, result);
@@ -714,7 +722,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             }
             else
             {
-                var cachedToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
+                var cachedToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
                 log.LogInformation("setting http client x-zumo-auth from cached session var = " + cachedToken);
                 this.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(ControlChannelConstants.HEADER_X_ZUMO_AUTH, cachedToken);
                 result = cachedToken;
@@ -800,9 +808,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                 var requestBody = @"{" +
                       @" ""id_token"" : """ +
-                      CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IDTOKEN) + @"""" +
+                      CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IDTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())) + @"""" +
                       @" ,""access_token"" : """ +
-                      CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN) +
+                      CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())) +
                       @"""}";
 
 
@@ -826,7 +834,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 var easyAuthToken = json.Value<string>("authenticationToken");
                 log.LogInformation("easy auth token is " + easyAuthToken);
 
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN, easyAuthToken);
+                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()), easyAuthToken);
                 //CurrentHttpContext.Session.SetString(ControlChannelConstants.XMSTOKENAADACCESSTOKEN, easyAuthToken);
                 return easyAuthToken;
                 // var applianceStatus = JsonConvert.DeserializeObject<WorkflowCheckpoint>(content);
@@ -874,8 +882,8 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 var baseuri = HttpClient.BaseAddress.ToString();
 
                 log.LogInformation("httpclient url " + request.RequestUri.ToString());
-                log.LogInformation("calling with ACCESS TOKEN=" + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
-                log.LogInformation("calling with ZUMOTOKEN=" + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN));
+                log.LogInformation("calling with ACCESS TOKEN=" + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())));
+                log.LogInformation("calling with ZUMOTOKEN=" + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())));
                 request.Headers.Accept.Add(GetMediaTypeJson());
                 if (!String.IsNullOrEmpty(jsonPayload))
                 {
@@ -956,12 +964,12 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
         private void ConfigureHttpClientHeaders()
         {
-            var currentSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
-            var impersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
-            var token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
+            var currentSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
+            var impersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
+            var token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser()));
             log.LogInformation("configuring dashboard rest client for call to appliance");
             // var accessToken = await this.GetCurrentAccessToken();
-            log.LogInformation("got current access token X-ZUMO-AUTH =  " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN));
+            log.LogInformation("got current access token X-ZUMO-AUTH =  " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN.GetSessionKeyForUser(this.GetUserOidFromUserClaims(), this.GetTenantGuidForUser())));
             HttpClient.DefaultRequestHeaders.Clear();
             // inject the azure ad app service easyauth token
             // as per https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#validate-tokens-from-providers
@@ -1017,6 +1025,14 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
         {
             List<AvailableCommand> ret = await EnsureWorkflowOperation(candidateCommand);
             return ret;
+        }
+
+        public string GetTenantGuidForUser()
+        {
+            var tenantClaim = "http://schemas.microsoft.com/identity/claims/tenantid";
+            log.LogInformation($"getting tenant id from user claims {tenantClaim}");
+            var tenantId = this.CurrentHttpContext.User.Claims.Where(c => c.Type.ToLowerInvariant().Contains(tenantClaim)).FirstOrDefault()?.Value;
+            return tenantId;
         }
     }
 }

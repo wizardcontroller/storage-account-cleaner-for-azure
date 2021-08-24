@@ -1,9 +1,65 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace com.ataxlab.azure.table.retention.models.control
 {
+
+    public static class DashboardExtensions
+    {
+        public static Guid HashToGuid(params String[] values)
+        {
+            String combined = string.Empty;
+            foreach (var item in values)
+            {
+                String.Concat(combined, item);
+            }
+
+            return combined.HashToGuid();
+        }
+
+        public static Guid HashToGuid(this String plaintext)
+        {
+
+            var t = JsonConvert.SerializeObject(plaintext);
+            var bytes = Encoding.Default.GetBytes(t);
+
+            MD5 hashIt = MD5.Create();
+            byte[] hashed = hashIt.ComputeHash(bytes);
+
+            return new Guid(hashed);
+        }
+
+        /// <summary>
+        /// will throw exceptions like you wouldn't believe
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="req"></param>
+        /// <returns></returns>
+
+    }
+
+
+
+    public static class SessionKeyExtension
+    {
+
+        /// <summary>
+        /// generate unique sessoin guid per user per tenant
+        /// </summary>
+        /// <param name="sessionKey"></param>
+        /// <param name="oid"></param>
+        /// <param name="tenantId"></param>
+        /// <returns></returns>
+        public static string GetSessionKeyForUser(this string sessionKey, string oid, string tenantId)
+        {
+            var ret = DashboardExtensions.HashToGuid(sessionKey, oid, tenantId);
+            return ret.ToString();
+        }
+    }
 
     public enum WorkflowCheckpointIdentifier
     {
