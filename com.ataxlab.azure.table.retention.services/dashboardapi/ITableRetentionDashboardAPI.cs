@@ -45,6 +45,5 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
         string GetUserOidFromUserClaims();
         Task<string> GetTemplateUrlForRoute(string endoint);
         Task<List<AvailableCommand>> EnsureWorkflowOperation(AvailableCommand command);
-        string GetTenantGuidForUser();
     }
 }
