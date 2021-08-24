@@ -232,7 +232,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
             .AddJwtBearer(o =>
             {
                 o.Events.OnMessageReceived = OnMessageReceived;
-                // o.Authority = Configuration.GetValue<string>("AzureAD:Authority"); // "https://login.microsoftonline.com/{tenantguid}/v2.0";
+                o.Authority = Configuration.GetValue<string>("AzureAD:Authority"); // "https://login.microsoftonline.com/{tenantguid}/v2.0";
                 //Require tokens be saved in the AuthenticationProperties on the request
                 //We need the token later to get another token
                 o.SaveToken = true;
