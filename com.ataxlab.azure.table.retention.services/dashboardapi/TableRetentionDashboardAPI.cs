@@ -666,61 +666,74 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
         public async Task<string> EnsureEasyAuth()
         {
-            log.LogInformation("ensuring easy auth. caching token in session");
-
             var result = string.Empty;
-            Microsoft.Identity.Client.AuthenticationResult impersonationResult = null;
-            var currentToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN);
-            var tenantId = this.GetTenantIdFromUserClaims();
-            if (string.IsNullOrEmpty(currentToken))
+            // disable easyauth
+            if (true == false)
             {
-                log.LogInformation("initializing Session.UserToken");
-                var eachScope = new List<string>()
+                try
+                {
+                    log.LogInformation("ensuring easy auth. caching token in session");
+
+                    result = string.Empty;
+                    Microsoft.Identity.Client.AuthenticationResult impersonationResult = null;
+                    var currentToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN);
+                    var tenantId = this.GetTenantIdFromUserClaims();
+                    if (string.IsNullOrEmpty(currentToken))
+                    {
+                        log.LogInformation("initializing Session.UserToken");
+                        var eachScope = new List<string>()
                     {
                     Configuration["Dashboard:AppUri"] + "/user_impersonation",
                         // Configuration["ApplianceAppUri"] + "/user_impersonation",
                         ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION
                     };
-                foreach (var s in eachScope)
-                {
-                    impersonationResult = await TokenAcquisitionHelper
-                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: tenantId);
+                        foreach (var s in eachScope)
+                        {
+                            impersonationResult = await TokenAcquisitionHelper
+                            .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, tenantId: tenantId);
+                        }
+
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken);
+                        log.LogInformation("setting http client USERTOKEN = " + impersonationResult.AccessToken);
+                        this.HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
+                    }
+                    else
+                    {
+                        log.LogInformation("http USERTOKEN request header already set =" + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
+                        this.HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.SESSION_ACCESS_TOKEN, CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
+                    }
+
+
+
+                    // cache the easy auth access token
+                    if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN)))
+                    {
+                        log.LogInformation("calling GetCurrentAccessToken");
+                        // context.Session.SetString(SESSION_KEY_EASYAUTHTOKEN, await this.GetCurrentAccessToken());
+                        result = await this.GetCurrentEasyAuthToken();
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN, result);
+                        log.LogInformation("setting http client x-zumo-auth var = " + result);
+
+                        this.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(ControlChannelConstants.HEADER_X_ZUMO_AUTH, result);
+
+                    }
+                    else
+                    {
+                        var cachedToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
+                        log.LogInformation("setting http client x-zumo-auth from cached session var = " + cachedToken);
+                        this.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(ControlChannelConstants.HEADER_X_ZUMO_AUTH, cachedToken);
+                        result = cachedToken;
+                    }
+
+
+                    return result;
                 }
-
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken);
-                log.LogInformation("setting http client USERTOKEN = " + impersonationResult.AccessToken);
-                this.HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.SESSION_ACCESS_TOKEN, impersonationResult.AccessToken);
+                catch (Exception e)
+                {
+                    // be tolerant of easyauth errors
+                }
             }
-            else
-            {
-                log.LogInformation("http USERTOKEN request header already set =" + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
-                this.HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.SESSION_ACCESS_TOKEN, CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
-            }
-
-
-
-            // cache the easy auth access token
-            if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN)))
-            {
-                log.LogInformation("calling GetCurrentAccessToken");
-                // context.Session.SetString(SESSION_KEY_EASYAUTHTOKEN, await this.GetCurrentAccessToken());
-                result = await this.GetCurrentEasyAuthToken();
-                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN, result);
-                log.LogInformation("setting http client x-zumo-auth var = " + result);
-
-                this.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(ControlChannelConstants.HEADER_X_ZUMO_AUTH, result);
-
-            }
-            else
-            {
-                var cachedToken = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
-                log.LogInformation("setting http client x-zumo-auth from cached session var = " + cachedToken);
-                this.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(ControlChannelConstants.HEADER_X_ZUMO_AUTH, cachedToken);
-                result = cachedToken;
-            }
-
-
             return result;
         }
 
