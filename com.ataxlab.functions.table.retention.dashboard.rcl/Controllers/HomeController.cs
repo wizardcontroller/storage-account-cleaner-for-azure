@@ -159,7 +159,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                         // if you got here the user is authorized to get subscriptions
                         // and found none
                         // var token = this.TokenAcquisition.GetAccessTokenForUserAsync(new string[] {"openid", "user.read", "https://wizardcontroller.com/sac-appliance/user_impersonation", "https://management.azure.com/user_impersonation" });
-                        string promptConsentUrl = this.GetManagementAuthorizeUrl();
+                        string promptConsentUrl = this.GetAdminConsentPrompt();
                         return Redirect(promptConsentUrl);
                     }
 
@@ -185,7 +185,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             }
             catch (Exception e)
             {
-                string promptConsentUrl = GetManagementAuthorizeUrl();
+                string promptConsentUrl = GetAdminConsentPrompt();
                 return Redirect(promptConsentUrl);
             }
 
@@ -233,8 +233,9 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 $"& code_verifier={codeVerifier}&client_secret={clientSecret}";
             return url;
         }
-
-        private string GetManagementAuthorizeUrl(string scopeBase = "openid profile https://management.azure.com/user_impersonation")
+        
+        [Obsolete]
+        private string DeprecatedGetManagementAuthorizeUrl(string scopeBase = "openid profile https://management.azure.com/user_impersonation")
         {
             using (SHA256 mySHA256 = SHA256.Create())
             {
