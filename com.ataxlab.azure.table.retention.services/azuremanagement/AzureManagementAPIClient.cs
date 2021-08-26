@@ -257,7 +257,7 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
                 else if (await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
                 {
                     token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { "/user_impersonation" }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
+                        new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
 
                     // token is nearing expiration 
                     //impersonationResult = await TokenAcquisitionHelper

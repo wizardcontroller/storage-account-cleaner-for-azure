@@ -163,8 +163,7 @@ namespace com.ataxlab.azure.table.retention.models.control
         // public static string TASKHUBNAME = System.Environment.GetEnvironmentVariable( "tableretentiontaskhubname");
         public const string TASKHUBNAME = "tableretentionhub";
         public const string STORAGEIMPERSONATION = "https://storage.azure.com/user_impersonation";
-        private const string MANAGEMENTAPIIMPERSATION = "https://login.microsoftonline.com/common/oauth2/authorize/user_impersonation";
-        public const string AZUREMANAGEMENT_USERIMPERSONATION = "https://management.azure.com/user_impersonation"; // "https://storage.azure.com/user_impersonation"; // "https://management.azure.com/user_impersonation";
+         public const string AZUREMANAGEMENT_USERIMPERSONATION = "https://management.azure.com/user_impersonation"; // "https://storage.azure.com/user_impersonation"; // "https://management.azure.com/user_impersonation";
         public const string AZUREMANAGEMENT_BASEURL_NO_TRAILING_SLASH = "https://management.azure.com";
 
         public const string DialogChooseSubscription = "DialogChooseSubscription";
