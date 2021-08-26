@@ -209,7 +209,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
             {
                 options.Secure = CookieSecurePolicy.SameAsRequest;
                 options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
                 options.HandleSameSiteCookieCompatibility();
 
             });
@@ -285,7 +285,8 @@ namespace com.ataxlab.functions.table.retention.dashboard
                 //opts.IdleTimeout = TimeSpan.FromSeconds(10);
                 opts.Cookie.HttpOnly = false;
                 opts.Cookie.IsEssential = true;
-
+                opts.Cookie.SameSite = SameSiteMode.None;
+             
             });
 
             services.AddControllersWithViews(options =>
