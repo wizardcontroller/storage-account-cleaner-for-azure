@@ -434,12 +434,26 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         [Route("/Operator/ConfigureAppliance")]
         public async Task<IActionResult> GetCofigureAppliance()
         {
-            OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
+            OperatorPageModel OperatorPageModel = null;
+            try
+            {
+                log.LogInformation("configure appliance will get the operator page model");
+                OperatorPageModel = await InitializeOperatorPageModel();
+                log.LogInformation("configure appliance did get the operator page model");
 
+            }
+            catch (Exception e)
+            {
+                log.LogInformation($"configure appliance didn't get the operator page model: {e.Message}");
+
+            }
             // clear any storage accounts 
             OperatorPageModel.ApplianceSessionContext.AvailableStorageAccounts.Clear();
             OperatorPageModel.ApplianceSessionContext.SelectedStorageAccounts.Clear();
             OperatorPageModel.IsMustRenderApplianceConfig = true;
+
+            log.LogInformation("configure appliance will apply the chosen subscription id");
+
             // choose a useable subscription id 
             string subscriptionId = await ApplyConfigureApplianceSubscriptionIdStrategy(OperatorPageModel);
 
@@ -486,6 +500,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
             OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId = subscriptionId != null ?
                                     subscriptionId : OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
             subscriptionId = OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
+            HttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, subscriptionId);
 
 
             return await Task.FromResult<string>(subscriptionId);
@@ -596,48 +611,74 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         }
 
         [HttpGet(Name = "SelectSubscription")]
-        [Route("/dashboard/{oid}/selectsubscription/{subscriptionId}")]
+        [Route("/home/{oid}/selectsubscription/{subscriptionId}")]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<ActionResult> SelectSubscription(string oid, string subscriptionId)
         {
-            OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
+            log.LogInformation($"subscriptionid {subscriptionId} selected by user {oid}. getting operator page model");
+            OperatorPageModel OperatorPageModel = null;
+            try
+            {
+                log.LogInformation("SelectSubscription will initialize page model");
+                OperatorPageModel = await InitializeOperatorPageModel();
+            }
+            catch(Exception e)
+            {
+                log.LogError($"operator pagemodel threw exception {e.Message}");
+            }
 
             try
             {
                 if (User.Identity.IsAuthenticated)
                 {
 
-                    log.LogInformation("getting storage accounts");
+                    try
+                    {
+                        log.LogInformation("getting storage accounts");
 
-                    OperatorPageModel.ApplianceSessionContext.AvailableStorageAccounts = await
-                        this.ApplianceClient.GetStorageAccounts(subscriptionId,
-                                HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN),
-                    OperatorPageModel.ApplianceSessionContext.UserOid);
+                        OperatorPageModel.ApplianceSessionContext.AvailableStorageAccounts = await
+                            this.ApplianceClient.GetStorageAccounts(subscriptionId,
+                                    HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN), oid);
+                    }
+                    catch(Exception e)
+                    {
+                        log.LogError($"failed to get storage accounts {e.Message}");
+                    }
 
+                    log.LogInformation("select subscription is handling subscriptions");
 
-                    var validSubscription = OperatorPageModel.Subscriptions
-                    .Where(s => s.subscriptionId.Equals(subscriptionId))
-                    .FirstOrDefault();
+                    try
+                    {
+                        var validSubscription = OperatorPageModel.Subscriptions
+                        .Where(s => s.subscriptionId.Equals(subscriptionId))
+                        .FirstOrDefault();
 
-                    validSubscription.IsSelected = true;
-
-                    OperatorPageModel.ApplianceSessionContext.SelectedSubscription = validSubscription;
-                    OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId = validSubscription.subscriptionId;
-                    this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, validSubscription.subscriptionId);
-                }
+                        validSubscription.IsSelected = true;
+                        OperatorPageModel.SubscriptionId = subscriptionId;
+                        OperatorPageModel.ApplianceSessionContext.SelectedSubscription = validSubscription;
+                        OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId = validSubscription.subscriptionId;
+                        this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, validSubscription.subscriptionId);
+                    }
+                    catch(Exception e)
+                    {
+                        log.LogError($"exception setting subscription {e.Message}");
+                    }
+                    }
                 else
                 {
+                    log.LogInformation("returning index view");
                     return View(nameof(HomeController.Index));
                 }
             }
             catch (Exception e)
             {
-                log.LogError("problem getting storage accounts {0}", e.Message);
+                log.LogError("problem selecting subscription {0}", e.Message);
             }
 
             if (oid.Equals(OperatorPageModel.ApplianceSessionContext.UserOid, StringComparison.InvariantCultureIgnoreCase))
             {
                 // triage whatever this was TODO
+                log.LogError($"current oid {oid} doesn't match appliace sessioncotext oid");
             }
 
             OperatorPageModel.IsMustRenderApplianceConfig = true;
