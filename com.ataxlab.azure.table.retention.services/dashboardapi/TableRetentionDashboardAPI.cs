@@ -166,7 +166,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     oid = GetUserOidFromUserClaims();
                     tenantid = GetTenantIdFromUserClaims();
-
+                   
                     // may be null at this point
                     operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
 
@@ -415,8 +415,9 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             TokenAcquisitionOptions opts = new TokenAcquisitionOptions();
             try
             {
-
-                if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN)))
+                // avoid examining the cache to determine the flow of the followinglogic
+                if(1 == 1)
+                //if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN)))
                 {
 
                     log.LogInformation("initializing Session.UserToken");
