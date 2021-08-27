@@ -170,8 +170,8 @@ namespace com.ataxlab.functions.table.retention
 
 
             builder.Services.AddLogging();
+            builder.Services.AddHttpContextAccessor();
 
-  
             builder.Services.AddScoped<ITableEntityRetentionClient, TableEntityRetentionClient>();
 
             builder.Services.AddScoped<ITableRetentionApplianceActivities, TableRetentionApplianceActivities>();

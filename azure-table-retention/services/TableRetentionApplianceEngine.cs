@@ -31,6 +31,7 @@ using WorkflowOperation = com.ataxlab.functions.table.retention.entities.Workflo
 using Newtonsoft.Json.Serialization;
 using System.Net.Http.Formatting;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
 
 namespace com.ataxlab.functions.table.retention.services
 {
@@ -87,6 +88,7 @@ namespace com.ataxlab.functions.table.retention.services
         Task<EntityStateResponse<WorkflowCheckpoint>> GetStateForUpdateWorkflowCheckpoints(IDurableEntityClient durableEntityClient, string tenantid, string subscriptionid, string userOid, WorkflowOperation operation);
         Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient);
         Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient);
+        Task<string> GetHttpContextHeaderValueForKey(string headerKey);
         #endregion durable entity operations
     }
 
@@ -97,7 +99,7 @@ namespace com.ataxlab.functions.table.retention.services
     public class TableRetentionApplianceEngine : ITableRetentionApplianceEngine
     {
         ITableRetentionApplianceActivities tableRetentionApplianceActivities;
-
+        private IHttpContextAccessor CurrentHttpContext { get; set; }
         ILogger<TableRetentionApplianceEngine> log;
 
 
@@ -112,9 +114,9 @@ namespace com.ataxlab.functions.table.retention.services
         /// this exists as a way to support easy
         /// eastantiation during unit tests
         /// </summary>
-        protected internal TableRetentionApplianceEngine()
+        protected internal TableRetentionApplianceEngine(IHttpContextAccessor ctx = null)
         {
-
+            this.CurrentHttpContext = ctx;
         }
 
         public static ITableRetentionApplianceEngine GetUnitTestableEngine()
@@ -123,6 +125,18 @@ namespace com.ataxlab.functions.table.retention.services
         }
 
         #endregion test generation support
+
+        public async Task<string> GetHttpContextHeaderValueForKey(string headerKey)
+        {
+            var ret = string.Empty;
+
+            var ctx = this.CurrentHttpContext.HttpContext;
+            var header = ctx.Request.Headers.Where(w => w.Key.ToLowerInvariant().Equals(headerKey.ToLowerInvariant()))
+                            .FirstOrDefault()
+                            .Value;
+            ret = header;
+            return await Task.FromResult<string>(ret);
+        }
 
         public async Task<string> GetUserOidFromClaims(IEnumerable<Claim> claims)
         {
@@ -298,7 +312,9 @@ namespace com.ataxlab.functions.table.retention.services
 
                 log.LogInformation("posted command null {0}", commandJson == null);
                 var command = await commandJson.FromJSONStringAsync<WorkflowOperationCommandEntity>();
-                var instanceId = CrucialExtensions.HashToGuid(tenantId, oid);
+                var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
+                var instanceId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
 
                 log.LogInformation("posted command code {0}", command.CommandCode.ToString("G"));
 
@@ -336,7 +352,7 @@ namespace com.ataxlab.functions.table.retention.services
                     // the instruction dispatcher
                     if (isValidTransition)
                     {
-                        var subscriptionId = applianceContext.EntityState.SelectedSubscriptionId;
+                        subscriptionId = applianceContext.EntityState.SelectedSubscriptionId;
 
 
 
@@ -853,17 +869,18 @@ namespace com.ataxlab.functions.table.retention.services
         public async Task<EntityId> GetEntityIdForUser<T>(string tenantId, string oid) where T : new()
         {
             var t = new T();
-            var ctxId = CrucialExtensions.HashToGuid(tenantId, oid);
+            var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+            var ctxId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
             var ctxEntitId = new EntityId(t.GetType().Name, ctxId.ToString());
             return await Task.FromResult(ctxEntitId);
         }
 
-        public TableRetentionApplianceEngine(AzureADJwtBearerValidation azureADJwtBearerValidation, ILogger<TableRetentionApplianceEngine> logger, ITableRetentionApplianceActivities activitiesEngine)
+        public TableRetentionApplianceEngine(IHttpContextAccessor ctx, AzureADJwtBearerValidation azureADJwtBearerValidation, ILogger<TableRetentionApplianceEngine> logger, ITableRetentionApplianceActivities activitiesEngine)
         {
             log = logger;
 
             AzureADJwtBearerValidationService = azureADJwtBearerValidation;
-
+            this.CurrentHttpContext = ctx;
             ActivitiesEngine = activitiesEngine;
             logger.LogInformation("constructor completed");
         }
@@ -885,7 +902,7 @@ namespace com.ataxlab.functions.table.retention.services
             }
 
             var operation = WorkflowOperation.ProvisionAppliance;
-            var instanceId = (CrucialExtensions.HashToGuid(tenantid, userOid)).ToString();
+            var instanceId = (CrucialExtensions.HashToGuid(tenantid, userOid, subscriptionid)).ToString();
 
             var workflowEntityId = new EntityId(nameof(WorkflowCheckpoint), instanceId);
             var checkpointEntityId = new EntityId(nameof(WorkflowCheckpointEditMode), instanceId);
@@ -1246,6 +1263,7 @@ namespace com.ataxlab.functions.table.retention.services
             List<AvailableCommandEntity> availableCommands = new List<AvailableCommandEntity>();
 
             log.LogInformation("ValidateTransition");
+            var httpCtx = this.CurrentHttpContext.HttpContext;
             var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid);
             var editModeEntityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid);
 
@@ -1692,7 +1710,9 @@ namespace com.ataxlab.functions.table.retention.services
             else
             {
                 // here because we can return a workflow checkpoint 
-                var instanceId = CrucialExtensions.HashToGuid(tenantId, oid);
+                var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
+                var instanceId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
                 log.LogInformation("workflow checkpoint found for user");
                 var orchestrationStatus = await durableClient.GetStatusAsync(instanceId.ToString(), showHistory: true);
 

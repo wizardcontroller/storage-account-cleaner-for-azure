@@ -18,6 +18,7 @@ using com.ataxlab.azure.table.retention.state.entities;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Management.Cdn.Fluent.Models;
 using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.Network.Fluent;
@@ -80,7 +81,7 @@ namespace com.ataxlab.functions.table.retention
         private AzureCredentials azureCredentials;
         private IMapper autoMapper;
         private TelemetryClient telemetryClient;
-
+        private IHttpContextAccessor CurrentHttpContext { get; set; }
         /// <summary>
         /// as per https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-class-library?tabs=v2%2Ccmd#log-custom-telemetry-in-c-functions
         /// </summary>
@@ -103,7 +104,7 @@ namespace com.ataxlab.functions.table.retention
         /// </summary>
         /// <param name="creds"></param>
         /// <param name="telemetryConfiguration"></param>
-        public TableEntityRetentionClient(AzureCredentials creds, TelemetryConfiguration telemetryConfiguration, IMapper mapper)
+        public TableEntityRetentionClient( AzureCredentials creds, TelemetryConfiguration telemetryConfiguration, IMapper mapper)
         {
 
             azureCredentials = creds;
@@ -112,16 +113,17 @@ namespace com.ataxlab.functions.table.retention
             telemetryClient?.TrackEvent(new EventTelemetry("TableEntityRetentionClient:Ctor:WithTelemetryConfiguration:WillInitIAzure"));
 
             InitIAzure(creds);
+
         }
 
         /// <summary>
         /// for testing
         /// </summary>
         /// <param name="telemetryKey"></param>
-        public TableEntityRetentionClient(AzureCredentials creds, string telemetryKey = null)
+        public TableEntityRetentionClient(AzureCredentials creds, IHttpContextAccessor ctx, string telemetryKey = null)
         {
             azureCredentials = creds;
-
+            this.CurrentHttpContext = ctx;
             if (telemetryKey != null)
             {
                 TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration(telemetryKey);

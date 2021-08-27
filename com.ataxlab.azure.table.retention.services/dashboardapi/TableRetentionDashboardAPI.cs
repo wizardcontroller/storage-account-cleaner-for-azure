@@ -180,7 +180,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         RouteFormatTemplate = ControlChannelConstants.QueryWorkflowCheckpointStatusRouteFormatTemplate
                     };
 
-                    var queryWorkflowStatusTemplateRoute = await this.GetTemplateUrlForRoute(routeParam, oid, tenantid);
+                    var queryWorkflowStatusTemplateRoute = await this.GetTemplateUrlForRoute(routeParam, tenantid, oid);
 
                     log.LogTrace("populationg operator pagemodel with workflow checkpoint status");
                     operatorPageModel.QueryWorkflowCheckpointStatusEndpoint = queryWorkflowStatusTemplateRoute;
@@ -192,7 +192,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                         RouteFormatTemplate = ControlChannelConstants.DeleteWorkflowCheckpointEditModeRouteFormatTemplate
                     };
 
-                    var resetRoute = await this.GetTemplateUrlForRoute(resetStateParams, oid, tenantid);
+                    var resetRoute = await this.GetTemplateUrlForRoute(resetStateParams, tenantid, oid);
                     operatorPageModel.ResetDeviceUrl = resetRoute;
                     //OperatorPageModel.QueryWorkflowCheckpointStatusEndpoint = await this.GetTemplateUrlForRoute(ControlChannelConstants.QueryWorkflowCheckpointStatusEndpoint);
                 }
@@ -392,7 +392,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     log.LogTrace("populating orchestrations");
                     var orchestrationStatus = await this
                         .QueryAppliance<List<DurableOrchestrationStateDTO>>(System.Net.Http.HttpMethod.Get,
-                        await this.GetTemplateUrlForRoute(orchestrationRouteParams, oid, tenantid, fromDays));
+                        await this.GetTemplateUrlForRoute(orchestrationRouteParams, tenantid, oid, fromDays));
 
                     // ViewData[VIEWBAGKEY_ORCHESTRATION_STATUS] = orchestrationStatus;
                     operatorPageModel.Orchestrations = orchestrationStatus;
@@ -750,7 +750,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     RouteFormatTemplate = ControlChannelConstants.ApplianceContextRouteFormatTemplate
                 };
 
-                var route = await this.GetTemplateUrlForRoute(routeParam, oid, tenantId);
+                var route = await this.GetTemplateUrlForRoute(routeParam,tenantId, oid);
 
                 //var url = await this.GetTemplateUrlForRoute(ControlChannelConstants.ApplianceContextEndpoint);
                 log.LogTrace("getting appliance context from uri {0}", route);
@@ -954,7 +954,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     RouteFormatTemplate = ControlChannelConstants.QueryWorkflowCheckpointStatusRouteFormatTemplate
                 };
 
-                var queryWorkflowStatusTemplateRoute = await this.GetTemplateUrlForRoute(routeParam, oid, tenantid);
+                var queryWorkflowStatusTemplateRoute = await this.GetTemplateUrlForRoute(routeParam,  tenantid, oid);
                 ret = await this.QueryAppliance<WorkflowCheckpointDTO>(HttpMethod.Get, queryWorkflowStatusTemplateRoute); // new WorkflowCheckpointDTO();
 
             }
@@ -971,6 +971,17 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
         private void ConfigureHttpClientHeaders()
         {
             var currentSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+            
+            // subscription detection strategy
+            if(String.IsNullOrEmpty(currentSubscription))
+            {
+                var subscriptions =  this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
+                if(subscriptions.IsCompletedSuccessfully)
+                {
+                    currentSubscription = subscriptions.Result.FirstOrDefault().id;
+                }
+            }
+
             var impersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
             var token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);
             log.LogInformation("configuring dashboard rest client for call to appliance");

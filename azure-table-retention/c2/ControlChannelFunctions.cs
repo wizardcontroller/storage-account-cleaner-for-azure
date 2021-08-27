@@ -4,6 +4,7 @@ using com.ataxlab.azure.table.retention.models.models;
 using com.ataxlab.azure.table.retention.state.entities;
 using com.ataxlab.functions.table.retention.services;
 using com.ataxlab.functions.table.retention.utility;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -25,7 +26,7 @@ namespace com.ataxlab.functions.table.retention.c2
         private ITableRetentionApplianceEngine TableRetentionApplianceEngine { get; set; }
 
         ILogger<ControlChannelFunctions> log;
-
+        private IHttpContextAccessor CurrentHttpContext { get; set; }
         /// <summary>
         /// class globally available authentication status
         /// as we do jwt validation
@@ -35,7 +36,7 @@ namespace com.ataxlab.functions.table.retention.c2
         /// </summary>
         bool IsAuthorized { get; set; }
 
-        public ControlChannelFunctions(ITableRetentionApplianceEngine engine,
+        public ControlChannelFunctions(IHttpContextAccessor ctx, ITableRetentionApplianceEngine engine,
                                         //IConfiguration configuration, 
                                         ILogger<ControlChannelFunctions> logger)
         {
@@ -43,7 +44,7 @@ namespace com.ataxlab.functions.table.retention.c2
             //_configuration = configuration;
             TableRetentionApplianceEngine = engine;
 
-
+            this.CurrentHttpContext = ctx;
             log = logger;
         }
 
@@ -60,6 +61,7 @@ namespace com.ataxlab.functions.table.retention.c2
             log.LogInformation("appliance context endpoint is handling a request.");
             try
             {
+                var httpCtx = this.CurrentHttpContext.HttpContext;
 
                 // handle the case of sending a new appliance context
                 if (req.Method == HttpMethod.Post)
@@ -268,7 +270,8 @@ namespace com.ataxlab.functions.table.retention.c2
                 log.LogError("problem getting orchestration instances {0}", e.Message);
             }
 
-            var instanceId = CrucialExtensions.HashToGuid(tenantId, oid);
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+            var instanceId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
             //var workflowCheckpointEntityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid);
             //var workflowCheckpointEditModeEntityid = await this.TableRetentionApplianceEngine.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid);
             //var applianceContext = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
@@ -410,7 +413,9 @@ namespace com.ataxlab.functions.table.retention.c2
 
             log.LogInformation("Delete Operation Authorized? {0}", isAuthorized);
             //provisionally ignore the entity key
-            string entityKey = (CrucialExtensions.HashToGuid(tenantId, oid)).ToString();
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
+            string entityKey = (CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId)).ToString();
 
 
             // delete running orchestrations

@@ -58,6 +58,8 @@ export class AuthHeaderInterceptor implements HttpInterceptor, OnDestroy {
             this.pageModel?.impersonationToken?.toString() as string)
             .set(this.HEADER_ACCESS_TOKEN,
               this.pageModel?.accessToken?.toString() as string)
+            .set(this.HEADER_CURRENTSUBSCRIPTION,
+              this.pageModel?.selectedSubscriptionId?.toString() as string)
       });
 
       return next.handle(requestClone);

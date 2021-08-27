@@ -83,14 +83,14 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
         public async Task<IActionResult> AdminConsent(string tenant, string state, bool admin_consent)
         {
             int i = 0;
-            var tokenResult = await this.TokenAcquisition.GetAccessTokenForUserAsync(new[] { "https://management.azure.com/user_impersonation"},
+            var tokenResult = await this.TokenAcquisition.GetAccessTokenForUserAsync(new[] { "https://management.azure.com/user_impersonation" },
                tenantId: this.ApplianceClient.GetTenantIdFromUserClaims(), user: this.HttpContext.User);
 
             var subscriptions = await this.AzureManagementClient.GetSubscriptionsForLoggedInUser(tokenResult);
 
-            if(tokenResult != null &&
+            if (tokenResult != null &&
                 !String.IsNullOrEmpty(tokenResult))
-{
+            {
                 this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, tokenResult);
                 string redirectUrl = GetDefaultScopeAdminConsentUrl(); // GetAzureManagementPromptConsentUrl();
                 return Redirect(redirectUrl);
@@ -108,7 +108,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                 //return View(nameof(HomeController.Index), pageModel);
             }
-            
+
             string promptConsentUrl = GetDefaultScopeAdminConsentUrl(); // GetAzureManagementPromptConsentUrl();
             return Redirect(promptConsentUrl);
 
@@ -172,7 +172,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                 log.LogInformation("home controller has easy auth token = " + OperatorPageModel.EasyAuthAccessToken);
             }
-            catch(MicrosoftIdentityWebChallengeUserException e)
+            catch (MicrosoftIdentityWebChallengeUserException e)
             {
                 if (e.InnerException.Message.Contains("AADSTS65001"))
                 {
@@ -210,9 +210,9 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                     var response = await client.PostAsync(url, data);
                     log.LogInformation("app registered");
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
-                    int xi = 0; 
+                    int xi = 0;
                 }
             }
 
@@ -233,13 +233,13 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 $"& code_verifier={codeVerifier}&client_secret={clientSecret}";
             return url;
         }
-        
+
         [Obsolete]
         private string DeprecatedGetManagementAuthorizeUrl(string scopeBase = "openid profile https://management.azure.com/user_impersonation")
         {
             using (SHA256 mySHA256 = SHA256.Create())
             {
-                
+
                 var clientId = Configuration["AzureAd:clientId"];
                 var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims(); // "organizations"; 
                 var redirect = HttpUtility.UrlEncode($"https://{this.Request.Host}/azuremgmtauth");
@@ -250,7 +250,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                     $"client_id={clientId}" +
                     $"&response_type=code" +
                     $"&redirect_uri={redirect}" +
-                    $"&response_mode=query" +                  
+                    $"&response_mode=query" +
                     $"&scope={scope}" +
                     $"&state={state}&code_challenge={sha256}" +
                     $"&code_challenge_method=S256&prompt=consent";
@@ -322,7 +322,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 {
                     OperatorPageModel = await this.ApplianceClient.GetOperatorPageModel();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     int i = 0;
                 }
@@ -522,9 +522,11 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                             //[Bind("SelectedSubscriptionId,SelectedStorageAccountId,UserOid")]
                             ApplianceSessionContext applianceSessionContext)
         {
+            var subscriptionId = applianceSessionContext.SelectedSubscriptionId; // HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+
+            HttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, subscriptionId);
             OperatorPageModel OperatorPageModel = await InitializeOperatorPageModel();
 
-            var subscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
             OperatorPageModel.ApplianceSessionContext.AvailableStorageAccounts = await
                 this.ApplianceClient.GetStorageAccounts(subscriptionId,
             HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN),
@@ -578,7 +580,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                     .AddRange(selectedAccounts);
 
                 // update the context with the selected subscription
-                applianceSessionContext.SelectedSubscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+                // applianceSessionContext.SelectedSubscriptionId = HttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
                 var tenantId = this.ApplianceClient.GetTenantIdFromUserClaims();
                 applianceSessionContext.TenantId = tenantId;
                 foreach (var acct in selectedAccounts)
@@ -622,7 +624,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                 log.LogInformation("SelectSubscription will initialize page model");
                 OperatorPageModel = await InitializeOperatorPageModel();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 log.LogError($"operator pagemodel threw exception {e.Message}");
             }
@@ -640,7 +642,7 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
                             this.ApplianceClient.GetStorageAccounts(subscriptionId,
                                     HttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN), oid);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         log.LogError($"failed to get storage accounts {e.Message}");
                     }
@@ -655,15 +657,16 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
                         validSubscription.IsSelected = true;
                         OperatorPageModel.SubscriptionId = subscriptionId;
+                        OperatorPageModel.SelectedSubscriptionId = subscriptionId;
                         OperatorPageModel.ApplianceSessionContext.SelectedSubscription = validSubscription;
                         OperatorPageModel.ApplianceSessionContext.SelectedSubscriptionId = validSubscription.subscriptionId;
                         this.HttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, validSubscription.subscriptionId);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         log.LogError($"exception setting subscription {e.Message}");
                     }
-                    }
+                }
                 else
                 {
                     log.LogInformation("returning index view");

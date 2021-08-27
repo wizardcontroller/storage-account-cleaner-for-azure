@@ -207,7 +207,7 @@ export class ApplianceApiService implements OnDestroy {
             var tenantid = data.tenantid as string;
             console.log("ensurePageModelSubject(): tenantId: " + tenantid);
 
-            var subscriptionId = data.subscriptionId as string;
+            var subscriptionId = data.selectedSubscriptionId as string;
             console.log("ensurePageModelSubject(): subscriptionId: " + subscriptionId);
 
             var oid = data.oid as string;
