@@ -234,49 +234,53 @@ namespace com.ataxlab.azure.table.retention.services.azuremanagement
             {
                 var isTokenExpiring = await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN));
 
-                Microsoft.Identity.Client.AuthenticationResult impersonationResult = null;
-                if (String.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
-                {
-                    // never had a token
+                // Microsoft.Identity.Client.AuthenticationResult impersonationResult = null;
+                token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                     new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
+                CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
 
-                    token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User) ;
+                //if (String.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
+                //{
+                //    // never had a token
 
-
-                    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                    //    new List<string>() { mgmtScope });
-
-                    //impersonationResult = await TokenAcquisitionHelper
-                    //    .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                    //    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
-                    //// {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
-                    //token = impersonationResult.AccessToken;
-
-                    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
-                }
-                else if (await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
-                {
-                    token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                        new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
-
-                    // token is nearing expiration 
-                    //impersonationResult = await TokenAcquisitionHelper
-                    //                    .GetAuthenticationResultForUserAsync(scopes: new List<string>()
-                    //    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
-                    //// {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
-                    //token = impersonationResult.AccessToken;
+                //    token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                //        new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
 
 
-                    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
-                    //    new List<string>() { mgmtScope });
+                //    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                //    //    new List<string>() { mgmtScope });
 
-                    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
-                }
-                else
-                {
-                    token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
+                //    //impersonationResult = await TokenAcquisitionHelper
+                //    //    .GetAuthenticationResultForUserAsync(scopes: new List<string>()
+                //    //    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
+                //    //// {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
+                //    //token = impersonationResult.AccessToken;
 
-                }
+                //    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
+                //}
+                //else if (await IsTokenExpired(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN)))
+                //{
+                //    token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                //        new List<string>() { mgmtScope }, tenantId: this.GetTenantId(), user: this.CurrentHttpContext.User);
+
+                //    // token is nearing expiration 
+                //    //impersonationResult = await TokenAcquisitionHelper
+                //    //                    .GetAuthenticationResultForUserAsync(scopes: new List<string>()
+                //    //    {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: this.GetTenantId());
+                //    //// {ControlChannelConstants.AZUREMANAGEMENT_USERIMPERSONATION}, tenantId: Configuration["AzureAd:TenantId"]);
+                //    //token = impersonationResult.AccessToken;
+
+
+                //    //token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(
+                //    //    new List<string>() { mgmtScope });
+
+                //    CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN, token);
+                //}
+                //else
+                //{
+                //    token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
+
+                //}
             }
             catch (Exception ex)
             {
