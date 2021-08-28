@@ -40,7 +40,7 @@
             $(element).html('');
         $(element).append('updating...');
 
-        var currentSubscription = "@Model.ApplianceSessionContext.SelectedSubscriptionId";
+        var currentSubscription = "@Model.SelectedSubscriptionId";
         console.log("getting current workflow checkpoint status for subscription=".concat(currentSubscription))
         $.ajax({
             type: "GET",

@@ -158,7 +158,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     {
                         operatorPageModel = await EnsureAuthScopesforOperatorPageModel();
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         log.LogError($"problem ensuring access tokens for page model");
                         throw;
@@ -166,9 +166,22 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
 
                     oid = GetUserOidFromUserClaims();
                     tenantid = GetTenantIdFromUserClaims();
-                   
+
+                    try
+                    {
+                        // fulfill the subscriptions dependency
+                        var subscriptions = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
+                        var currentSubscription = subscriptions?.FirstOrDefault().subscriptionId;
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION, currentSubscription);
+                        operatorPageModel.SelectedSubscriptionId = currentSubscription;
+                    }
+                    catch(Exception e)
+                    {
+
+                    }
+
                     // may be null at this point
-                    operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
+                    // operatorPageModel.SelectedSubscriptionId = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
 
                     operatorPageModel.ImpersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
                     operatorPageModel.Oid = oid;
@@ -212,7 +225,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                 try
                 {
                     log.LogTrace("getting subscriptions for logged in user");
-                    var token = await this.TokenAcquisitionHelper.GetAccessTokenForUserAsync(new string[] { "https://management.azure.com/user_impersonation"}, tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
+                    var token = await this.TokenAcquisitionHelper.GetAccessTokenForUserAsync(new string[] { "https://management.azure.com/user_impersonation" }, tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
 
                     var subscriptionsResult = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser(token);
                     operatorPageModel.Subscriptions = subscriptionsResult;
@@ -314,7 +327,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     // maybe don't use the subscription on appliance context
                     // selectedSubscription = this.AzureManagementAPIClient.GetSubscriptions() // operatorPageModel.ApplianceSessionContext.SelectedSubscriptionId;
                     var subscriptions = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
-                    if(subscriptions == null || subscriptions.Count() == 0)
+                    if (subscriptions == null || subscriptions.Count() == 0)
                     {
                         operatorPageModel.ApplianceSessionContext.UserOid = oid;
                         operatorPageModel.IsMustRenderApplianceConfig = true;
@@ -416,7 +429,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             try
             {
                 // avoid examining the cache to determine the flow of the followinglogic
-                if(1 == 1)
+                if (1 == 1)
                 //if (string.IsNullOrEmpty(CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN)))
                 {
 
@@ -428,20 +441,20 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     { appUri + "/user_impersonation"};
 
                     var token = await this.CurrentHttpContext.GetTokenAsync("access_token");
- 
+
 
 
                     foreach (var s in eachScope)
                     {
-                            AuthenticationResult impersonationResult = await TokenAcquisitionHelper
+                        AuthenticationResult impersonationResult = await TokenAcquisitionHelper
 
-                                                        .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, this.GetTenantIdFromUserClaims());
+                                                    .GetAuthenticationResultForUserAsync(scopes: new List<string>() { s }, this.GetTenantIdFromUserClaims());
                         token = impersonationResult.AccessToken;
 
                         // token = await TokenAcquisitionHelper.GetAccessTokenForUserAsync(new[] { s } ,tenantId: this.GetTenantIdFromUserClaims(), user: this.CurrentHttpContext.User);
 
                         CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_ACCESS_TOKEN, token);
-                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken); 
+                        CurrentHttpContext.Session.SetString(ControlChannelConstants.SESSION_IDTOKEN, impersonationResult.IdToken);
                         OperatorPageModel.ImpersonationToken = token;
 
                         eventualAccessToken = token;
@@ -750,7 +763,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     RouteFormatTemplate = ControlChannelConstants.ApplianceContextRouteFormatTemplate
                 };
 
-                var route = await this.GetTemplateUrlForRoute(routeParam,tenantId, oid);
+                var route = await this.GetTemplateUrlForRoute(routeParam, tenantId, oid);
 
                 //var url = await this.GetTemplateUrlForRoute(ControlChannelConstants.ApplianceContextEndpoint);
                 log.LogTrace("getting appliance context from uri {0}", route);
@@ -954,7 +967,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
                     RouteFormatTemplate = ControlChannelConstants.QueryWorkflowCheckpointStatusRouteFormatTemplate
                 };
 
-                var queryWorkflowStatusTemplateRoute = await this.GetTemplateUrlForRoute(routeParam,  tenantid, oid);
+                var queryWorkflowStatusTemplateRoute = await this.GetTemplateUrlForRoute(routeParam, tenantid, oid);
                 ret = await this.QueryAppliance<WorkflowCheckpointDTO>(HttpMethod.Get, queryWorkflowStatusTemplateRoute); // new WorkflowCheckpointDTO();
 
             }
@@ -968,19 +981,14 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
         }
 
 
-        private void ConfigureHttpClientHeaders()
+        private async void ConfigureHttpClientHeaders()
         {
-            var currentSubscription = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_SELECTED_SUBSCRIPTION);
-            
-            // subscription detection strategy
-            if(String.IsNullOrEmpty(currentSubscription))
-            {
-                var subscriptions =  this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
-                if(subscriptions.IsCompletedSuccessfully)
-                {
-                    currentSubscription = subscriptions.Result.FirstOrDefault().id;
-                }
-            }
+            var currentSubscription = string.Empty;
+            var subscriptions = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
+
+            currentSubscription = subscriptions.FirstOrDefault().subscriptionId;
+
+            CurrentHttpContext.Session.SetString(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION, currentSubscription);
 
             var impersonationToken = this.CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_IMPERSONATION_TOKEN);
             var token = CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN);

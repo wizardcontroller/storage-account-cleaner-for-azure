@@ -717,6 +717,8 @@ namespace com.ataxlab.functions.table.retention.services
             // handle the case of wanting to get the appliance context
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.Accepted);
             var formatter = await this.GetJsonFormatter();
+            var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+            log.LogInformation($"handling appliance session context for subscriptionid={subscriptionId}; tenantId={tenantId}; oid={oid} ");
             var currentState = await this.GetApplianceContextForUser(tenantId, oid, durableClient);
             if (currentState.EntityExists == true)
             {
@@ -747,6 +749,7 @@ namespace com.ataxlab.functions.table.retention.services
             try
             {
                 var entityId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
+                log.LogInformation($"entityid calculated as {entityId.ToString()}");
 
                 try
                 {
@@ -759,7 +762,14 @@ namespace com.ataxlab.functions.table.retention.services
                     log.LogError("problem updating application context timestamp {0}", e.Message);
                 }
 
+
                 var currentstate = await durableClient.ReadEntityStateAsync<ApplianceSessionContextEntity>(entityId);
+
+                if (currentstate.EntityState != null)
+                {
+                    log.LogInformation($"returning appliance context userOid={currentstate.EntityState?.UserOid}; TenantId={currentstate.EntityState?.TenantId}; SelectedSubscriptionId={currentstate.EntityState.SelectedSubscriptionId} ");
+                }
+
                 ret = currentstate;
             }
             catch (Exception e)
@@ -871,6 +881,7 @@ namespace com.ataxlab.functions.table.retention.services
             var t = new T();
             var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
             var ctxId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
+            log.LogInformation($"getting entity key for tenantId={tenantId}, oid={oid}, subscriptionId={subscriptionId}");
             var ctxEntitId = new EntityId(t.GetType().Name, ctxId.ToString());
             return await Task.FromResult(ctxEntitId);
         }
@@ -1953,11 +1964,11 @@ namespace com.ataxlab.functions.table.retention.services
                 var ctxId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
                 await durableClient.SignalEntityAsync<IApplianceSessionContextEntity>(ctxId, proxy =>
                 {
-                // clear the current job output
-                proxy.SetCurrentJobOutput(ctx.CurrentJobOutput);
+                    // clear the current job output
+                    proxy.SetCurrentJobOutput(ctx.CurrentJobOutput);
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return false;
             }
@@ -2029,10 +2040,10 @@ namespace com.ataxlab.functions.table.retention.services
                 var methods = stackTrace.GetFrames().Select(s => s.GetMethod()).ToList();
                 var filtered = methods.Select(s => s.DeclaringType).ToList();
 
-                var frames = filtered.Where( w => w != null &&  w.FullName != null && w.FullName.Contains("ataxlab")).ToList(); // stackTrace.GetFrames().Where(w => w.GetMethod().DeclaringType.FullName.ToLower().Contains("ataxlab".ToLower())).ToList();
-                
-                
-                logEntry.source = frames[2].Name ; //stackTrace.GetFrame(2).GetMethod().Name;
+                var frames = filtered.Where(w => w != null && w.FullName != null && w.FullName.Contains("ataxlab")).ToList(); // stackTrace.GetFrames().Where(w => w.GetMethod().DeclaringType.FullName.ToLower().Contains("ataxlab".ToLower())).ToList();
+
+
+                logEntry.source = frames[2].Name; //stackTrace.GetFrame(2).GetMethod().Name;
 
                 var entityId = await this.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
                 await entityClient.SignalEntityAsync<IJobOutputLogEntity>(entityId, proxy =>

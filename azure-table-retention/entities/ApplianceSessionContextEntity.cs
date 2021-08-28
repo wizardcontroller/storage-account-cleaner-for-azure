@@ -13,6 +13,7 @@ using com.ataxlab.azure.table.retention.models;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Serialization;
+using System.Reactive;
 
 namespace com.ataxlab.azure.table.retention.state.entities
 {
@@ -93,7 +94,8 @@ namespace com.ataxlab.azure.table.retention.state.entities
         /// </summary>
         /// <param name="accounts"></param>
         public void SetSelectedStorageAccounts(List<StorageAccountEntity> accounts)
-        {
+{
+            TimeStamp = DateTime.UtcNow;
             SelectedStorageAccounts = accounts;
         }
 
@@ -104,6 +106,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
         public void SetUserOid(string oid)
         {
+            TimeStamp = DateTime.UtcNow;
             UserOid = oid;
         }
 
@@ -114,6 +117,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
         public void SetSelectedSubscriptionId(string id)
         {
+            TimeStamp = DateTime.UtcNow;
             SelectedSubscriptionId = id;
         }
 
@@ -124,6 +128,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
         public void SetTenantId(string tenantId)
         {
+            TimeStamp = DateTime.UtcNow;
             TenantId = tenantId;
         }
         public async Task<string> GetId()
@@ -133,11 +138,13 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
         public void SetId(string id)
         {
+            TimeStamp = DateTime.UtcNow;
             Id = id;
         }
 
         public void SetJobOutputHistory(List<ApplianceJobOutputEntity> jobOutput)
         {
+            TimeStamp = DateTime.UtcNow;
             JobOutput = jobOutput;
         }
 
@@ -153,6 +160,7 @@ namespace com.ataxlab.azure.table.retention.state.entities
 
         public void SetCurrentJobOutput(ApplianceJobOutputEntity output)
         {
+            TimeStamp = DateTime.UtcNow;
             CurrentJobOutput = output;
         }
 
@@ -414,10 +422,10 @@ namespace com.ataxlab.azure.table.retention.state.entities
             SelectedStorageAccounts = new List<StorageAccountEntity>();
             JobOutput = new List<ApplianceJobOutputEntity>();
             CurrentJobOutput = new ApplianceJobOutputEntity();
-
+            TimeStamp = DateTime.UtcNow;
         }
 
-
+        [JsonProperty("timeStamp")]
         public DateTime TimeStamp { get; set; }
         /// <summary>
         /// represents a hash of all the other properties

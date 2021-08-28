@@ -26,11 +26,11 @@ namespace com.ataxlab.functions.table.retention.utility
         public static Guid HashToGuid(this String plaintext) 
         {
 
-            var t = JsonConvert.SerializeObject(plaintext);
-            var bytes = Encoding.Default.GetBytes(t);
+            // var t = JsonConvert.SerializeObject(plaintext);
+            var bytes = ASCIIEncoding.ASCII.GetBytes(plaintext);
 
             MD5 hashIt = MD5.Create();
-            byte[] hashed = hashIt.ComputeHash(bytes);
+            byte[] hashed = new MD5CryptoServiceProvider().ComputeHash(bytes); // hashIt.ComputeHash(bytes);
 
             return new Guid(hashed);
         }

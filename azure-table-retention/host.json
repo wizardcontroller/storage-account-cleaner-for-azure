@@ -16,7 +16,7 @@
   },
   "logging": {
     "logLevel": {
-      "default": "warning"
+      "default": "information"
     },
     "applicationInsights": {
       "samplingExcludedTypes": "",
