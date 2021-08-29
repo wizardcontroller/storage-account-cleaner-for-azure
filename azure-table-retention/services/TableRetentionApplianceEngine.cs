@@ -314,7 +314,7 @@ namespace com.ataxlab.functions.table.retention.services
                 var command = await commandJson.FromJSONStringAsync<WorkflowOperationCommandEntity>();
                 var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
-                var instanceId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
+                var instanceId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
 
                 log.LogInformation("posted command code {0}", command.CommandCode.ToString("G"));
 
@@ -880,7 +880,7 @@ namespace com.ataxlab.functions.table.retention.services
         {
             var t = new T();
             var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
-            var ctxId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
+            var ctxId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
             log.LogInformation($"getting entity key for tenantId={tenantId}, oid={oid}, subscriptionId={subscriptionId}");
             var ctxEntitId = new EntityId(t.GetType().Name, ctxId.ToString());
             return await Task.FromResult(ctxEntitId);
@@ -913,7 +913,7 @@ namespace com.ataxlab.functions.table.retention.services
             }
 
             var operation = WorkflowOperation.ProvisionAppliance;
-            var instanceId = (CrucialExtensions.HashToGuid(tenantid, userOid, subscriptionid)).ToString();
+            var instanceId = (CrucialExtensions.HashToSha256(tenantid, userOid, subscriptionid)).ToString();
 
             var workflowEntityId = new EntityId(nameof(WorkflowCheckpoint), instanceId);
             var checkpointEntityId = new EntityId(nameof(WorkflowCheckpointEditMode), instanceId);
@@ -1723,7 +1723,7 @@ namespace com.ataxlab.functions.table.retention.services
                 // here because we can return a workflow checkpoint 
                 var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
-                var instanceId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
+                var instanceId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
                 log.LogInformation("workflow checkpoint found for user");
                 var orchestrationStatus = await durableClient.GetStatusAsync(instanceId.ToString(), showHistory: true);
 
@@ -1906,7 +1906,7 @@ namespace com.ataxlab.functions.table.retention.services
                 proxy.SetCurrentJobOutput(new ApplianceJobOutputEntity());
             });
 
-            var instanceId = CrucialExtensions.HashToGuid(tenantId, oid);
+            var instanceId = CrucialExtensions.HashToSha256(tenantId, oid);
             if (ctx.EntityExists)
             {
                 var existingInstance = await starter.GetStatusAsync(instanceId.ToString());

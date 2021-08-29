@@ -773,7 +773,7 @@ tenantId, oid, entityClient);
 
             var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
-            var ctxId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
+            var ctxId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
             var ctxEntitId = new EntityId(nameof(IApplianceSessionContextEntity), ctxId.ToString());
 
             var ctx = await entityClient.ReadEntityStateAsync<ApplianceSessionContextEntity>(ctxEntitId);

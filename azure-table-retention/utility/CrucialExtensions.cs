@@ -12,26 +12,70 @@ namespace com.ataxlab.functions.table.retention.utility
 {
     public static class CrucialExtensions
     {
-        public static Guid HashToGuid(params String[] values)
+       public static string HashToSha256(params String[] values)
         {
-            String combined = string.Empty;
-            foreach(var item in values)
+            StringBuilder combined = new StringBuilder(string.Empty);
+            foreach (var item in values)
             {
-                String.Concat(combined, item);
+                combined.Append(item);
             }
 
-            return combined.HashToGuid();
+            return combined.ToString().HashToGuid().ToString();
         }
 
-        public static Guid HashToGuid(this String plaintext) 
+
+
+        public static string HashToSha256(this String plaintext)
         {
+            string ret = string.Empty;
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
 
-            // var t = JsonConvert.SerializeObject(plaintext);
-            var bytes = ASCIIEncoding.ASCII.GetBytes(plaintext);
+                
+                byte[] sha267bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(plaintext));
+                ret = HashToGuid(ConvertStringToHex(plaintext, Encoding.UTF8).ToString()).ToString();
+                // a durable function entity key cannot contain special characters
+                // return ConvertStringToHex(System.Convert.ToBase64String(sha267bytes), Encoding.UTF8);
+            }
 
-            MD5 hashIt = MD5.Create();
-            byte[] hashed = new MD5CryptoServiceProvider().ComputeHash(bytes); // hashIt.ComputeHash(bytes);
+            return ret;
+        }
 
+        public static string ConvertStringToHex(String input, System.Text.Encoding encoding)
+        {
+            Byte[] stringBytes = encoding.GetBytes(input);
+            StringBuilder sbBytes = new StringBuilder(stringBytes.Length * 2);
+            foreach (byte b in stringBytes)
+            {
+                sbBytes.AppendFormat("{0:X2}", b);
+            }
+            return sbBytes.ToString();
+        }
+
+        public static Guid HashToGuid(params String[] values)
+        {
+            StringBuilder combined = new StringBuilder(string.Empty);
+            foreach (var item in values)
+            {
+                combined.Append(item);
+            }
+
+            return combined.ToString().HashToGuid();
+        }
+
+        public static Guid HashToGuid(this String plaintext)
+        {
+            byte[] hashed;
+            // Create a SHA256   
+
+
+                var t = JsonConvert.SerializeObject(plaintext);
+
+                var bytes = ASCIIEncoding.ASCII.GetBytes(plaintext);
+
+                MD5 hashIt = MD5.Create();
+                hashed = hashIt.ComputeHash(bytes);
+         
             return new Guid(hashed);
         }
 

@@ -271,7 +271,7 @@ namespace com.ataxlab.functions.table.retention.c2
             }
 
             var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
-            var instanceId = CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId);
+            var instanceId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
             //var workflowCheckpointEntityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid);
             //var workflowCheckpointEditModeEntityid = await this.TableRetentionApplianceEngine.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid);
             //var applianceContext = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
@@ -415,7 +415,7 @@ namespace com.ataxlab.functions.table.retention.c2
             //provisionally ignore the entity key
             var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
-            string entityKey = (CrucialExtensions.HashToGuid(tenantId, oid, subscriptionId)).ToString();
+            string entityKey = (CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId)).ToString();
 
 
             // delete running orchestrations
