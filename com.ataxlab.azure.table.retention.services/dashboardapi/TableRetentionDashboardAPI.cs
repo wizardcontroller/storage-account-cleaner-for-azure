@@ -801,7 +801,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             try
             {
 
-                HttpClient.DefaultRequestHeaders.Clear();
+                // HttpClient.DefaultRequestHeaders.Clear();
 
                 // TODO clean up the associated magic strings here there and everywhere
                 // expect url with trailing /api

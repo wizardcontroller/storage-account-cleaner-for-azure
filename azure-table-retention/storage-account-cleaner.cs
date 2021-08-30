@@ -719,6 +719,8 @@ tenantId, oid, entityClient);
             var tenantId = activityConfig.ActivityContext.TenantId;
             var oid = activityConfig.ActivityContext.UserOid;
             var token = activityConfig.AuthToken;
+            var subscriptionId = activityConfig.ActivityContext.SelectedSubscriptionId;
+
             await this.TableRetentionApplianceEngine.Log(new JobOutputLogEntry()
             {
                 summary = "storage accounts",
@@ -770,8 +772,6 @@ tenantId, oid, entityClient);
                 tenantId, oid, entityClient);
                 log.LogError($"exception getting storage accounts {e.Message}");
             }
-
-            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
             var ctxId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
             var ctxEntitId = new EntityId(nameof(IApplianceSessionContextEntity), ctxId.ToString());

@@ -147,12 +147,12 @@ namespace com.ataxlab.functions.table.retention.dashboard.Controllers
 
             try
             {
-                OperatorPageModel = await InitializeOperatorPageModel();
+ 
 
                 if (User.Identity.IsAuthenticated)
                 {
 
-
+                    OperatorPageModel = await InitializeOperatorPageModel();
 
                     if (OperatorPageModel.Subscriptions == null || OperatorPageModel.Subscriptions.Count() == 0)
                     {

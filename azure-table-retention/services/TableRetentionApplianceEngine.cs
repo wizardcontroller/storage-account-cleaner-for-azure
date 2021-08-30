@@ -58,15 +58,16 @@ namespace com.ataxlab.functions.table.retention.services
 
         public Task<List<AvailableCommandEntity>> GetAvailableCommandsForTransition(WorkflowOperation candidateOperation, SubscriptionDTO subscription = null);
 
-        public Task<OrchestrationStatusQueryResult> QueryInstancesAsync(IDurableOrchestrationClient client, OrchestrationStatusQueryCondition queryFilter);
-        public JObject GetCustomEventForJObject(string policyStatus);
-        Task<bool> CanGetStorageAccountsForUser(string impersonate, ApplianceSessionContextEntityBase ctx);
         Task<TableRetentionApplianceEngine.ApplianceInitializationResult> ValidateApplianceContextForUser(string tenantId, string oid, List<Claim> userClaims, string impersonationToken, ApplianceSessionContextEntityBase ctx);
-        Task<string> GetImpersonationTokenFromHeaders(HttpRequestHeaders headers);
-        Task<string> GetUserOidFromClaims(IEnumerable<Claim> claims);
 
         Task<TableStorageRetentionPolicyEntity> GetRetentionPolicy(string tenantId, string subscriptionId, string storageAccountId, string oid, IDurableClient durableClient);
         Task<TableStorageRetentionPolicyEntity> SetGetRetentionPolicy(string tenantId, string subscriptionId, string storageAccountId, string oid, TableStorageRetentionPolicyEntity policy, IDurableClient durableClient);
+
+        public Task<OrchestrationStatusQueryResult> QueryInstancesAsync(IDurableOrchestrationClient client, OrchestrationStatusQueryCondition queryFilter);
+        public JObject GetCustomEventForJObject(string policyStatus);
+        Task<bool> CanGetStorageAccountsForUser(string impersonate, ApplianceSessionContextEntityBase ctx);
+        Task<string> GetImpersonationTokenFromHeaders(HttpRequestHeaders headers);
+        Task<string> GetUserOidFromClaims(IEnumerable<Claim> claims);
 
         #region durable entity operations
 
@@ -312,7 +313,7 @@ namespace com.ataxlab.functions.table.retention.services
 
                 log.LogInformation("posted command null {0}", commandJson == null);
                 var command = await commandJson.FromJSONStringAsync<WorkflowOperationCommandEntity>();
-                var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+                var subscriptionId = command.CandidateCommand.SubscriptionId; // await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
                 var instanceId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
 
