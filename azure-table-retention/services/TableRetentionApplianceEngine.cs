@@ -42,7 +42,7 @@ namespace com.ataxlab.functions.table.retention.services
         public Task<WorkflowCheckpoint> ProvisionDevice(IDurableEntityClient durableEntityClient,
                                                         string tenantid, string subscriptionid,
                                                         string userOid, ApplianceSessionContextEntityBase ctx);
-        public Task<HttpResponseMessage> GetResponseForBeginWorkflow(IDurableEntityClient entityClient, IDurableClient durableClient, IDurableOrchestrationClient starter, string tenantId, string oid);
+        public Task<HttpResponseMessage> GetResponseForBeginWorkflow(IDurableEntityClient entityClient, IDurableClient durableClient, IDurableOrchestrationClient starter, string tenantId, string oid, string subscriptionId);
 
         public Task<bool> ApplyAuthorizationStrategy(HttpRequestHeaders req, ClaimsPrincipal claimsPrincipal, SubscriptionDTO subscription = null);
         public string GetAuthorizationHeader(HttpRequestHeaders req);
@@ -73,22 +73,22 @@ namespace com.ataxlab.functions.table.retention.services
 
 
 
-        Task<EntityId> GetEntityIdForUser<T>(string tenantId, string oid) where T : new();
-        Task<EntityStateResponse<ApplianceSessionContextEntity>> GetApplianceContextForUser(string tenantId, string oid, IDurableEntityClient durableClient);
+        Task<EntityId> GetEntityIdForUser<T>(string tenantId, string oid, string subscriptionId = "") where T : new();
+        Task<EntityStateResponse<ApplianceSessionContextEntity>> GetApplianceContextForUser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId = "");
         Task<EntityStateResponse<WorkflowCheckpoint>> GetWorkflowCheckpointEntityForUser(IDurableEntityClient durableClient, EntityId entityId, string subscriptionid, string tenantid, string oid);
         Task<EntityStateResponse<WorkflowCheckpointEditMode>> GetWorkflowCheckpointEditModeEntityForUser(IDurableEntityClient durableClient, EntityId entityId, string subscriptionid, string tenantid, string oid);
-        Task<HttpResponseMessage> GetWorkflowEditModeCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid);
-        Task<HttpResponseMessage> GetWorkflowCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid);
+        Task<HttpResponseMessage> GetWorkflowEditModeCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string subscriptionId = "");
+        Task<HttpResponseMessage> GetWorkflowCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string subscriptionId = "");
         Task<bool> SetWorkflowState(IDurableClient durableEntityClient, List<AvailableCommandEntity> commands, string message, WorkflowCheckpointIdentifier commandCode, SubscriptionDTO subscription = null);
         Task SetWorkflowCheckpointForUser(IDurableEntityClient durableEntityClient, EntityId entityId, string tenantId, string userOid, string subscriptionId, WorkflowOperation workflowOperation);
 
-        Task<ApplianceSessionContextEntityBase> SetApplianceContextForUser(string tenantId, string oid, ApplianceSessionContextEntityBase ctx, IDurableClient durableEntityClient);
-        Task<HttpResponseMessage> GetApplianceSessionContextResponseForuser(string tenantId, string oid, IDurableEntityClient durableClient);
+        Task<ApplianceSessionContextEntityBase> SetApplianceContextForUser(string tenantId, string oid, ApplianceSessionContextEntityBase ctx, IDurableClient durableEntityClient, string subscriptionId);
+        Task<HttpResponseMessage> GetApplianceSessionContextResponseForuser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId = "");
         Task<HttpResponseMessage> GetResposeForPostedApplianceSessionContext(string impersonationToken, string tenantId, string oid, List<Claim> claims, IDurableClient durableClient, string commandJson);
         Task<HttpResponseMessage> GetResponseForWorkflowOperator(IDurableOrchestrationClient starter, IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string commandJson, string impersonationToken);
         Task<EntityStateResponse<WorkflowCheckpoint>> GetStateForUpdateWorkflowCheckpoints(IDurableEntityClient durableEntityClient, string tenantid, string subscriptionid, string userOid, WorkflowOperation operation);
-        Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient);
-        Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient);
+        Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient, string susbscriptionId);
+        Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient, string subscriptionId = "");
         Task<string> GetHttpContextHeaderValueForKey(string headerKey);
         #endregion durable entity operations
     }
@@ -319,8 +319,8 @@ namespace com.ataxlab.functions.table.retention.services
 
                 log.LogInformation("posted command code {0}", command.CommandCode.ToString("G"));
 
-                var applianceContextEntityId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
-                var applianceContext = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient);
+                var applianceContextEntityId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid, subscriptionId);
+                var applianceContext = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient, subscriptionId);
                 if (applianceContext.EntityExists)
                 {
                     log.LogInformation("dispatching command with valid appliance context");
@@ -333,7 +333,7 @@ namespace com.ataxlab.functions.table.retention.services
                             orchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed)
                         {
                             // orchestration failed - apply the begin workflow condition
-                            httpResponseMessage = await this.GetResponseForBeginWorkflow(durableEntityClient, durableClient, starter, tenantId, oid);
+                            httpResponseMessage = await this.GetResponseForBeginWorkflow(durableEntityClient, durableClient, starter, tenantId, oid, subscriptionId);
                             //return await this
                             //    .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
 
@@ -408,10 +408,10 @@ namespace com.ataxlab.functions.table.retention.services
 
                                         // validate the user passed a usable token to run the workflow
                                         return await this
-                                            .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                                            .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                                     }
                                     return await this
-                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
 
                                 }
                             case WorkflowOperation.GetCurrentWorkflowCheckpoint:
@@ -419,10 +419,10 @@ namespace com.ataxlab.functions.table.retention.services
                                     // report the workflow status - redundant
                                     log.LogInformation("executing operation {0}", WorkflowOperation.GetCurrentWorkflowCheckpoint.ToString("G"));
 
-                                    var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid);
+                                    var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid, subscriptionId);
 
                                     return await this
-                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
 
                                 }
 
@@ -433,9 +433,9 @@ namespace com.ataxlab.functions.table.retention.services
                                     // this is one of the available commands
                                     log.LogInformation("executing operation {0}", WorkflowOperation.BeginWorkflow.ToString("G"));
                                     // validate the user passed a usable token to run the workflow
-                                    httpResponseMessage = await this.GetResponseForBeginWorkflow(durableEntityClient, durableClient, starter, tenantId, oid);
+                                    httpResponseMessage = await this.GetResponseForBeginWorkflow(durableEntityClient, durableClient, starter, tenantId, oid, subscriptionId);
                                     return await this
-                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
 
                                 }
                             case WorkflowOperation.GetV2StorageAccounts:
@@ -461,7 +461,7 @@ namespace com.ataxlab.functions.table.retention.services
 
                                     // validate the user passed a usable token to run the workflow
                                     return await this
-                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                                 }
                             case WorkflowOperation.BuildEnvironmentRetentionPolicy:
                                 {
@@ -481,7 +481,7 @@ namespace com.ataxlab.functions.table.retention.services
                                         ControlChannelConstants.WorkflowEvent_BuildRetentionPolicyTuples,
                                         config);
                                     return await this
-                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                                 }
 
                             case WorkflowOperation.ApplyEnvironmentRetentionPolicy:
@@ -502,7 +502,7 @@ namespace com.ataxlab.functions.table.retention.services
                                             ControlChannelConstants.WorkflowEvent_ApplyRetentionPolicyTuples,
                                             config);
                                     return await this
-                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                                 }
 
                             case WorkflowOperation.CommitRetentionPolicyConfiguration:
@@ -523,12 +523,12 @@ namespace com.ataxlab.functions.table.retention.services
                                                 ControlChannelConstants.WorkflowEvent_CommitRetentionPolicy,
                                                 config);
                                     return await this
-                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                                        .GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                                 }
                             case WorkflowOperation.ProvisionAppliance:
                                 {
                                     // provision if appliance context exists
-                                    var ctx = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient);
+                                    var ctx = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient, subscriptionId);
                                     if (ctx.EntityExists)
                                     {
                                         try
@@ -537,7 +537,7 @@ namespace com.ataxlab.functions.table.retention.services
                                                                                 ControlChannelConstants.CANCEL_WORKFLOW,
                                                                                 command);
 
-                                            httpResponseMessage = await this.GetResponseForBeginWorkflow(durableEntityClient, durableClient, starter, tenantId, oid);
+                                            httpResponseMessage = await this.GetResponseForBeginWorkflow(durableEntityClient, durableClient, starter, tenantId, oid, subscriptionId);
 
                                             //var state = await this.GetStateForUpdateWorkflowCheckpoints(durableEntityClient, tenantId, subscriptionId,
                                             //        oid, command.CommandCode);
@@ -553,7 +553,7 @@ namespace com.ataxlab.functions.table.retention.services
                                             tenantId, command.CandidateCommand.SubscriptionId, oid, ctx.EntityState);
                                         log.LogInformation("operation completed");
                                         return await this.GetWorkflowCheckpointResponseForUser(durableClient,
-                                            durableEntityClient, tenantId, oid);
+                                            durableEntityClient, tenantId, oid, subscriptionId);
                                     }
                                     else
                                     {
@@ -664,7 +664,7 @@ namespace com.ataxlab.functions.table.retention.services
                     result = await this.SetApplianceContextForUser(
                                         tenantId,
                                         oid,
-                                        applianceContext, durableClient);
+                                        applianceContext, durableClient, applianceContext.SelectedSubscriptionId);
                     log.LogInformation("done persisting appliance context");
                 }
                 catch (Exception e)
@@ -713,14 +713,14 @@ namespace com.ataxlab.functions.table.retention.services
             }
         }
 
-        public async Task<HttpResponseMessage> GetApplianceSessionContextResponseForuser(string tenantId, string oid, IDurableEntityClient durableClient)
+        public async Task<HttpResponseMessage> GetApplianceSessionContextResponseForuser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId )
         {
             // handle the case of wanting to get the appliance context
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.Accepted);
             var formatter = await this.GetJsonFormatter();
-            var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
             log.LogInformation($"handling appliance session context for subscriptionid={subscriptionId}; tenantId={tenantId}; oid={oid} ");
-            var currentState = await this.GetApplianceContextForUser(tenantId, oid, durableClient);
+            var currentState = await this.GetApplianceContextForUser(tenantId, oid, durableClient, subscriptionId);
             if (currentState.EntityExists == true)
             {
                 var currentPolicyJobs = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs;
@@ -743,13 +743,13 @@ namespace com.ataxlab.functions.table.retention.services
             }
         }
 
-        public async Task<EntityStateResponse<ApplianceSessionContextEntity>> GetApplianceContextForUser(string tenantId, string oid, IDurableEntityClient durableClient)
+        public async Task<EntityStateResponse<ApplianceSessionContextEntity>> GetApplianceContextForUser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId)
         {
 
             EntityStateResponse<ApplianceSessionContextEntity> ret = new EntityStateResponse<ApplianceSessionContextEntity>();
             try
             {
-                var entityId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
+                var entityId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid, subscriptionId);
                 log.LogInformation($"entityid calculated as {entityId.ToString()}");
 
                 try
@@ -794,9 +794,9 @@ namespace com.ataxlab.functions.table.retention.services
         /// <param name="oid"></param>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public async Task<ApplianceSessionContextEntityBase> SetApplianceContextForUser(string tenantId, string oid, ApplianceSessionContextEntityBase ctx, IDurableClient durableEntityClient)
+        public async Task<ApplianceSessionContextEntityBase> SetApplianceContextForUser(string tenantId, string oid, ApplianceSessionContextEntityBase ctx, IDurableClient durableEntityClient, string subscriptionId)
         {
-            EntityId ctxEntitId = await GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
+            EntityId ctxEntitId = await GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid, subscriptionId);
 
             try
             {
@@ -877,10 +877,11 @@ namespace com.ataxlab.functions.table.retention.services
             });
         }
 
-        public async Task<EntityId> GetEntityIdForUser<T>(string tenantId, string oid) where T : new()
+        public async Task<EntityId> GetEntityIdForUser<T>(string tenantId, string oid, string subscriptionId) where T : new()
         {
             var t = new T();
-            var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
+
             var ctxId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
             log.LogInformation($"getting entity key for tenantId={tenantId}, oid={oid}, subscriptionId={subscriptionId}");
             var ctxEntitId = new EntityId(t.GetType().Name, ctxId.ToString());
@@ -1003,7 +1004,7 @@ namespace com.ataxlab.functions.table.retention.services
 
         public async Task<EntityStateResponse<WorkflowCheckpoint>> GetStateForUpdateWorkflowCheckpoints(IDurableEntityClient durableEntityClient, string tenantid, string subscriptionid, string userOid, WorkflowOperation operation)
         {
-            var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantid, userOid);
+            var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantid, userOid, subscriptionid);
             var currentstate = await durableEntityClient.ReadEntityStateAsync<WorkflowCheckpoint>(entityId);
             log.LogInformation("current workflow checkpoint state exists? {0}", currentstate.EntityExists);
 
@@ -1011,7 +1012,7 @@ namespace com.ataxlab.functions.table.retention.services
             log.LogInformation("update the live mode state");
             await SetWorkflowCheckpointForUser(durableEntityClient, entityId, tenantid, userOid, subscriptionid, operation);
 
-            entityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantid, userOid);
+            entityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantid, userOid, subscriptionid);
             log.LogInformation("update the edit mode state");
             await SetWorkflowCheckpointForUser(durableEntityClient, entityId, tenantid, userOid, subscriptionid, operation);
 
@@ -1276,8 +1277,8 @@ namespace com.ataxlab.functions.table.retention.services
 
             log.LogInformation("ValidateTransition");
             var httpCtx = this.CurrentHttpContext.HttpContext;
-            var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid);
-            var editModeEntityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid);
+            var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid, subscriptionId);
+            var editModeEntityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid, subscriptionId);
 
             var state = await this.GetWorkflowCheckpointEntityForUser(durableClient, entityId, tenantId, oid, subscriptionId);
             log.LogInformation("current workflow checkpoint state {0}", await state.ToJSONStringAsync());
@@ -1618,18 +1619,18 @@ namespace com.ataxlab.functions.table.retention.services
             return state;
         }
 
-        public async Task<HttpResponseMessage> GetWorkflowCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid)
+        public async Task<HttpResponseMessage> GetWorkflowCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string subscriptionId)
         {
 
             try
             {
 
-                var applianceContext = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient);
+                var applianceContext = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient, subscriptionId);
                 if (applianceContext.EntityExists == true)
                 {
                     log.LogInformation("found appliance context for user");
-                    var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid);
-                    var editEntityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid);
+                    var entityId = await this.GetEntityIdForUser<WorkflowCheckpoint>(tenantId, oid, subscriptionId);
+                    var editEntityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid, subscriptionId);
                     // instantiates the entity if not exists
                     await durableEntityClient.SignalEntityAsync<IWorkflowCheckpoint>(entityId, proxy =>
                     { proxy.SetTimeStamp(DateTime.UtcNow); });
@@ -1818,14 +1819,14 @@ namespace com.ataxlab.functions.table.retention.services
             }
         }
 
-        public async Task<HttpResponseMessage> GetWorkflowEditModeCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid)
+        public async Task<HttpResponseMessage> GetWorkflowEditModeCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string subscriptionId)
         {
             var formatter = await this.GetJsonFormatter();
-            var applianceContext = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient);
+            var applianceContext = await this.GetApplianceContextForUser(tenantId, oid, durableEntityClient, subscriptionId);
             if (applianceContext.EntityExists == true)
             {
                 log.LogInformation("found checkpoint for user");
-                var entityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid);
+                var entityId = await this.GetEntityIdForUser<WorkflowCheckpointEditMode>(tenantId, oid, subscriptionId);
                 var result = await this.GetWorkflowCheckpointEditModeEntityForUser(durableEntityClient, entityId,
                    await applianceContext.EntityState.GetSelectedSubscriptionId(), tenantId, oid);
                 if (result.EntityExists != true)
@@ -1894,20 +1895,20 @@ namespace com.ataxlab.functions.table.retention.services
         /// <param name="starter"></param>
         /// <returns></returns>
         public async Task<HttpResponseMessage> GetResponseForBeginWorkflow([DurableClient] IDurableEntityClient entityClient,
-            IDurableClient durableClient, IDurableOrchestrationClient starter, string tenantId, string oid)
+            IDurableClient durableClient, IDurableOrchestrationClient starter, string tenantId, string oid, string subscriptionId)
         {
             DurableOrchestrationStatus durableOrchestrationStatus = new DurableOrchestrationStatus();
-            var ctx = await this.GetApplianceContextForUser(tenantId, oid, entityClient);
+            var ctx = await this.GetApplianceContextForUser(tenantId, oid, entityClient, subscriptionId);
             // reset the context
 
-            var ctxId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
+            var ctxId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid, subscriptionId);
             await entityClient.SignalEntityAsync<IApplianceSessionContextEntity>(ctxId, proxy =>
             {
                 // clear the current job output
                 proxy.SetCurrentJobOutput(new ApplianceJobOutputEntity());
             });
 
-            var instanceId = CrucialExtensions.HashToSha256(tenantId, oid);
+            var instanceId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
             if (ctx.EntityExists)
             {
                 var existingInstance = await starter.GetStatusAsync(instanceId.ToString());
@@ -1958,11 +1959,11 @@ namespace com.ataxlab.functions.table.retention.services
             return httpResponseMessage;
         }
 
-        public async Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient)
+        public async Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient, string subscriptionId)
         {
             try
             {
-                var ctxId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
+                var ctxId = await this.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid, subscriptionId);
                 await durableClient.SignalEntityAsync<IApplianceSessionContextEntity>(ctxId, proxy =>
                 {
                     // clear the current job output
@@ -2032,7 +2033,7 @@ namespace com.ataxlab.functions.table.retention.services
             throw new NotImplementedException();
         }
 
-        public async Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient)
+        public async Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient, string subscriptionId)
         {
             try
             {
@@ -2046,7 +2047,7 @@ namespace com.ataxlab.functions.table.retention.services
 
                 logEntry.source = frames[2].Name; //stackTrace.GetFrame(2).GetMethod().Name;
 
-                var entityId = await this.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
+                var entityId = await this.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid, subscriptionId);
                 await entityClient.SignalEntityAsync<IJobOutputLogEntity>(entityId, proxy =>
                 {
                     proxy.appendLog(logEntry);

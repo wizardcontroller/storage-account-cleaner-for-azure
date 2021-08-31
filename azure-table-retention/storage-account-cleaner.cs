@@ -282,6 +282,8 @@ namespace com.ataxlab.functions.table.retention
             ApplianceSessionContextEntity ret = new ApplianceSessionContextEntity();
             string tenantId = string.Empty;
             string oid = string.Empty;
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
 
             var input = new ActivityConfig();
             try
@@ -303,8 +305,8 @@ namespace com.ataxlab.functions.table.retention
                         severity = "info",
                         timeStamp = DateTime.UtcNow
                     },
-                    tenantId, oid, entityClient);
-                    var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
+                    tenantId, oid, entityClient, subscriptionId);
+                    var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid, subscriptionId);
                     var entity = await entityClient.ReadEntityStateAsync<ApplianceSessionContextEntity>(entityId);
                     var entityJson = JsonConvert.SerializeObject(entity.EntityState);
                     ret = JsonConvert.DeserializeObject<ApplianceSessionContextEntity>(entityJson);
@@ -316,7 +318,7 @@ namespace com.ataxlab.functions.table.retention
                         severity = "info",
                         timeStamp = DateTime.UtcNow
                     },
-                    tenantId, oid, entityClient);
+                    tenantId, oid, entityClient, subscriptionId);
                 }
             }
             catch (Exception e)
@@ -329,7 +331,7 @@ namespace com.ataxlab.functions.table.retention
                     severity = "error",
                     timeStamp = DateTime.UtcNow
                 },
-tenantId, oid, entityClient);
+tenantId, oid, entityClient, subscriptionId);
             }
 
             return ret;
@@ -440,7 +442,7 @@ tenantId, oid, entityClient);
                     timeStamp = DateTime.UtcNow,
                     ExecutedCommand = input.WorkflowOperation.CandidateCommand
                 },
-                tenantId, oid, entityClient);
+                tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
                 policies = jobOutput.retentionPolicyJobs.Select(s => s.SourceTuple).ToList();
 
                 foreach (var policyTuple in policies)
@@ -454,7 +456,7 @@ tenantId, oid, entityClient);
                         timeStamp = DateTime.UtcNow,
                         ExecutedCommand = input.WorkflowOperation.CandidateCommand
                     },
-    tenantId, oid, entityClient);
+    tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
 
                     TableStorageEntityRetentionPolicyEntity tableStorageEntityRetentionPolicy = policyTuple.Item1.TableStorageEntityRetentionPolicy;
                     TableStorageTableRetentionPolicyEntity tableStorageTableRetentionPolicy = policyTuple.Item1.TableStorageTableRetentionPolicy;
@@ -479,7 +481,7 @@ tenantId, oid, entityClient);
                             timeStamp = DateTime.UtcNow,
                             ExecutedCommand = input.WorkflowOperation.CandidateCommand
                         },
-                    tenantId, oid, entityClient);
+                    tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
                     }
                     catch (Exception e)
                     {
@@ -492,7 +494,7 @@ tenantId, oid, entityClient);
                             timeStamp = DateTime.UtcNow,
                             ExecutedCommand = input.WorkflowOperation.CandidateCommand
                         },
-                            tenantId, oid, entityClient);
+                            tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
                         log.LogError("exception applying policy {0}", e.Message);
                     }
 
@@ -508,7 +510,7 @@ tenantId, oid, entityClient);
                             timeStamp = DateTime.UtcNow,
                             ExecutedCommand = input.WorkflowOperation.CandidateCommand
                         },
-                    tenantId, oid, entityClient);
+                    tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
                     }
                     catch (Exception e)
                     {
@@ -521,7 +523,7 @@ tenantId, oid, entityClient);
                             timeStamp = DateTime.UtcNow,
                             ExecutedCommand = input.WorkflowOperation.CandidateCommand
                         },
-                            tenantId, oid, entityClient);
+                            tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
 
                     }
 
@@ -535,7 +537,7 @@ tenantId, oid, entityClient);
                             timeStamp = DateTime.UtcNow,
                             ExecutedCommand = input.WorkflowOperation.CandidateCommand
                         },
-                    tenantId, oid, entityClient);
+                    tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
                         // persist the job output
                         var contextId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(input.ActivityContext.TenantId, input.ActivityContext.UserOid);
                         var currentState = await entityClient.ReadEntityStateAsync<IApplianceSessionContextEntity>(contextId);
@@ -568,7 +570,7 @@ tenantId, oid, entityClient);
                             timeStamp = DateTime.UtcNow,
                             ExecutedCommand = input.WorkflowOperation.CandidateCommand
                         },
-                    tenantId, oid, entityClient);
+                    tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
 
                     }
                     catch (Exception e)
@@ -582,7 +584,7 @@ tenantId, oid, entityClient);
                             timeStamp = DateTime.UtcNow,
                             ExecutedCommand = input.WorkflowOperation.CandidateCommand
                         },
-                        tenantId, oid, entityClient);
+                        tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
                     }
 
                     log.LogInformation(string.Format("applied Retention Policy Tuples"));
@@ -602,7 +604,7 @@ tenantId, oid, entityClient);
                     timeStamp = DateTime.UtcNow,
                     ExecutedCommand = input.WorkflowOperation.CandidateCommand
                 },
-                            tenantId, oid, entityClient);
+                            tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
                 return ret;
             }
 
@@ -638,7 +640,7 @@ tenantId, oid, entityClient);
                     timeStamp = DateTime.UtcNow,
                     ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
                 },
-                tenantId, oid, entityClient);
+                tenantId, oid, entityClient, activityConfig.ActivityContext.SelectedSubscriptionId);
                 log.LogTrace("build retention policy tuples: using token {0}", token);
                 log.LogTrace("build retention policy tuples: using tenantId {0}", tenantId);
                 log.LogTrace("build retention policy tuples: using oid {0}", oid);
@@ -658,7 +660,7 @@ tenantId, oid, entityClient);
                     timeStamp = DateTime.UtcNow,
                     ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
                 },
-                tenantId, oid, entityClient);
+                tenantId, oid, entityClient, activityConfig.ActivityContext.SelectedSubscriptionId);
                 var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
                 var currentCtx = await this.TableRetentionApplianceEngine.ActivitiesEngine.InitializeCurrentJobOutput(entityId,
                     entityClient, result);
@@ -672,7 +674,7 @@ tenantId, oid, entityClient);
                     timeStamp = DateTime.UtcNow,
                     ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
                 },
-                tenantId, oid, entityClient);
+                tenantId, oid, entityClient, activityConfig.ActivityContext.SelectedSubscriptionId);
                 log.LogTrace("completed BuildRetentionPolicyTuples activity");
 
             }
@@ -686,7 +688,7 @@ tenantId, oid, entityClient);
                     timeStamp = DateTime.UtcNow,
                     ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
                 },
-               tenantId, oid, entityClient);
+               tenantId, oid, entityClient, activityConfig.ActivityContext.SelectedSubscriptionId);
                 log.LogError("problem getting tuples {0}", e.Message);
             }
 
@@ -729,7 +731,7 @@ tenantId, oid, entityClient);
                 timeStamp = DateTime.UtcNow,
                 ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
             },
-                tenantId, oid, entityClient);
+                tenantId, oid, entityClient, activityConfig.ActivityContext.SelectedSubscriptionId);
 
             // TODO - make a RESET current job output -
             // clear the previous workflow results for this step
@@ -757,7 +759,7 @@ tenantId, oid, entityClient);
                     timeStamp = DateTime.UtcNow,
                     ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
                 },
-                tenantId, oid, entityClient);
+                tenantId, oid, entityClient, activityConfig.ActivityContext.SelectedSubscriptionId);
             }
             catch (Exception e)
             {
@@ -769,7 +771,7 @@ tenantId, oid, entityClient);
                     timeStamp = DateTime.UtcNow,
                     ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
                 },
-                tenantId, oid, entityClient);
+                tenantId, oid, entityClient, activityConfig.ActivityContext.SelectedSubscriptionId);
                 log.LogError($"exception getting storage accounts {e.Message}");
             }
 

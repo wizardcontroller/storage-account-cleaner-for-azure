@@ -69,7 +69,7 @@ namespace com.ataxlab.functions.table.retention.c2
         {
             log.LogInformation("RetentionPolicyEndpoint");
             var ret = new TableStorageRetentionPolicyEntity();
-
+  
             bool isAuthorized = false;
             isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
 
@@ -79,7 +79,7 @@ namespace com.ataxlab.functions.table.retention.c2
                 try
                 {
                     log.LogInformation("getting workflow checkpoint response for user");
-                    var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                    var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                     log.LogInformation("got workflow checkpoint response for user");
 
 
@@ -144,7 +144,7 @@ namespace com.ataxlab.functions.table.retention.c2
                 try
                 {
                     log.LogInformation("getting workflow checkpoint response for user");
-                    var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                    var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                     log.LogInformation("got workflow checkpoint response for user");
 
                     return ret;
@@ -184,12 +184,14 @@ namespace com.ataxlab.functions.table.retention.c2
             string oid,
           ClaimsPrincipal claimsPrincipal)
         {
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
             log.LogInformation("QueryWorkflowEditModeCheckpointStatusEndpoint");
             bool isAuthorized = false;
             isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             if (isAuthorized)
             {
-                var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                 return response;
             }
             else
@@ -215,12 +217,13 @@ namespace com.ataxlab.functions.table.retention.c2
         {
             try
             {
+                var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
 
                 if (req.Method == HttpMethod.Get)
                 {
                     log.LogInformation("handling get request for appliance session context");
-                    return await this.TableRetentionApplianceEngine.GetApplianceSessionContextResponseForuser(tenantId, oid, durableClient);
+                    return await this.TableRetentionApplianceEngine.GetApplianceSessionContextResponseForuser(tenantId, oid, durableClient, subscriptionId);
                 }
                 else
                 {
@@ -336,6 +339,8 @@ namespace com.ataxlab.functions.table.retention.c2
             TableStorageTableRetentionPolicyEntity ret = new TableStorageTableRetentionPolicyEntity();
             try
             {
+                var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
                 var commandJson = await req.Content.ReadAsStringAsync();
                 var command = await commandJson.FromJSONStringAsync<TableStorageTableRetentionPolicyEntity>();
                 var item = command.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.First();
@@ -355,7 +360,7 @@ namespace com.ataxlab.functions.table.retention.c2
                    .First()
                    .RetentionPeriodInDays = item.RetentionPeriodInDays;
 
-                    var updated = await this.TableRetentionApplianceEngine.SetCurrentJobOutput(tenantId, oid, applianceCtx, durableClient);
+                    var updated = await this.TableRetentionApplianceEngine.SetCurrentJobOutput(tenantId, oid, applianceCtx, durableClient, subscriptionId);
 
 
                 ret = applianceCtx.CurrentJobOutput.retentionPolicyJobs
@@ -392,6 +397,7 @@ namespace com.ataxlab.functions.table.retention.c2
             ClaimsPrincipal claimsPrincipal)
         {
             var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
             var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
             var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
@@ -412,6 +418,7 @@ namespace com.ataxlab.functions.table.retention.c2
             string oid)
         {
             var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
             var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
             var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
@@ -434,6 +441,7 @@ namespace com.ataxlab.functions.table.retention.c2
             try
             {
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+                var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
                 var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
                 var res = currentState.
@@ -487,6 +495,7 @@ namespace com.ataxlab.functions.table.retention.c2
             ClaimsPrincipal claimsPrincipal)
         {
             var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
             var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
             var res = currentState.EntityState.CurrentJobOutput;
@@ -539,7 +548,7 @@ namespace com.ataxlab.functions.table.retention.c2
             var ret = new HttpResponseMessage(HttpStatusCode.OK);
             bool isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             var impersonate = await this.TableRetentionApplianceEngine.GetImpersonationTokenFromHeaders(req.Headers);
-
+            
             var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
             var currentState = await durableClient.ReadEntityStateAsync<JobOutputLogEntity>(entityId);
             if (currentState.EntityExists)

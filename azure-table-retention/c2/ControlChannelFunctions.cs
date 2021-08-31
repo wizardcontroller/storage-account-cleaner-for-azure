@@ -506,12 +506,14 @@ namespace com.ataxlab.functions.table.retention.c2
             string oid,
           ClaimsPrincipal claimsPrincipal)
         {
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
             log.LogInformation("QueryWorkflowEditModeCheckpointStatusEndpoint");
             bool isAuthorized = false;
             isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             if (isAuthorized)
             {
-                var response = await this.TableRetentionApplianceEngine.GetWorkflowEditModeCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                var response = await this.TableRetentionApplianceEngine.GetWorkflowEditModeCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                 return response;
             }
             else
@@ -550,6 +552,8 @@ namespace com.ataxlab.functions.table.retention.c2
             log.LogInformation("QueryWorkflowCheckpointStatusEndpoint");
             bool isAuthorized = false;
             isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
 
             //try
             //{
@@ -630,7 +634,7 @@ namespace com.ataxlab.functions.table.retention.c2
                 try
                 {
                     log.LogInformation("getting workflow checkpoint response for user");
-                    var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid);
+                    var response = await this.TableRetentionApplianceEngine.GetWorkflowCheckpointResponseForUser(durableClient, durableEntityClient, tenantId, oid, subscriptionId);
                     log.LogInformation("got workflow checkpoint response for user");
 
                     return response;
