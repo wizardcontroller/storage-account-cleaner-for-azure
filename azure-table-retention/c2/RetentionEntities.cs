@@ -544,12 +544,13 @@ namespace com.ataxlab.functions.table.retention.c2
         int offset, int pageSize, int pageCount,
         ILogger log)
         {
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
             var ret = new HttpResponseMessage(HttpStatusCode.OK);
             bool isAuthorized = await this.TableRetentionApplianceEngine.ApplyAuthorizationStrategy(req.Headers, claimsPrincipal);
             var impersonate = await this.TableRetentionApplianceEngine.GetImpersonationTokenFromHeaders(req.Headers);
             
-            var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid);
+            var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<JobOutputLogEntity>(tenantId, oid, subscriptionId);
             var currentState = await durableClient.ReadEntityStateAsync<JobOutputLogEntity>(entityId);
             if (currentState.EntityExists)
             {

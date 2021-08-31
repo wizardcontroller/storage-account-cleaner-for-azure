@@ -73,7 +73,7 @@ namespace com.ataxlab.functions.table.retention.services
 
 
 
-        Task<EntityId> GetEntityIdForUser<T>(string tenantId, string oid, string subscriptionId = "") where T : new();
+        Task<EntityId> GetEntityIdForUser<T>(string tenantId, string oid, string subscriptionId) where T : new();
         Task<EntityStateResponse<ApplianceSessionContextEntity>> GetApplianceContextForUser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId = "");
         Task<EntityStateResponse<WorkflowCheckpoint>> GetWorkflowCheckpointEntityForUser(IDurableEntityClient durableClient, EntityId entityId, string subscriptionid, string tenantid, string oid);
         Task<EntityStateResponse<WorkflowCheckpointEditMode>> GetWorkflowCheckpointEditModeEntityForUser(IDurableEntityClient durableClient, EntityId entityId, string subscriptionid, string tenantid, string oid);

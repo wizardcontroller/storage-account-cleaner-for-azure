@@ -539,7 +539,7 @@ tenantId, oid, entityClient, subscriptionId);
                         },
                     tenantId, oid, entityClient, input.ActivityContext.SelectedSubscriptionId);
                         // persist the job output
-                        var contextId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(input.ActivityContext.TenantId, input.ActivityContext.UserOid);
+                        var contextId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(input.ActivityContext.TenantId, input.ActivityContext.UserOid, input.ActivityContext.SelectedSubscriptionId);
                         var currentState = await entityClient.ReadEntityStateAsync<IApplianceSessionContextEntity>(contextId);
                         var currentJobOutput = await currentState.EntityState.GetCurrentJobOutput();
                         var jobHistory = await currentState.EntityState.GetJobOutputHistory();
@@ -661,7 +661,7 @@ tenantId, oid, entityClient, subscriptionId);
                     ExecutedCommand = activityConfig.WorkflowOperation.CandidateCommand
                 },
                 tenantId, oid, entityClient, activityConfig.ActivityContext.SelectedSubscriptionId);
-                var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid);
+                var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(tenantId, oid, activityConfig.ActivityContext.SelectedSubscriptionId);
                 var currentCtx = await this.TableRetentionApplianceEngine.ActivitiesEngine.InitializeCurrentJobOutput(entityId,
                     entityClient, result);
                 ret = currentCtx;
@@ -790,7 +790,7 @@ tenantId, oid, entityClient, subscriptionId);
             var ret = new ApplianceJobOutputEntity();
             try
             {
-                var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(context.TenantId, context.UserOid);
+                var entityId = await this.TableRetentionApplianceEngine.GetEntityIdForUser<ApplianceSessionContextEntity>(context.TenantId, context.UserOid, context.SelectedSubscriptionId);
                 await entityClient.SignalEntityAsync<IApplianceSessionContextEntity>(entityId, proxy =>
                 {
                     proxy.SetCurrentJobOutput(new ApplianceJobOutputEntity());
