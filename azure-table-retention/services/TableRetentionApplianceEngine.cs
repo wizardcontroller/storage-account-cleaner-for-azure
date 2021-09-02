@@ -74,21 +74,21 @@ namespace com.ataxlab.functions.table.retention.services
 
 
         Task<EntityId> GetEntityIdForUser<T>(string tenantId, string oid, string subscriptionId) where T : new();
-        Task<EntityStateResponse<ApplianceSessionContextEntity>> GetApplianceContextForUser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId = "");
+        Task<EntityStateResponse<ApplianceSessionContextEntity>> GetApplianceContextForUser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId);
         Task<EntityStateResponse<WorkflowCheckpoint>> GetWorkflowCheckpointEntityForUser(IDurableEntityClient durableClient, EntityId entityId, string subscriptionid, string tenantid, string oid);
         Task<EntityStateResponse<WorkflowCheckpointEditMode>> GetWorkflowCheckpointEditModeEntityForUser(IDurableEntityClient durableClient, EntityId entityId, string subscriptionid, string tenantid, string oid);
-        Task<HttpResponseMessage> GetWorkflowEditModeCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string subscriptionId = "");
-        Task<HttpResponseMessage> GetWorkflowCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string subscriptionId = "");
+        Task<HttpResponseMessage> GetWorkflowEditModeCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string subscriptionId );
+        Task<HttpResponseMessage> GetWorkflowCheckpointResponseForUser(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string subscriptionId );
         Task<bool> SetWorkflowState(IDurableClient durableEntityClient, List<AvailableCommandEntity> commands, string message, WorkflowCheckpointIdentifier commandCode, SubscriptionDTO subscription = null);
         Task SetWorkflowCheckpointForUser(IDurableEntityClient durableEntityClient, EntityId entityId, string tenantId, string userOid, string subscriptionId, WorkflowOperation workflowOperation);
 
         Task<ApplianceSessionContextEntityBase> SetApplianceContextForUser(string tenantId, string oid, ApplianceSessionContextEntityBase ctx, IDurableClient durableEntityClient, string subscriptionId);
-        Task<HttpResponseMessage> GetApplianceSessionContextResponseForuser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId = "");
+        Task<HttpResponseMessage> GetApplianceSessionContextResponseForuser(string tenantId, string oid, IDurableEntityClient durableClient, string subscriptionId);
         Task<HttpResponseMessage> GetResposeForPostedApplianceSessionContext(string impersonationToken, string tenantId, string oid, List<Claim> claims, IDurableClient durableClient, string commandJson);
         Task<HttpResponseMessage> GetResponseForWorkflowOperator(IDurableOrchestrationClient starter, IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, string commandJson, string impersonationToken);
         Task<EntityStateResponse<WorkflowCheckpoint>> GetStateForUpdateWorkflowCheckpoints(IDurableEntityClient durableEntityClient, string tenantid, string subscriptionid, string userOid, WorkflowOperation operation);
         Task Log(JobOutputLogEntry logEntry, string tenantId, string oid, IDurableEntityClient entityClient, string susbscriptionId);
-        Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient, string subscriptionId = "");
+        Task<bool> SetCurrentJobOutput(string tenantId, string oid, ApplianceSessionContextEntity ctx, IDurableClient durableClient, string subscriptionId);
         Task<string> GetHttpContextHeaderValueForKey(string headerKey);
         #endregion durable entity operations
     }
@@ -1644,7 +1644,7 @@ namespace com.ataxlab.functions.table.retention.services
                     log.LogInformation("getting workflow response");
                     try
                     {
-                        var currentWorkflowResponse = await HandleCurrentWorkflowCheckpointResponse(durableClient, durableEntityClient, tenantId, oid, result);
+                        var currentWorkflowResponse = await HandleCurrentWorkflowCheckpointResponse(durableClient, durableEntityClient, tenantId, oid, result, subscriptionId);
                         return currentWorkflowResponse;
                     }
                     catch (Exception e)
@@ -1683,7 +1683,8 @@ namespace com.ataxlab.functions.table.retention.services
         /// <param name="oid"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        private async Task<HttpResponseMessage> HandleCurrentWorkflowCheckpointResponse(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, EntityStateResponse<WorkflowCheckpoint> result)
+        /// <param name="subscriptionId"></param>
+        private async Task<HttpResponseMessage> HandleCurrentWorkflowCheckpointResponse(IDurableClient durableClient, IDurableEntityClient durableEntityClient, string tenantId, string oid, EntityStateResponse<WorkflowCheckpoint> result, string subscriptionId)
         {
             var formatter = await this.GetJsonFormatter();
 
@@ -1723,7 +1724,7 @@ namespace com.ataxlab.functions.table.retention.services
             else
             {
                 // here because we can return a workflow checkpoint 
-                var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+                // var subscriptionId = await this.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
                 var instanceId = CrucialExtensions.HashToSha256(tenantId, oid, subscriptionId);
                 log.LogInformation("workflow checkpoint found for user");

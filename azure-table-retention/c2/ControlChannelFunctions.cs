@@ -61,6 +61,9 @@ namespace com.ataxlab.functions.table.retention.c2
             log.LogInformation("appliance context endpoint is handling a request.");
             try
             {
+                var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
+
                 var httpCtx = this.CurrentHttpContext.HttpContext;
 
                 // handle the case of sending a new appliance context
@@ -90,7 +93,7 @@ namespace com.ataxlab.functions.table.retention.c2
                 else if (req.Method == HttpMethod.Get)
                 {
                     log.LogInformation("handling get request for appliance session context");
-                    return await this.TableRetentionApplianceEngine.GetApplianceSessionContextResponseForuser(tenantId, oid, durableClient);
+                    return await this.TableRetentionApplianceEngine.GetApplianceSessionContextResponseForuser(tenantId, oid, durableClient, subscriptionId);
                 }
                 else
                 {

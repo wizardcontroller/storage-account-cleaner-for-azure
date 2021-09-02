@@ -894,9 +894,16 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             var ret = new T();
             try
             {
+                var currentSubscription = string.Empty;
+                var subscriptions = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
+                currentSubscription = subscriptions.FirstOrDefault().subscriptionId;
+
+                // HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_IMPERSONATION_TOKEN, impersonationToken);
 
                 ConfigureHttpClientHeaders();
                 var request = new HttpRequestMessage(method, endpoint);
+                request.Headers.Add(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION, currentSubscription);
+                request.Headers.Add(ControlChannelConstants.HEADER_ACCESS_TOKEN, CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_ACCESS_TOKEN));
 
                 var baseuri = HttpClient.BaseAddress.ToString();
 
@@ -981,7 +988,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
         }
 
 
-        private async void ConfigureHttpClientHeaders()
+        private async void ConfigureHttpClientHeaders ()
         {
             var currentSubscription = string.Empty;
             var subscriptions = await this.AzureManagementAPIClient.GetSubscriptionsForLoggedInUser();
@@ -995,7 +1002,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             log.LogInformation("configuring dashboard rest client for call to appliance");
             // var accessToken = await this.GetCurrentAccessToken();
             log.LogInformation("got current access token X-ZUMO-AUTH =  " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN));
-            HttpClient.DefaultRequestHeaders.Clear();
+            // HttpClient.DefaultRequestHeaders.Clear();
             // inject the azure ad app service easyauth token
             // as per https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#validate-tokens-from-providers
             HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_X_ZUMO_AUTH, new List<string>() { token });

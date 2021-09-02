@@ -281,12 +281,15 @@ namespace com.ataxlab.functions.table.retention.c2
             ClaimsPrincipal claimsPrincipal,
                     string tenantId, string oid, string policyEntityId, string surfaceEntityId)
         {
-     TableStorageEntityRetentionPolicyEntity ret = await GetResponseForSetEntityReentionPolicy(req, durableClient, tenantId, oid, surfaceEntityId);
+            var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
+
+
+            TableStorageEntityRetentionPolicyEntity ret = await GetResponseForSetEntityReentionPolicy(req, durableClient, tenantId, oid, surfaceEntityId, subscriptionId);
 
             return ret;
         }
 
-          private async Task<TableStorageEntityRetentionPolicyEntity> GetResponseForSetEntityReentionPolicy(HttpRequestMessage req, IDurableClient durableClient, string tenantId, string oid, string surfaceEntityId)
+          private async Task<TableStorageEntityRetentionPolicyEntity> GetResponseForSetEntityReentionPolicy(HttpRequestMessage req, IDurableClient durableClient, string tenantId, string oid, string surfaceEntityId, string subscriptionId)
         {
             TableStorageEntityRetentionPolicyEntity ret = new TableStorageEntityRetentionPolicyEntity();
             try
@@ -295,7 +298,7 @@ namespace com.ataxlab.functions.table.retention.c2
                 var command = await commandJson.FromJSONStringAsync<TableStorageEntityRetentionPolicyEntity>();
                 var item = command.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.First();
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
-                var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
+                var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient, subscriptionId)).EntityState;
                 
                 applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
                     .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First().RetentionPeriodInDays = item.RetentionPeriodInDays;
@@ -309,8 +312,8 @@ namespace com.ataxlab.functions.table.retention.c2
                 var newRetentionPeriod = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
                     .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First().RetentionPeriodInDays;
 
-                var updated = await this.TableRetentionApplianceEngine.SetCurrentJobOutput(tenantId, oid, applianceCtx, durableClient);
-                applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
+                var updated = await this.TableRetentionApplianceEngine.SetCurrentJobOutput(tenantId, oid, applianceCtx, durableClient, subscriptionId);
+                applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient, subscriptionId)).EntityState;
 
                 var newerRetentionPeriod = applianceCtx.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Equals(storageAccountId)).First()
                     .TableStorageRetentionPolicy.TableStorageEntityRetentionPolicy.DiagnosticsRetentionSurface.DiagnosticsRetentionSurfaceEntities.Where(w => w.Id == item.Id).First().RetentionPeriodInDays;
@@ -345,7 +348,7 @@ namespace com.ataxlab.functions.table.retention.c2
                 var command = await commandJson.FromJSONStringAsync<TableStorageTableRetentionPolicyEntity>();
                 var item = command.MetricRetentionSurface.MetricsRetentionSurfaceItemEntities.First();
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
-                var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient)).EntityState;
+                var applianceCtx = (await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient, subscriptionId)).EntityState;
   
                 applianceCtx.CurrentJobOutput.retentionPolicyJobs
                     .Where(w => w.StorageAccount.Id.Equals(storageAccountId))
@@ -399,7 +402,7 @@ namespace com.ataxlab.functions.table.retention.c2
             var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
             var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
-            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
+            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient, subscriptionId);
             var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
 
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
@@ -420,7 +423,7 @@ namespace com.ataxlab.functions.table.retention.c2
             var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
             var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
-            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
+            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient, subscriptionId);
             var res = currentState.EntityState.CurrentJobOutput.retentionPolicyJobs.Where(w => w.StorageAccount.Id.Contains(storageAccountId)).FirstOrDefault();
 
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
@@ -443,7 +446,7 @@ namespace com.ataxlab.functions.table.retention.c2
                 var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
                 var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
-                var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
+                var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient, subscriptionId);
                 var res = currentState.
                             EntityState.
                             CurrentJobOutput.
@@ -497,7 +500,7 @@ namespace com.ataxlab.functions.table.retention.c2
             var storageAccountId = req.Headers.Where(w => w.Key.Contains(ControlChannelConstants.HEADER_CURRENT_STORAGE_ACCOUNT)).FirstOrDefault().Value.First();
             var subscriptionId = await this.TableRetentionApplianceEngine.GetHttpContextHeaderValueForKey(ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION);
 
-            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient);
+            var currentState = await this.TableRetentionApplianceEngine.GetApplianceContextForUser(tenantId, oid, durableClient, subscriptionId);
             var res = currentState.EntityState.CurrentJobOutput;
 
             HttpResponseMessage resp = new HttpResponseMessage(HttpStatusCode.OK);
