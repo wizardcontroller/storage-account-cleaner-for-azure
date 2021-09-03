@@ -32,7 +32,7 @@
             $(element).html('');
         $(element).append('updating...');
 
-        var currentSubscription = "@Model.ApplianceSessionContext.SelectedSubscriptionId";
+        var currentSubscription = "@Model.SelectedSubscriptionId";
         console.log("getting current workflow checkpoint status for subscription=".concat(currentSubscription))
         $.ajax({
             type: "GET",
@@ -42,7 +42,7 @@
             headers: {
                 "X-ZUMO-AUTH": "@Model.EasyAuthAccessToken",
                 "credentials": "include",
-                "@ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION": currentSubscription,
+                 "@ControlChannelConstants.HEADER_CURRENTSUBSCRIPTION":  "@Model.SelectedSubscriptionId",
                 "mode": "cors"
             },
             contentType: "application/json; charset=utf-8",
