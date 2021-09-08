@@ -365,6 +365,7 @@ namespace com.ataxlab.functions.table.retention.dashboard
             {
                 app.UseExceptionHandler("/");
                 app.UseDeveloperExceptionPage();
+                app.UseRouteDebugger();
             }
             else
             {
