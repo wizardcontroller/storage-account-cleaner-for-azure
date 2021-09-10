@@ -1002,7 +1002,7 @@ namespace com.ataxlab.azure.table.retention.services.dashboardapi
             log.LogInformation("configuring dashboard rest client for call to appliance");
             // var accessToken = await this.GetCurrentAccessToken();
             log.LogInformation("got current access token X-ZUMO-AUTH =  " + CurrentHttpContext.Session.GetString(ControlChannelConstants.SESSION_KEY_EASYAUTHTOKEN));
-            // HttpClient.DefaultRequestHeaders.Clear();
+            HttpClient.DefaultRequestHeaders.Clear();
             // inject the azure ad app service easyauth token
             // as per https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#validate-tokens-from-providers
             HttpClient.DefaultRequestHeaders.Add(ControlChannelConstants.HEADER_X_ZUMO_AUTH, new List<string>() { token });
